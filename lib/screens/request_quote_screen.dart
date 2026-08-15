@@ -1,0 +1,1145 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+const Color _primaryBlue = Color(0xFF07569E);
+const Color _darkNavy = Color(0xFF10233F);
+const Color _accentRed = Color(0xFFD72638);
+const Color _pageBackground = Color(0xFFF4F7FB);
+const Color _borderColor = Color(0xFFE3E9F0);
+const Color _mutedText = Color(0xFF8B95A3);
+
+class RequestQuoteScreen extends StatefulWidget {
+  const RequestQuoteScreen({super.key});
+
+  @override
+  State<RequestQuoteScreen> createState() => _RequestQuoteScreenState();
+}
+
+class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _pickupController = TextEditingController();
+  final _deliveryController = TextEditingController();
+  final _cargoController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _quantityController = TextEditingController();
+  final _dateController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _notesController = TextEditingController();
+
+  final List<String> _cargoTypes = const [
+    'General Cargo',
+    'Vehicles',
+    'Heavy Equipment',
+    'Furniture',
+    'Electronics',
+    'Food Products',
+    'Medical Supplies',
+    'Other',
+  ];
+
+  final List<String> _shippingModes = const [
+    'Road Freight',
+    'Air Freight',
+    'Sea Freight',
+    'Express',
+  ];
+
+  String _selectedCargoType = 'General Cargo';
+  String _selectedShippingMode = 'Road Freight';
+
+  DateTime? _pickupDate;
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _pickupController.dispose();
+    _deliveryController.dispose();
+    _cargoController.dispose();
+    _weightController.dispose();
+    _quantityController.dispose();
+    _dateController.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  IconData _shippingModeIcon(String mode) {
+    switch (mode) {
+      case 'Air Freight':
+        return Icons.flight_takeoff_rounded;
+      case 'Sea Freight':
+        return Icons.directions_boat_filled_outlined;
+      case 'Express':
+        return Icons.bolt_rounded;
+      default:
+        return Icons.local_shipping_outlined;
+    }
+  }
+
+  Future<void> _choosePickupDate() async {
+    final today = DateTime.now();
+
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _pickupDate ?? today.add(const Duration(days: 1)),
+      firstDate: today,
+      lastDate: DateTime(today.year + 2),
+      helpText: 'Select preferred pickup date',
+      cancelText: 'Cancel',
+      confirmText: 'Select',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: _primaryBlue,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: _darkNavy,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (selectedDate == null) return;
+
+    setState(() {
+      _pickupDate = selectedDate;
+      _dateController.text = _formatDate(selectedDate);
+    });
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    final day = date.day.toString().padLeft(2, '0');
+    final month = months[date.month - 1];
+
+    return '$day $month ${date.year}';
+  }
+
+  Future<void> _submitQuote() async {
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please sign in before submitting a quote request'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      await FirebaseFirestore.instance.collection('quotes').add({
+        'userId': user.uid,
+        'pickupLocation': _pickupController.text.trim(),
+        'deliveryLocation': _deliveryController.text.trim(),
+        'cargo': _cargoController.text.trim(),
+        'weight': _weightController.text.trim(),
+        'quantity': _quantityController.text.trim(),
+        'shipmentDate': _dateController.text.trim(),
+        'fullName': _nameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'email': _emailController.text.trim(),
+        'notes': _notesController.text.trim(),
+        'status': 'new',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+
+      _pickupController.clear();
+      _deliveryController.clear();
+      _cargoController.clear();
+      _weightController.clear();
+      _quantityController.clear();
+      _dateController.clear();
+      _nameController.clear();
+      _phoneController.clear();
+      _emailController.clear();
+      _notesController.clear();
+
+      _showSuccessDialog();
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not submit quote request. Please try again.'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x26000000),
+                  blurRadius: 35,
+                  offset: Offset(0, 16),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8F7F1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: Color(0xFF16765C),
+                    size: 38,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Quote Request Submitted',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _darkNavy,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  'Your shipping request has been prepared successfully. Our logistics team will review the details and contact you.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _mutedText,
+                    fontSize: 13.5,
+                    height: 1.55,
+                  ),
+                ),
+
+                const SizedBox(height: 22),
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F8FC),
+                    borderRadius: BorderRadius.circular(17),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.local_shipping_outlined,
+                        color: _primaryBlue,
+                      ),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Text(
+                          '${_pickupController.text} → ${_deliveryController.text}',
+                          style: const TextStyle(
+                            color: _darkNavy,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 22),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primaryBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(17),
+                      ),
+                    ),
+                    child: const Text(
+                      'Done',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  InputDecoration _fieldDecoration({
+    required String hintText,
+    required IconData icon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: const TextStyle(color: Color(0xFFA2AAB5), fontSize: 13.5),
+      prefixIcon: Icon(icon, color: _primaryBlue, size: 21),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: const Color(0xFFF7F9FC),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 18),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: const BorderSide(color: _borderColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: const BorderSide(color: _primaryBlue, width: 1.7),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: const BorderSide(color: _accentRed),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(17),
+        borderSide: const BorderSide(color: _accentRed, width: 1.5),
+      ),
+    );
+  }
+
+  String? _requiredValidator(String? value, String message) {
+    if (value == null || value.trim().isEmpty) {
+      return message;
+    }
+
+    return null;
+  }
+
+  String? _emailValidator(String? value) {
+    final email = value?.trim() ?? '';
+
+    if (email.isEmpty) {
+      return 'Please enter your email address';
+    }
+
+    final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+
+    if (!validEmail) {
+      return 'Please enter a valid email address';
+    }
+
+    return null;
+  }
+
+  String? _weightValidator(String? value) {
+    final weight = value?.trim() ?? '';
+
+    if (weight.isEmpty) {
+      return 'Please enter the cargo weight';
+    }
+
+    final parsedWeight = double.tryParse(weight);
+
+    if (parsedWeight == null || parsedWeight <= 0) {
+      return 'Please enter a valid weight';
+    }
+
+    return null;
+  }
+
+  String? _quantityValidator(String? value) {
+    final quantity = value?.trim() ?? '';
+
+    if (quantity.isEmpty) {
+      return 'Please enter the number of items';
+    }
+
+    final parsedQuantity = int.tryParse(quantity);
+
+    if (parsedQuantity == null || parsedQuantity <= 0) {
+      return 'Please enter a valid quantity';
+    }
+
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _pageBackground,
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 38),
+            children: [
+              _buildPremiumHeader(),
+
+              const SizedBox(height: 22),
+
+              _SectionCard(
+                icon: Icons.route_rounded,
+                title: 'Route Details',
+                subtitle:
+                    'Tell us where your shipment will be collected and delivered.',
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _pickupController,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        return _requiredValidator(
+                          value,
+                          'Please enter the pickup location',
+                        );
+                      },
+                      decoration: _fieldDecoration(
+                        hintText: 'Pickup location',
+                        icon: Icons.radio_button_checked_rounded,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F2FC),
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_downward_rounded,
+                        color: _primaryBlue,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    TextFormField(
+                      controller: _deliveryController,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        return _requiredValidator(
+                          value,
+                          'Please enter the delivery location',
+                        );
+                      },
+                      decoration: _fieldDecoration(
+                        hintText: 'Delivery location',
+                        icon: Icons.location_on_rounded,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              _SectionCard(
+                icon: Icons.local_shipping_outlined,
+                title: 'Shipping Service',
+                subtitle:
+                    'Choose the transportation service that fits your shipment.',
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final itemWidth = (constraints.maxWidth - 12) / 2;
+
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: _shippingModes.map((mode) {
+                        return SizedBox(
+                          width: itemWidth,
+                          child: _ShippingModeCard(
+                            title: mode,
+                            icon: _shippingModeIcon(mode),
+                            selected: _selectedShippingMode == mode,
+                            onTap: () {
+                              setState(() {
+                                _selectedShippingMode = mode;
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              _SectionCard(
+                icon: Icons.inventory_2_outlined,
+                title: 'Cargo Information',
+                subtitle:
+                    'Provide the cargo details so we can prepare an accurate quote.',
+                child: Column(
+                  children: [
+                    DropdownButtonFormField<String>(
+                      initialValue: _selectedCargoType,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: _darkNavy,
+                      ),
+                      isExpanded: true,
+                      decoration: _fieldDecoration(
+                        hintText: 'Cargo type',
+                        icon: Icons.category_outlined,
+                      ),
+                      items: _cargoTypes.map((cargoType) {
+                        return DropdownMenuItem<String>(
+                          value: cargoType,
+                          child: Text(
+                            cargoType,
+                            style: const TextStyle(
+                              color: _darkNavy,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+
+                        setState(() {
+                          _selectedCargoType = value;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    TextFormField(
+                      controller: _cargoController,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        return _requiredValidator(
+                          value,
+                          'Please describe your cargo',
+                        );
+                      },
+                      decoration: _fieldDecoration(
+                        hintText: 'Cargo description',
+                        icon: Icons.description_outlined,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _weightController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            textInputAction: TextInputAction.next,
+                            validator: _weightValidator,
+                            decoration: _fieldDecoration(
+                              hintText: 'Weight (kg)',
+                              icon: Icons.scale_outlined,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: TextFormField(
+                            controller: _quantityController,
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.next,
+                            validator: _quantityValidator,
+                            decoration: _fieldDecoration(
+                              hintText: 'Quantity',
+                              icon: Icons.numbers_rounded,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              _SectionCard(
+                icon: Icons.calendar_month_outlined,
+                title: 'Pickup Schedule',
+                subtitle: 'Choose your preferred date for cargo collection.',
+                child: TextFormField(
+                  controller: _dateController,
+                  readOnly: true,
+                  onTap: _choosePickupDate,
+                  validator: (value) {
+                    if (_pickupDate == null) {
+                      return 'Please select a pickup date';
+                    }
+
+                    return null;
+                  },
+                  decoration: _fieldDecoration(
+                    hintText: 'Preferred pickup date',
+                    icon: Icons.calendar_today_outlined,
+                    suffixIcon: const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: _darkNavy,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              _SectionCard(
+                icon: Icons.person_outline_rounded,
+                title: 'Contact Information',
+                subtitle:
+                    'Enter the details our logistics team can use to contact you.',
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _nameController,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.words,
+                      validator: (value) {
+                        return _requiredValidator(
+                          value,
+                          'Please enter your full name',
+                        );
+                      },
+                      decoration: _fieldDecoration(
+                        hintText: 'Full name',
+                        icon: Icons.person_outline_rounded,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    TextFormField(
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        return _requiredValidator(
+                          value,
+                          'Please enter your phone number',
+                        );
+                      },
+                      decoration: _fieldDecoration(
+                        hintText: 'Phone number',
+                        icon: Icons.phone_outlined,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      validator: _emailValidator,
+                      decoration: _fieldDecoration(
+                        hintText: 'Email address',
+                        icon: Icons.email_outlined,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              _SectionCard(
+                icon: Icons.edit_note_rounded,
+                title: 'Additional Notes',
+                subtitle:
+                    'Add any instructions or special requirements for your shipment.',
+                child: TextFormField(
+                  controller: _notesController,
+                  minLines: 4,
+                  maxLines: 7,
+                  textInputAction: TextInputAction.newline,
+                  decoration: _fieldDecoration(
+                    hintText:
+                        'Special handling, cargo dimensions, customs notes...',
+                    icon: Icons.notes_rounded,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              Container(
+                padding: const EdgeInsets.all(17),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF4FD),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFD5E8F8)),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.verified_user_outlined,
+                      color: _primaryBlue,
+                      size: 22,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Your shipment information will be reviewed securely by the Tawam logistics team before the final quotation is prepared.',
+                        style: TextStyle(
+                          color: Color(0xFF587089),
+                          fontSize: 12.5,
+                          height: 1.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              SizedBox(
+                width: double.infinity,
+                height: 61,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submitQuote,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _primaryBlue,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: const Color(0xFF7DA9D0),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(19),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Submit Quote Request',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            SizedBox(width: 11),
+                            Icon(Icons.arrow_forward_rounded, size: 22),
+                          ],
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF092542), Color(0xFF07569E), Color(0xFF0874C9)],
+        ),
+        borderRadius: BorderRadius.circular(29),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x3507569E),
+            blurRadius: 30,
+            offset: Offset(0, 16),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Material(
+                color: const Color(0x26FFFFFF),
+                borderRadius: BorderRadius.circular(15),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  borderRadius: BorderRadius.circular(15),
+                  child: const SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Icon(Icons.arrow_back_rounded, color: Colors.white),
+                  ),
+                ),
+              ),
+
+              const Spacer(),
+
+              Container(
+                width: 51,
+                height: 51,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(17),
+                ),
+                child: const Icon(
+                  Icons.request_quote_outlined,
+                  color: _primaryBlue,
+                  size: 26,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 27),
+
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: const Color(0x24FFFFFF),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0x28FFFFFF)),
+            ),
+            child: const Icon(
+              Icons.calculate_outlined,
+              color: Colors.white,
+              size: 29,
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          const Text(
+            'Request a Quote',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 29,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          const Text(
+            'Share your shipment details and receive a tailored transportation quotation.',
+            style: TextStyle(
+              color: Color(0xFFD9E9F8),
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+
+          const SizedBox(height: 22),
+
+          const Row(
+            children: [
+              Expanded(
+                child: _HeaderBenefit(
+                  icon: Icons.lock_outline_rounded,
+                  label: 'Secure',
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _HeaderBenefit(
+                  icon: Icons.tune_rounded,
+                  label: 'Tailored',
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _HeaderBenefit(
+                  icon: Icons.support_agent_rounded,
+                  label: 'Supported',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderBenefit extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _HeaderBenefit({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0x20FFFFFF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x24FFFFFF)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.white, size: 20),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFFDCEAF8),
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  const _SectionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(21),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: _borderColor),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D0B294D),
+            blurRadius: 22,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 47,
+                height: 47,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F2FC),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(icon, color: _primaryBlue, size: 23),
+              ),
+
+              const SizedBox(width: 13),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: _darkNavy,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: _mutedText,
+                        fontSize: 12,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _ShippingModeCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ShippingModeCard({
+    required this.title,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? _primaryBlue : const Color(0xFFF7F9FC),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 17),
+          decoration: BoxDecoration(
+            color: selected ? _primaryBlue : const Color(0xFFF7F9FC),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: selected ? _primaryBlue : _borderColor),
+            boxShadow: selected
+                ? const [
+                    BoxShadow(
+                      color: Color(0x2807569E),
+                      blurRadius: 16,
+                      offset: Offset(0, 8),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 39,
+                height: 39,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? const Color(0x22FFFFFF)
+                      : const Color(0xFFE8F2FC),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: selected ? Colors.white : _primaryBlue,
+                  size: 21,
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: selected ? Colors.white : _darkNavy,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+
+              if (selected)
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

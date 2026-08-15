@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "402180551310",
+    "project_id": "tawam-al-shahin-transport",
+    "storage_bucket": "tawam-al-shahin-transport.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:402180551310:android:903047e18127da11874fdf",
+        "android_client_info": {
+          "package_name": "com.tawamalshahin.transport"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1FuJNhZIRuJZuoLaOxd0P8adBW75OZ3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
