@@ -1,15 +1,30 @@
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'my_support_requests_screen.dart';
 
-const Color _primaryBlue = Color(0xFF07569E);
-const Color _darkNavy = Color(0xFF10233F);
-const Color _accentRed = Color(0xFFD72638);
-const Color _pageBackground = Color(0xFFF4F7FB);
-const Color _borderColor = Color(0xFFE3E9F0);
-const Color _mutedText = Color(0xFF8B95A3);
-const Color _successGreen = Color(0xFF16765C);
+// ==========================================================
+// TAWAM BRAND
+// ==========================================================
+
+const Color _primaryBlue = Color(0xFF0B4F9C);
+const Color _brightBlue = Color(0xFF1268BC);
+const Color _deepBlue = Color(0xFF062B55);
+
+const Color _pageBg = Color(0xFFF4F7FB);
+const Color _softBlue = Color(0xFFEAF3FF);
+const Color _border = Color(0xFFE2EAF2);
+
+const Color _textDark = Color(0xFF101B2D);
+const Color _textGrey = Color(0xFF7E8A9A);
+
+const Color _success = Color(0xFF16765C);
+const Color _danger = Color(0xFFD72638);
+
+// ==========================================================
+// SCREEN
+// ==========================================================
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({super.key});
@@ -40,6 +55,30 @@ class _SupportScreenState extends State<SupportScreen> {
   String _selectedCategory = 'Shipment Tracking';
   bool _isSubmitting = false;
 
+  // ==========================================================
+  // INIT / DISPOSE
+  // ==========================================================
+
+  @override
+  void initState() {
+    super.initState();
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final displayName = user.displayName?.trim() ?? '';
+      final email = user.email?.trim() ?? '';
+
+      if (displayName.isNotEmpty) {
+        _nameController.text = displayName;
+      }
+
+      if (email.isNotEmpty) {
+        _emailController.text = email;
+      }
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -50,15 +89,29 @@ class _SupportScreenState extends State<SupportScreen> {
     super.dispose();
   }
 
-  void _showTemporaryMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      ),
-    );
+  // ==========================================================
+  // MESSAGES
+  // ==========================================================
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      );
   }
+
+  // ==========================================================
+  // CONTACT METHODS
+  // ==========================================================
 
   Future<void> _openWhatsApp() async {
     final message = Uri.encodeComponent(
@@ -68,8 +121,7 @@ class _SupportScreenState extends State<SupportScreen> {
     final uri = Uri.parse('https://wa.me/971509106107?text=$message');
 
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      if (!mounted) return;
-      _showTemporaryMessage('Could not open WhatsApp');
+      _showMessage('Could not open WhatsApp.');
     }
   }
 
@@ -77,8 +129,7 @@ class _SupportScreenState extends State<SupportScreen> {
     final uri = Uri.parse('tel:+971509106107');
 
     if (!await launchUrl(uri)) {
-      if (!mounted) return;
-      _showTemporaryMessage('Could not open phone');
+      _showMessage('Could not open the phone app.');
     }
   }
 
@@ -90,14 +141,17 @@ class _SupportScreenState extends State<SupportScreen> {
     );
 
     if (!await launchUrl(uri)) {
-      if (!mounted) return;
-      _showTemporaryMessage('Could not open email');
+      _showMessage('Could not open the email app.');
     }
   }
 
-  String? _requiredValidator(String? value, String errorMessage) {
+  // ==========================================================
+  // VALIDATION
+  // ==========================================================
+
+  String? _requiredValidator(String? value, String message) {
     if (value == null || value.trim().isEmpty) {
-      return errorMessage;
+      return message;
     }
 
     return null;
@@ -110,24 +164,30 @@ class _SupportScreenState extends State<SupportScreen> {
       return 'Please enter your email address';
     }
 
-    final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+    final isValid = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
 
-    if (!validEmail) {
+    if (!isValid) {
       return 'Please enter a valid email address';
     }
 
     return null;
   }
 
+  // ==========================================================
+  // SUBMIT SUPPORT REQUEST
+  // ==========================================================
+
   Future<void> _submitSupportRequest() async {
     FocusScope.of(context).unfocus();
 
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showTemporaryMessage('Please sign in before sending a support request');
+      _showMessage('Please sign in before sending a support request.');
       return;
     }
 
@@ -136,10 +196,12 @@ class _SupportScreenState extends State<SupportScreen> {
     });
 
     try {
+      // Keep the same Firestore field structure used by
+      // the existing support system/admin panel.
       await FirebaseFirestore.instance.collection('support_requests').add({
         'userId': user.uid,
         'category': _selectedCategory,
-        'shipmentNumber': _shipmentController.text.trim(),
+        'shipmentNumber': _shipmentController.text.trim().toUpperCase(),
         'fullName': _nameController.text.trim(),
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
@@ -151,18 +213,13 @@ class _SupportScreenState extends State<SupportScreen> {
       if (!mounted) return;
 
       _shipmentController.clear();
-      _nameController.clear();
-      _emailController.clear();
-      _phoneController.clear();
       _messageController.clear();
 
       _showSuccessDialog();
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
 
-      _showTemporaryMessage(
-        'Could not send your support request. Please try again.',
-      );
+      _showMessage('Could not send your support request. Please try again.');
     } finally {
       if (mounted) {
         setState(() {
@@ -171,6 +228,10 @@ class _SupportScreenState extends State<SupportScreen> {
       }
     }
   }
+
+  // ==========================================================
+  // SUCCESS DIALOG
+  // ==========================================================
 
   void _showSuccessDialog() {
     showDialog(
@@ -181,10 +242,10 @@ class _SupportScreenState extends State<SupportScreen> {
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 24),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(25, 29, 25, 24),
+            padding: const EdgeInsets.fromLTRB(24, 27, 24, 23),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(29),
+              borderRadius: BorderRadius.circular(28),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x26000000),
@@ -197,86 +258,86 @@ class _SupportScreenState extends State<SupportScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 76,
-                  height: 76,
+                  width: 74,
+                  height: 74,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE8F7F1),
+                    color: Color(0xFFEAF8F0),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.check_rounded,
-                    color: _successGreen,
-                    size: 40,
+                    color: _success,
+                    size: 39,
                   ),
                 ),
 
-                const SizedBox(height: 21),
+                const SizedBox(height: 19),
 
                 const Text(
-                  'Support Request Sent',
+                  'Request Successfully Sent',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: _darkNavy,
-                    fontSize: 23,
-                    fontWeight: FontWeight.w800,
+                    color: _textDark,
+                    fontSize: 21,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 9),
 
                 const Text(
-                  'Your request was submitted successfully. Our support team will review it and contact you as soon as possible.',
+                  'Your support case has been securely submitted to the TAWAM operations team.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _mutedText,
-                    fontSize: 13.5,
-                    height: 1.55,
-                  ),
+                  style: TextStyle(color: _textGrey, fontSize: 12, height: 1.5),
                 ),
 
-                const SizedBox(height: 21),
+                const SizedBox(height: 18),
 
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F8FC),
-                    borderRadius: BorderRadius.circular(18),
+                    color: const Color(0xFFF7F9FC),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: _border),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 42,
-                        height: 42,
+                        width: 41,
+                        height: 41,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE8F2FC),
-                          borderRadius: BorderRadius.circular(13),
+                          color: _softBlue,
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
                           Icons.support_agent_rounded,
                           color: _primaryBlue,
+                          size: 21,
                         ),
                       ),
 
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 11),
 
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Request category',
+                              'REQUEST CATEGORY',
                               style: TextStyle(
-                                color: Color(0xFF929BA8),
-                                fontSize: 10.5,
+                                color: _textGrey,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: .55,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               _selectedCategory,
                               style: const TextStyle(
-                                color: _darkNavy,
-                                fontSize: 13,
+                                color: _textDark,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -287,28 +348,29 @@ class _SupportScreenState extends State<SupportScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 22),
+                const SizedBox(height: 20),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 55,
+                  height: 52,
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
                     style: ElevatedButton.styleFrom(
+                      elevation: 0,
                       backgroundColor: _primaryBlue,
                       foregroundColor: Colors.white,
-                      elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(17),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                     ),
                     child: const Text(
-                      'Done',
+                      'DONE',
                       style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: .5,
                       ),
                     ),
                   ),
@@ -321,466 +383,255 @@ class _SupportScreenState extends State<SupportScreen> {
     );
   }
 
+  // ==========================================================
+  // FIELD STYLE
+  // ==========================================================
+
   InputDecoration _fieldDecoration({
     required String hintText,
     required IconData icon,
-    Widget? suffixIcon,
   }) {
     return InputDecoration(
       hintText: hintText,
-      hintStyle: const TextStyle(color: Color(0xFFA2AAB5), fontSize: 13.5),
-      prefixIcon: Icon(icon, color: _primaryBlue, size: 21),
-      suffixIcon: suffixIcon,
+      hintStyle: const TextStyle(
+        color: Color(0xFFA2AAB5),
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+      ),
+      prefixIcon: Icon(icon, color: _primaryBlue, size: 20),
       filled: true,
-      fillColor: const Color(0xFFF7F9FC),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 18),
+      fillColor: const Color(0xFFF8FAFD),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: _borderColor),
+        borderRadius: BorderRadius.circular(15),
+        borderSide: const BorderSide(color: _border),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: _primaryBlue, width: 1.7),
+        borderRadius: BorderRadius.circular(15),
+        borderSide: const BorderSide(color: _primaryBlue, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: _accentRed),
+        borderRadius: BorderRadius.circular(15),
+        borderSide: const BorderSide(color: _danger),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: _accentRed, width: 1.5),
+        borderRadius: BorderRadius.circular(15),
+        borderSide: const BorderSide(color: _danger, width: 1.5),
       ),
     );
   }
+
+  // ==========================================================
+  // BUILD
+  // ==========================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _pageBackground,
+      backgroundColor: _pageBg,
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 38),
-            children: [
-              _buildPremiumHeader(),
+        child: Column(
+          children: [
+            _buildTopHeader(),
 
-              const SizedBox(height: 22),
-
-              const Text(
-                'Contact our team',
-                style: TextStyle(
-                  color: _darkNavy,
-                  fontSize: 21,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-
-              const SizedBox(height: 7),
-
-              const Text(
-                'Choose the fastest way to reach Tawam support.',
-                style: TextStyle(color: _mutedText, fontSize: 13),
-              ),
-
-              const SizedBox(height: 15),
-
-              _ContactMethodCard(
-                icon: Icons.chat_rounded,
-                iconBackground: const Color(0xFFE8F7F1),
-                iconColor: _successGreen,
-                title: 'WhatsApp Support',
-                subtitle: 'Quick assistance from our logistics team',
-                actionText: 'Start chat',
-                onTap: _openWhatsApp,
-              ),
-
-              const SizedBox(height: 13),
-
-              _ContactMethodCard(
-                icon: Icons.phone_in_talk_outlined,
-                iconBackground: const Color(0xFFE8F2FC),
-                iconColor: _primaryBlue,
-                title: 'Call Support',
-                subtitle: 'Speak directly with a support specialist',
-                actionText: 'Call now',
-                onTap: _callSupport,
-              ),
-
-              const SizedBox(height: 13),
-
-              _ContactMethodCard(
-                icon: Icons.email_outlined,
-                iconBackground: const Color(0xFFFFECEE),
-                iconColor: _accentRed,
-                title: 'Email Support',
-                subtitle: 'Send documents or detailed information',
-                actionText: 'Send email',
-                onTap: _emailSupport,
-              ),
-
-              const SizedBox(height: 22),
-
-              _SectionCard(
-                icon: Icons.support_agent_rounded,
-                title: 'Send a Support Request',
-                subtitle:
-                    'Share the details below and our team will review your request.',
-                child: Column(
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 36),
                   children: [
-                    DropdownButtonFormField<String>(
-                      initialValue: _selectedCategory,
-                      isExpanded: true,
-                      icon: const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: _darkNavy,
-                      ),
-                      decoration: _fieldDecoration(
-                        hintText: 'Support category',
-                        icon: Icons.category_outlined,
-                      ),
-                      items: _supportCategories.map((category) {
-                        return DropdownMenuItem<String>(
-                          value: category,
-                          child: Text(
-                            category,
-                            style: const TextStyle(
-                              color: _darkNavy,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value == null) return;
+                    _buildHero(),
 
-                        setState(() {
-                          _selectedCategory = value;
-                        });
-                      },
+                    const SizedBox(height: 18),
+
+                    _sectionHeading(
+                      title: 'Instant Assistance',
+                      subtitle: 'Choose the fastest channel for your request.',
                     ),
 
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 11),
 
-                    TextFormField(
-                      controller: _shipmentController,
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.characters,
-                      decoration: _fieldDecoration(
-                        hintText: 'Shipment number — optional',
-                        icon: Icons.local_shipping_outlined,
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    TextFormField(
-                      controller: _nameController,
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.words,
-                      validator: (value) {
-                        return _requiredValidator(
-                          value,
-                          'Please enter your full name',
-                        );
-                      },
-                      decoration: _fieldDecoration(
-                        hintText: 'Full name',
-                        icon: Icons.person_outline_rounded,
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: _emailValidator,
-                      decoration: _fieldDecoration(
-                        hintText: 'Email address',
-                        icon: Icons.email_outlined,
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    TextFormField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) {
-                        return _requiredValidator(
-                          value,
-                          'Please enter your phone number',
-                        );
-                      },
-                      decoration: _fieldDecoration(
-                        hintText: 'Phone number',
-                        icon: Icons.phone_outlined,
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    TextFormField(
-                      controller: _messageController,
-                      minLines: 5,
-                      maxLines: 8,
-                      textInputAction: TextInputAction.newline,
-                      validator: (value) {
-                        final result = _requiredValidator(
-                          value,
-                          'Please describe your request',
-                        );
-
-                        if (result != null) return result;
-
-                        if (value!.trim().length < 10) {
-                          return 'Please add more details';
-                        }
-
-                        return null;
-                      },
-                      decoration: _fieldDecoration(
-                        hintText:
-                            'Describe the issue or assistance you need...',
-                        icon: Icons.edit_note_rounded,
-                      ),
-                    ),
-
-                    const SizedBox(height: 17),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 59,
-                      child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _submitSupportRequest,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _primaryBlue,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: const Color(0xFF7CA8CF),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _QuickContactCard(
+                            icon: Icons.chat_rounded,
+                            label: 'WhatsApp',
+                            subtitle: 'Start chat',
+                            color: _success,
+                            background: const Color(0xFFEAF8F0),
+                            onTap: _openWhatsApp,
                           ),
                         ),
-                        child: _isSubmitting
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
-                              )
-                            : const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Send Support Request',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Icon(Icons.arrow_forward_rounded),
-                                ],
-                              ),
-                      ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: _QuickContactCard(
+                            icon: Icons.phone_in_talk_outlined,
+                            label: 'Call',
+                            subtitle: 'Call support',
+                            color: _primaryBlue,
+                            background: _softBlue,
+                            onTap: _callSupport,
+                          ),
+                        ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: _QuickContactCard(
+                            icon: Icons.email_outlined,
+                            label: 'Email',
+                            subtitle: 'Send email',
+                            color: _deepBlue,
+                            background: const Color(0xFFF0F3F8),
+                            onTap: _emailSupport,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    _buildServiceAssurance(),
+
+                    const SizedBox(height: 16),
+
+                    _buildMySupportRequestsCard(),
+
+                    const SizedBox(height: 20),
+
+                    _sectionHeading(
+                      title: 'Open a Support Case',
+                      subtitle:
+                          'Send your request directly to our operations team.',
+                    ),
+
+                    const SizedBox(height: 11),
+
+                    _buildSupportForm(),
+
+                    const SizedBox(height: 20),
+
+                    _buildHoursCard(),
+
+                    const SizedBox(height: 20),
+
+                    _sectionHeading(
+                      title: 'Frequently Asked Questions',
+                      subtitle: 'Quick answers to common logistics questions.',
+                    ),
+
+                    const SizedBox(height: 11),
+
+                    const _FaqCard(
+                      question: 'Where can I find my tracking number?',
+                      answer:
+                          'Your tracking number is included in your shipment confirmation and can also be found in My Shipments.',
+                    ),
+
+                    const SizedBox(height: 9),
+
+                    const _FaqCard(
+                      question: 'Why has my shipment status not changed?',
+                      answer:
+                          'Tracking updates may appear after your shipment reaches the next logistics checkpoint or after an operations update.',
+                    ),
+
+                    const SizedBox(height: 9),
+
+                    const _FaqCard(
+                      question: 'How do I request a shipping quotation?',
+                      answer:
+                          'Open Get a Quote from the home page and submit your shipment details.',
+                    ),
+
+                    const SizedBox(height: 9),
+
+                    const _FaqCard(
+                      question: 'Can I update my delivery information?',
+                      answer:
+                          'Contact support and include your tracking number together with the new delivery information.',
                     ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              _buildWorkingHoursCard(),
-
-              const SizedBox(height: 23),
-
-              const Text(
-                'Frequently Asked Questions',
-                style: TextStyle(
-                  color: _darkNavy,
-                  fontSize: 21,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              const _FaqCard(
-                question: 'Where can I find my tracking number?',
-                answer:
-                    'Your tracking number is included in the shipment confirmation sent by Tawam.',
-              ),
-
-              const SizedBox(height: 11),
-
-              const _FaqCard(
-                question: 'Why has my shipment status not changed?',
-                answer:
-                    'Tracking updates may appear after the shipment reaches its next logistics checkpoint.',
-              ),
-
-              const SizedBox(height: 11),
-
-              const _FaqCard(
-                question: 'How do I request a shipping quotation?',
-                answer:
-                    'Open Request Quote from the home page and submit the shipment details.',
-              ),
-
-              const SizedBox(height: 11),
-
-              const _FaqCard(
-                question: 'Can I update my delivery information?',
-                answer:
-                    'Contact the support team and include your shipment number and the new delivery details.',
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildPremiumHeader() {
+  // ==========================================================
+  // TOP HEADER
+  // ==========================================================
+
+  Widget _buildTopHeader() {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
+      height: 82,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF092542), Color(0xFF07569E), Color(0xFF0874C9)],
-        ),
-        borderRadius: BorderRadius.circular(29),
-        boxShadow: const [
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x3507569E),
-            blurRadius: 30,
-            offset: Offset(0, 16),
+            color: _deepBlue.withValues(alpha: .06),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Material(
-                color: const Color(0x26FFFFFF),
-                borderRadius: BorderRadius.circular(15),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  borderRadius: BorderRadius.circular(15),
-                  child: const SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Icon(Icons.arrow_back_rounded, color: Colors.white),
-                  ),
-                ),
-              ),
-
-              const Spacer(),
-
-              Container(
-                width: 51,
-                height: 51,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(17),
-                ),
-                child: const Icon(
-                  Icons.support_agent_rounded,
-                  color: _primaryBlue,
-                  size: 27,
-                ),
-              ),
-            ],
+          _SquareButton(
+            icon: Icons.arrow_back_rounded,
+            onTap: () => Navigator.pop(context),
           ),
 
-          const SizedBox(height: 27),
+          const SizedBox(width: 13),
+
+          const Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Customer Support',
+                  style: TextStyle(
+                    color: _textDark,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -.35,
+                  ),
+                ),
+                SizedBox(height: 3),
+                Text(
+                  'TAWAM AL-SHAHIN TRANSPORT',
+                  style: TextStyle(
+                    color: _primaryBlue,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: .85,
+                  ),
+                ),
+              ],
+            ),
+          ),
 
           Container(
-            width: 59,
-            height: 59,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: const Color(0x24FFFFFF),
-              borderRadius: BorderRadius.circular(19),
-              border: Border.all(color: const Color(0x28FFFFFF)),
+              color: _softBlue,
+              borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
-              Icons.headset_mic_outlined,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          const Text(
-            'Customer Support',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 29,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          const Text(
-            'Expert assistance for your shipments, quotations and logistics requests.',
-            style: TextStyle(
-              color: Color(0xFFD9E9F8),
-              fontSize: 14,
-              height: 1.5,
-            ),
-          ),
-
-          const SizedBox(height: 21),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-            decoration: BoxDecoration(
-              color: const Color(0x20FFFFFF),
-              borderRadius: BorderRadius.circular(17),
-              border: Border.all(color: const Color(0x25FFFFFF)),
-            ),
-            child: const Row(
-              children: [
-                _PulsingStatusDot(),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Support team online',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                Text(
-                  'Fast response',
-                  style: TextStyle(
-                    color: Color(0xFFDCEAF8),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+              Icons.support_agent_rounded,
+              color: _primaryBlue,
+              size: 23,
             ),
           ),
         ],
@@ -788,187 +639,665 @@ class _SupportScreenState extends State<SupportScreen> {
     );
   }
 
-  Widget _buildWorkingHoursCard() {
+  // ==========================================================
+  // HERO
+  // ==========================================================
+
+  Widget _buildHero() {
     return Container(
-      padding: const EdgeInsets.all(21),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(19, 20, 19, 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFEEF6FD), Color(0xFFFFFFFF)],
+          colors: [_deepBlue, Color(0xFF0A4789), _brightBlue],
         ),
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: const Color(0xFFDCE9F5)),
+        boxShadow: [
+          BoxShadow(
+            color: _deepBlue.withValues(alpha: .17),
+            blurRadius: 26,
+            offset: const Offset(0, 11),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          const Row(
+          Positioned(
+            right: -32,
+            top: -30,
+            child: Icon(
+              Icons.headset_mic_rounded,
+              size: 150,
+              color: Colors.white.withValues(alpha: .05),
+            ),
+          ),
+
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.schedule_rounded, color: _primaryBlue),
-              SizedBox(width: 11),
+              Row(
+                children: [
+                  _LiveDot(),
+                  SizedBox(width: 7),
+                  Text(
+                    'LOGISTICS SUPPORT CENTER',
+                    style: TextStyle(
+                      color: Color(0xFFD2E3F3),
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: .8,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 16),
+
               Text(
-                'Support Hours',
+                'How Can We Help?',
                 style: TextStyle(
-                  color: _darkNavy,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  fontSize: 25,
+                  height: 1.05,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -.45,
                 ),
+              ),
+
+              SizedBox(height: 8),
+
+              Text(
+                'Professional assistance for shipments, quotations, customs and delivery requests.',
+                style: TextStyle(
+                  color: Color(0xFFD7E6F5),
+                  fontSize: 10.9,
+                  height: 1.45,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
+              SizedBox(height: 18),
+
+              Row(
+                children: [
+                  _HeroFeature(
+                    icon: Icons.lock_outline_rounded,
+                    label: 'Secure',
+                  ),
+                  SizedBox(width: 18),
+                  _HeroFeature(
+                    icon: Icons.support_agent_rounded,
+                    label: 'Expert Team',
+                  ),
+                  SizedBox(width: 18),
+                  _HeroFeature(icon: Icons.sync_rounded, label: 'Connected'),
+                ],
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
 
-          const SizedBox(height: 18),
+  // ==========================================================
+  // SECTION HEADING
+  // ==========================================================
 
-          const _WorkingHoursRow(
-            day: 'Monday – Friday',
-            time: '08:00 AM – 08:00 PM',
+  Widget _sectionHeading({required String title, required String subtitle}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: _textDark,
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
           ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          subtitle,
+          style: const TextStyle(color: _textGrey, fontSize: 9.6, height: 1.35),
+        ),
+      ],
+    );
+  }
 
-          const SizedBox(height: 12),
+  // ==========================================================
+  // SERVICE ASSURANCE
+  // ==========================================================
 
-          const Divider(color: Color(0xFFDCE6EF), height: 1),
-
-          const SizedBox(height: 12),
-
-          const _WorkingHoursRow(day: 'Saturday', time: '09:00 AM – 05:00 PM'),
-
-          const SizedBox(height: 12),
-
-          const Divider(color: Color(0xFFDCE6EF), height: 1),
-
-          const SizedBox(height: 12),
-
-          const _WorkingHoursRow(day: 'Sunday', time: 'Emergency support'),
-
-          const SizedBox(height: 17),
-
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+  Widget _buildServiceAssurance() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _border),
+      ),
+      child: const Row(
+        children: [
+          Expanded(
+            child: _AssuranceItem(
+              icon: Icons.verified_user_outlined,
+              title: 'Secure',
+              subtitle: 'Protected request',
             ),
-            child: const Row(
-              children: [
-                Icon(Icons.public_rounded, color: _primaryBlue, size: 20),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Times are shown in UAE local time.',
-                    style: TextStyle(
-                      color: Color(0xFF718093),
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+          ),
+          _VerticalDivider(),
+          Expanded(
+            child: _AssuranceItem(
+              icon: Icons.support_agent_rounded,
+              title: 'Specialists',
+              subtitle: 'Logistics team',
+            ),
+          ),
+          _VerticalDivider(),
+          Expanded(
+            child: _AssuranceItem(
+              icon: Icons.task_alt_rounded,
+              title: 'Tracked',
+              subtitle: 'Case submitted',
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _ContactMethodCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconBackground;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-  final String actionText;
-  final VoidCallback onTap;
-
-  const _ContactMethodCard({
-    required this.icon,
-    required this.iconBackground,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.actionText,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMySupportRequestsCard() {
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(23),
+      color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(23),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MySupportRequestsScreen()),
+          );
+        },
+        borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.all(18),
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(23),
-            border: Border.all(color: _borderColor),
-            boxShadow: const [
+            gradient: const LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xFF062B55), Color(0xFF0B4F9C)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
               BoxShadow(
-                color: Color(0x0D0B294D),
-                blurRadius: 20,
-                offset: Offset(0, 9),
+                color: _deepBlue.withValues(alpha: .12),
+                blurRadius: 18,
+                offset: const Offset(0, 7),
               ),
             ],
           ),
           child: Row(
             children: [
               Container(
-                width: 51,
-                height: 51,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: iconBackground,
-                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: iconColor, size: 25),
+                child: const Icon(
+                  Icons.history_rounded,
+                  color: Colors.white,
+                  size: 23,
+                ),
               ),
 
-              const SizedBox(width: 14),
+              const SizedBox(width: 13),
 
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
-                      style: const TextStyle(
-                        color: _darkNavy,
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w800,
+                      'My Support Requests',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: 4),
                     Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: _mutedText,
-                        fontSize: 11.5,
-                        height: 1.4,
+                      'View your cases and latest updates',
+                      style: TextStyle(
+                        color: Color(0xFFD6E5F4),
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(width: 8),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(
+                  Icons.arrow_forward_rounded,
+                  color: Colors.white,
+                  size: 19,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  // ==========================================================
+  // SUPPORT FORM
+  // ==========================================================
 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    actionText,
+  Widget _buildSupportForm() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: _deepBlue.withValues(alpha: .035),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 43,
+                height: 43,
+                decoration: BoxDecoration(
+                  color: _softBlue,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: const Icon(
+                  Icons.assignment_outlined,
+                  color: _primaryBlue,
+                  size: 21,
+                ),
+              ),
+
+              const SizedBox(width: 11),
+
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Support Request',
+                      style: TextStyle(
+                        color: _textDark,
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Provide the details below.',
+                      style: TextStyle(color: _textGrey, fontSize: 9.5),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 17),
+
+          DropdownButtonFormField<String>(
+            initialValue: _selectedCategory,
+            isExpanded: true,
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: _deepBlue,
+            ),
+            decoration: _fieldDecoration(
+              hintText: 'Support category',
+              icon: Icons.category_outlined,
+            ),
+            items: _supportCategories.map((category) {
+              return DropdownMenuItem<String>(
+                value: category,
+                child: Text(
+                  category,
+                  style: const TextStyle(
+                    color: _textDark,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              if (value == null) return;
+
+              setState(() {
+                _selectedCategory = value;
+              });
+            },
+          ),
+
+          const SizedBox(height: 12),
+
+          TextFormField(
+            controller: _shipmentController,
+            textInputAction: TextInputAction.next,
+            textCapitalization: TextCapitalization.characters,
+            decoration: _fieldDecoration(
+              hintText: 'Tracking / shipment number — optional',
+              icon: Icons.local_shipping_outlined,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextFormField(
+            controller: _nameController,
+            textInputAction: TextInputAction.next,
+            textCapitalization: TextCapitalization.words,
+            validator: (value) {
+              return _requiredValidator(value, 'Please enter your full name');
+            },
+            decoration: _fieldDecoration(
+              hintText: 'Full name',
+              icon: Icons.person_outline_rounded,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextFormField(
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            validator: _emailValidator,
+            decoration: _fieldDecoration(
+              hintText: 'Email address',
+              icon: Icons.email_outlined,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextFormField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            textInputAction: TextInputAction.next,
+            validator: (value) {
+              return _requiredValidator(
+                value,
+                'Please enter your phone number',
+              );
+            },
+            decoration: _fieldDecoration(
+              hintText: 'Phone number',
+              icon: Icons.phone_outlined,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          TextFormField(
+            controller: _messageController,
+            minLines: 5,
+            maxLines: 8,
+            textInputAction: TextInputAction.newline,
+            validator: (value) {
+              final required = _requiredValidator(
+                value,
+                'Please describe your request',
+              );
+
+              if (required != null) {
+                return required;
+              }
+
+              if (value!.trim().length < 10) {
+                return 'Please add more details';
+              }
+
+              return null;
+            },
+            decoration: _fieldDecoration(
+              hintText: 'Describe the issue or assistance you need...',
+              icon: Icons.edit_note_rounded,
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFD),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.info_outline_rounded, color: _primaryBlue, size: 17),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'For shipment-related requests, include the tracking number to help our team review the case faster.',
                     style: TextStyle(
-                      color: iconColor,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w800,
+                      color: _textGrey,
+                      fontSize: 9,
+                      height: 1.35,
                     ),
                   ),
-                  const SizedBox(height: 5),
-                  Icon(Icons.arrow_forward_rounded, color: iconColor, size: 19),
-                ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          SizedBox(
+            width: double.infinity,
+            height: 53,
+            child: ElevatedButton.icon(
+              onPressed: _isSubmitting ? null : _submitSupportRequest,
+              icon: _isSubmitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.2,
+                      ),
+                    )
+                  : const Icon(Icons.send_rounded, size: 18),
+              label: Text(
+                _isSubmitting ? 'SUBMITTING...' : 'SUBMIT SUPPORT REQUEST',
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: .45,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: _primaryBlue,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: const Color(0xFF7DA7CF),
+                disabledForegroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==========================================================
+  // HOURS
+  // ==========================================================
+
+  Widget _buildHoursCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFEEF6FD), Colors.white],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFDDE9F4)),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.schedule_rounded, color: _primaryBlue, size: 20),
+              SizedBox(width: 8),
+              Text(
+                'Support Hours',
+                style: TextStyle(
+                  color: _textDark,
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 15),
+
+          _HoursRow(day: 'Monday – Friday', time: '08:00 AM – 08:00 PM'),
+
+          SizedBox(height: 10),
+          Divider(color: Color(0xFFDDE6EF)),
+          SizedBox(height: 10),
+
+          _HoursRow(day: 'Saturday', time: '09:00 AM – 05:00 PM'),
+
+          SizedBox(height: 10),
+          Divider(color: Color(0xFFDDE6EF)),
+          SizedBox(height: 10),
+
+          _HoursRow(day: 'Sunday', time: 'Emergency support'),
+
+          SizedBox(height: 14),
+
+          Row(
+            children: [
+              Icon(Icons.public_rounded, color: _primaryBlue, size: 17),
+              SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  'Times shown in UAE local time.',
+                  style: TextStyle(
+                    color: _textGrey,
+                    fontSize: 9.2,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================================
+// QUICK CONTACT
+// ==========================================================
+
+class _QuickContactCard extends StatelessWidget {
+  const _QuickContactCard({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.color,
+    required this.background,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final Color color;
+  final Color background;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 112),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: _border),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 41,
+                height: 41,
+                decoration: BoxDecoration(
+                  color: background,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(icon, color: color, size: 21),
+              ),
+
+              const SizedBox(height: 9),
+
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: _textDark,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+
+              const SizedBox(height: 3),
+
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: _textGrey, fontSize: 7.8),
               ),
             ],
           ),
@@ -978,102 +1307,77 @@ class _ContactMethodCard extends StatelessWidget {
   }
 }
 
-class _SectionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Widget child;
+// ==========================================================
+// ASSURANCE
+// ==========================================================
 
-  const _SectionCard({
+class _AssuranceItem extends StatelessWidget {
+  const _AssuranceItem({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.child,
   });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(21),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: _borderColor),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D0B294D),
-            blurRadius: 22,
-            offset: Offset(0, 10),
+    return Column(
+      children: [
+        Icon(icon, color: _primaryBlue, size: 20),
+        const SizedBox(height: 7),
+        Text(
+          title,
+          style: const TextStyle(
+            color: _textDark,
+            fontSize: 9.5,
+            fontWeight: FontWeight.w800,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 47,
-                height: 47,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F2FC),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Icon(icon, color: _primaryBlue, size: 23),
-              ),
-
-              const SizedBox(width: 13),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: _darkNavy,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: _mutedText,
-                        fontSize: 12,
-                        height: 1.45,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          child,
-        ],
-      ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          subtitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: _textGrey, fontSize: 7.5),
+        ),
+      ],
     );
   }
 }
 
+class _VerticalDivider extends StatelessWidget {
+  const _VerticalDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 43,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      color: _border,
+    );
+  }
+}
+
+// ==========================================================
+// FAQ
+// ==========================================================
+
 class _FaqCard extends StatelessWidget {
+  const _FaqCard({required this.question, required this.answer});
+
   final String question;
   final String answer;
-
-  const _FaqCard({required this.question, required this.answer});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _borderColor),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _border),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(
@@ -1082,15 +1386,15 @@ class _FaqCard extends StatelessWidget {
           highlightColor: Colors.transparent,
         ),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           iconColor: _primaryBlue,
           collapsedIconColor: const Color(0xFF8D97A4),
           title: Text(
             question,
             style: const TextStyle(
-              color: _darkNavy,
-              fontSize: 13.5,
+              color: _textDark,
+              fontSize: 11.5,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -1100,9 +1404,9 @@ class _FaqCard extends StatelessWidget {
               child: Text(
                 answer,
                 style: const TextStyle(
-                  color: _mutedText,
-                  fontSize: 12,
-                  height: 1.55,
+                  color: _textGrey,
+                  fontSize: 10,
+                  height: 1.5,
                 ),
               ),
             ),
@@ -1113,11 +1417,15 @@ class _FaqCard extends StatelessWidget {
   }
 }
 
-class _WorkingHoursRow extends StatelessWidget {
+// ==========================================================
+// HOURS
+// ==========================================================
+
+class _HoursRow extends StatelessWidget {
+  const _HoursRow({required this.day, required this.time});
+
   final String day;
   final String time;
-
-  const _WorkingHoursRow({required this.day, required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -1127,8 +1435,8 @@ class _WorkingHoursRow extends StatelessWidget {
           child: Text(
             day,
             style: const TextStyle(
-              color: _darkNavy,
-              fontSize: 12.5,
+              color: _textDark,
+              fontSize: 10.5,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1137,7 +1445,7 @@ class _WorkingHoursRow extends StatelessWidget {
           time,
           style: const TextStyle(
             color: _primaryBlue,
-            fontSize: 12,
+            fontSize: 10,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -1146,21 +1454,73 @@ class _WorkingHoursRow extends StatelessWidget {
   }
 }
 
-class _PulsingStatusDot extends StatelessWidget {
-  const _PulsingStatusDot();
+// ==========================================================
+// HEADER / HERO SMALL COMPONENTS
+// ==========================================================
+
+class _SquareButton extends StatelessWidget {
+  const _SquareButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F9FC),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: _border),
+        ),
+        child: Icon(icon, color: _deepBlue, size: 22),
+      ),
+    );
+  }
+}
+
+class _LiveDot extends StatelessWidget {
+  const _LiveDot();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 12,
-      height: 12,
+      width: 9,
+      height: 9,
       decoration: const BoxDecoration(
-        color: Color(0xFF53E0A5),
+        color: Color(0xFF55D6A5),
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(color: Color(0x8053E0A5), blurRadius: 9, spreadRadius: 2),
-        ],
       ),
+    );
+  }
+}
+
+class _HeroFeature extends StatelessWidget {
+  const _HeroFeature({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: Colors.white, size: 13),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 9,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
     );
   }
 }

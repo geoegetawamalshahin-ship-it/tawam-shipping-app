@@ -1,15 +1,22 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import 'shipment_details_screen.dart';
 
-const Color _primaryBlue = Color(0xFF07569E);
-const Color _darkNavy = Color(0xFF10233F);
-const Color _pageBackground = Color(0xFFF4F7FB);
-const Color _borderColor = Color(0xFFE3E9F0);
+const Color _primaryBlue = Color(0xFF0B4F9C);
+const Color _brightBlue = Color(0xFF1268BC);
+const Color _deepBlue = Color(0xFF062B55);
+const Color _pageBg = Color(0xFFF4F7FB);
+const Color _softBlue = Color(0xFFEAF3FF);
+const Color _border = Color(0xFFE2EAF2);
+const Color _textDark = Color(0xFF101B2D);
+const Color _textGrey = Color(0xFF7E8A9A);
+const Color _success = Color(0xFF16765C);
+const Color _warning = Color(0xFFB26A00);
+const Color _danger = Color(0xFFD72638);
 
 class ShipmentsScreen extends StatefulWidget {
   const ShipmentsScreen({super.key});
@@ -20,29 +27,35 @@ class ShipmentsScreen extends StatefulWidget {
 
 class _ShipmentsScreenState extends State<ShipmentsScreen> {
   final TextEditingController _searchController = TextEditingController();
-
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
+  String? _loadError;
+  bool _isLoading = true;
   String _selectedFilter = 'All';
+  List<Map<String, dynamic>> _shipments = [];
 
   final List<String> _filters = const [
     'All',
     'Pending',
     'Confirmed',
+    'Prepared',
     'In Transit',
+    'Customs',
     'Out for Delivery',
     'Delivered',
     'Cancelled',
   ];
 
-  List<Map<String, dynamic>> _shipments = [];
-
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
-  _shipmentsSubscription;
-
-  bool _isLoadingShipments = true;
   @override
   void initState() {
     super.initState();
     _listenToShipments();
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _listenToShipments() {
@@ -51,12 +64,19 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     if (user == null) {
       setState(() {
         _shipments = [];
-        _isLoadingShipments = false;
+        _isLoading = false;
       });
       return;
     }
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
+    }
+    _subscription?.cancel();
 
-    _shipmentsSubscription = FirebaseFirestore.instance
+    _subscription = FirebaseFirestore.instance
         .collection('shipments')
         .where('userId', isEqualTo: user.uid)
         .snapshots()
@@ -64,14 +84,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           (snapshot) {
             final items = snapshot.docs.map((doc) {
               final data = doc.data();
-
-              final rawStatus = (data['status'] ?? 'pending')
-                  .toString()
-                  .toLowerCase();
-
-              final displayStatus = _displayStatus(rawStatus);
-              final progress = _statusProgress(rawStatus);
-              final stage = _statusStage(rawStatus);
+              final rawStatus = _normalizeStatus(
+                (data['status'] ?? 'pending').toString(),
+              );
 
               return <String, dynamic>{
                 ...data,
@@ -79,48 +94,617 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 'number': (data['trackingNumber'] ?? '').toString(),
                 'origin': (data['pickupLocation'] ?? '').toString(),
                 'destination': (data['deliveryLocation'] ?? '').toString(),
-                'status': displayStatus,
                 'rawStatus': rawStatus,
-                'date': _formatDeliveryDate(data['expectedDelivery']),
-                'type': (data['cargo'] ?? 'Shipment').toString(),
-                'stage': stage,
-                'progress': progress,
+                'displayStatus': _displayStatus(rawStatus),
+                'progress': _statusProgress(rawStatus),
+                'stage': _statusStage(rawStatus),
+                'type': (data['cargo'] ?? data['cargoType'] ?? 'Shipment')
+                    .toString(),
+                'date': _formatDate(
+                  data['expectedDelivery'] ?? data['estimatedDelivery'],
+                ),
+                'currentLocation': _currentLocation(data, rawStatus),
+                'lastUpdate': _formatDateTime(
+                  data['updatedAt'] ??
+                      data['lastUpdatedAt'] ??
+                      data['lastUpdate'] ??
+                      data['createdAt'],
+                ),
               };
             }).toList();
 
             items.sort((a, b) {
               final aCreated = a['createdAt'];
               final bCreated = b['createdAt'];
-
               if (aCreated is Timestamp && bCreated is Timestamp) {
                 return bCreated.compareTo(aCreated);
               }
-
               return 0;
             });
 
             if (!mounted) return;
-
             setState(() {
               _shipments = items;
-              _isLoadingShipments = false;
+              _isLoading = false;
             });
           },
           onError: (error) {
             if (!mounted) return;
 
             setState(() {
-              _isLoadingShipments = false;
+              _isLoading = false;
+              _loadError =
+                  'We couldn\'t load your shipments. Please check your connection and try again.';
             });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Could not load shipments: $error'),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
           },
         );
+  }
+
+  List<Map<String, dynamic>> get _visibleShipments {
+    final query = _searchController.text.trim().toLowerCase();
+
+    return _shipments.where((shipment) {
+      final status = (shipment['displayStatus'] ?? '').toString();
+      final searchable = [
+        shipment['number'],
+        shipment['origin'],
+        shipment['destination'],
+        shipment['type'],
+        shipment['currentLocation'],
+        status,
+      ].join(' ').toLowerCase();
+
+      final matchesFilter =
+          _selectedFilter == 'All' || status == _selectedFilter;
+      final matchesSearch = query.isEmpty || searchable.contains(query);
+
+      return matchesFilter && matchesSearch;
+    }).toList();
+  }
+
+  int _countStatus(String status) {
+    return _shipments
+        .where((shipment) => shipment['displayStatus'] == status)
+        .length;
+  }
+
+  void _openShipmentDetails(Map<String, dynamic> shipment) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ShipmentDetailsScreen(shipment: shipment),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final visible = _visibleShipments;
+
+    return Scaffold(
+      backgroundColor: _pageBg,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildTopHeader(),
+            Expanded(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                children: [
+                  _buildHero(),
+                  const SizedBox(height: 16),
+                  _buildSearchField(),
+                  const SizedBox(height: 14),
+                  _buildFilters(),
+                  const SizedBox(height: 20),
+                  _buildListHeader(visible.length),
+                  const SizedBox(height: 12),
+                  if (_isLoading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 60),
+                      child: Center(
+                        child: CircularProgressIndicator(color: _primaryBlue),
+                      ),
+                    )
+                  else if (_loadError != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 45),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEAF3FF),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(
+                                Icons.cloud_off_rounded,
+                                color: _primaryBlue,
+                                size: 30,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Unable to load shipments',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: _deepBlue,
+                              ),
+                            ),
+                            const SizedBox(height: 7),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: Text(
+                                _loadError!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  height: 1.5,
+                                  color: _textGrey,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            ElevatedButton.icon(
+                              onPressed: _listenToShipments,
+                              icon: const Icon(Icons.refresh_rounded),
+                              label: const Text('Try Again'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _primaryBlue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 22,
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else if (visible.isEmpty)
+                    _buildEmptyState()
+                  else
+                    ...visible.map(
+                      (shipment) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _ShipmentCard(
+                          shipment: shipment,
+                          statusInfo: _statusInfo(
+                            shipment['rawStatus'] as String,
+                          ),
+                          onTap: () => _openShipmentDetails(shipment),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopHeader() {
+    return Container(
+      height: 82,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: _deepBlue.withValues(alpha: .06),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          _SquareButton(
+            icon: Icons.arrow_back_rounded,
+            onTap: () => Navigator.pop(context),
+          ),
+          const SizedBox(width: 13),
+          const Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'My Shipments',
+                  style: TextStyle(
+                    color: _textDark,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -.35,
+                  ),
+                ),
+                SizedBox(height: 3),
+                Text(
+                  'TAWAM AL-SHAHIN TRANSPORT',
+                  style: TextStyle(
+                    color: _primaryBlue,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: .85,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: _softBlue,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.inventory_2_outlined,
+              color: _primaryBlue,
+              size: 22,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHero() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(19, 20, 19, 18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_deepBlue, Color(0xFF0A4789), _brightBlue],
+        ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: _deepBlue.withValues(alpha: .16),
+            blurRadius: 26,
+            offset: const Offset(0, 11),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -30,
+            top: -28,
+            child: Icon(
+              Icons.local_shipping_rounded,
+              size: 145,
+              color: Colors.white.withValues(alpha: .05),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  _LiveDot(),
+                  SizedBox(width: 7),
+                  Text(
+                    'LIVE CUSTOMER SHIPMENT PORTAL',
+                    style: TextStyle(
+                      color: Color(0xFFD2E3F3),
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: .75,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Your Shipping Network',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  height: 1.05,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -.45,
+                ),
+              ),
+              const SizedBox(height: 7),
+              const Text(
+                'Monitor every active and completed shipment from one secure place.',
+                style: TextStyle(
+                  color: Color(0xFFD7E6F5),
+                  fontSize: 10.8,
+                  height: 1.4,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 17),
+              Row(
+                children: [
+                  Expanded(
+                    child: _HeroStat(
+                      value: '${_shipments.length}',
+                      label: 'TOTAL',
+                      icon: Icons.inventory_2_outlined,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _HeroStat(
+                      value: '${_countStatus('In Transit')}',
+                      label: 'IN TRANSIT',
+                      icon: Icons.local_shipping_outlined,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _HeroStat(
+                      value: '${_countStatus('Delivered')}',
+                      label: 'DELIVERED',
+                      icon: Icons.check_circle_outline_rounded,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _searchController,
+      onChanged: (_) => setState(() {}),
+      style: const TextStyle(
+        color: _textDark,
+        fontSize: 12.5,
+        fontWeight: FontWeight.w700,
+      ),
+      decoration: InputDecoration(
+        hintText: 'Search tracking number, route or cargo',
+        hintStyle: const TextStyle(color: Color(0xFFA0A8B4), fontSize: 11.5),
+        prefixIcon: const Icon(Icons.search_rounded, color: _primaryBlue),
+        suffixIcon: _searchController.text.isEmpty
+            ? const Icon(Icons.manage_search_rounded, color: Color(0xFF7F8997))
+            : IconButton(
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {});
+                },
+                icon: const Icon(Icons.close_rounded, color: Color(0xFF7F8997)),
+              ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 17,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: const BorderSide(color: _border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: const BorderSide(color: _primaryBlue, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilters() {
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _filters.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final filter = _filters[index];
+          final selected = filter == _selectedFilter;
+
+          return InkWell(
+            onTap: () => setState(() => _selectedFilter = filter),
+            borderRadius: BorderRadius.circular(30),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              decoration: BoxDecoration(
+                color: selected ? _primaryBlue : Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: selected ? _primaryBlue : _border),
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: _primaryBlue.withValues(alpha: .14),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Text(
+                filter,
+                style: TextStyle(
+                  color: selected ? Colors.white : const Color(0xFF748090),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildListHeader(int count) {
+    return Row(
+      children: [
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Shipment Portfolio',
+                style: TextStyle(
+                  color: _textDark,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              SizedBox(height: 3),
+              Text(
+                'Select a shipment to view full details.',
+                style: TextStyle(color: _textGrey, fontSize: 9.5),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: _softBlue,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Text(
+            '$count',
+            style: const TextStyle(
+              color: _primaryBlue,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    final hasSearch = _searchController.text.trim().isNotEmpty;
+    final hasFilter = _selectedFilter != 'All';
+    final isFiltered = hasSearch || hasFilter;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 34),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEAF3FF),
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Icon(
+              isFiltered
+                  ? Icons.search_off_rounded
+                  : Icons.local_shipping_outlined,
+              color: _primaryBlue,
+              size: 34,
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          Text(
+            isFiltered ? 'No matching shipments' : 'No shipments yet',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: _textDark,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            isFiltered
+                ? 'We could not find any shipments matching your current search or filter.'
+                : 'Your shipments will appear here as soon as they are created by our operations team.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: _textGrey,
+              fontSize: 12,
+              height: 1.55,
+            ),
+          ),
+
+          if (isFiltered) ...[
+            const SizedBox(height: 20),
+
+            OutlinedButton.icon(
+              onPressed: () {
+                _searchController.clear();
+
+                setState(() {
+                  _selectedFilter = 'All';
+                });
+              },
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Clear Search & Filters'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _primaryBlue,
+                side: const BorderSide(color: _primaryBlue),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 13,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _normalizeStatus(String value) {
+    final normalized = value
+        .trim()
+        .toLowerCase()
+        .replaceAll('-', '_')
+        .replaceAll(' ', '_');
+
+    if (normalized == 'approved') return 'confirmed';
+    if (normalized == 'canceled') return 'cancelled';
+    return normalized;
   }
 
   String _displayStatus(String status) {
@@ -131,6 +715,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
         return 'Prepared';
       case 'in_transit':
         return 'In Transit';
+      case 'customs':
+      case 'customs_clearance':
+        return 'Customs';
       case 'out_for_delivery':
         return 'Out for Delivery';
       case 'delivered':
@@ -145,466 +732,246 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   double _statusProgress(String status) {
     switch (status) {
       case 'confirmed':
-        return 0.25;
+        return .25;
       case 'prepared':
-        return 0.40;
+        return .36;
       case 'in_transit':
-        return 0.55;
+        return .58;
+      case 'customs':
+      case 'customs_clearance':
+        return .72;
       case 'out_for_delivery':
-        return 0.85;
+        return .88;
       case 'delivered':
-        return 1.0;
+        return 1;
       case 'cancelled':
-        return 0.0;
+        return 0;
       default:
-        return 0.10;
+        return .10;
     }
   }
 
   String _statusStage(String status) {
     switch (status) {
       case 'confirmed':
-        return 'Shipment confirmed';
+        return 'Shipment confirmed by operations';
       case 'prepared':
-        return 'Shipment has been prepared';
+        return 'Shipment prepared for movement';
       case 'in_transit':
-        return 'Shipment is moving to destination';
+        return 'Shipment moving toward destination';
+      case 'customs':
+      case 'customs_clearance':
+        return 'Shipment under customs processing';
       case 'out_for_delivery':
-        return 'Shipment is out for final delivery';
+        return 'Shipment on final delivery route';
       case 'delivered':
         return 'Shipment delivered successfully';
       case 'cancelled':
         return 'Shipment has been cancelled';
       default:
-        return 'Waiting for shipment processing';
+        return 'Shipment awaiting processing';
     }
   }
 
-  String _formatDeliveryDate(dynamic value) {
-    if (value is Timestamp) {
-      final date = value.toDate();
-
-      return '${date.day.toString().padLeft(2, '0')}/'
-          '${date.month.toString().padLeft(2, '0')}/'
-          '${date.year}';
+  String _currentLocation(Map<String, dynamic> data, String status) {
+    for (final key in [
+      'currentLocation',
+      'currentArea',
+      'lastLocation',
+      'location',
+    ]) {
+      final value = data[key];
+      if (value != null && value.toString().trim().isNotEmpty) {
+        return value.toString().trim();
+      }
     }
 
-    if (value == null || value.toString().trim().isEmpty) {
-      return 'Not specified';
+    final pickup = (data['pickupLocation'] ?? '').toString().trim();
+    final delivery = (data['deliveryLocation'] ?? '').toString().trim();
+
+    if (status == 'delivered' || status == 'out_for_delivery') {
+      return delivery.isEmpty ? 'Location update pending' : delivery;
     }
 
-    return value.toString();
+    if (status == 'pending' || status == 'confirmed' || status == 'prepared') {
+      return pickup.isEmpty ? 'Location update pending' : pickup;
+    }
+
+    return 'Location update pending';
   }
 
-  @override
-  void dispose() {
-    _shipmentsSubscription?.cancel();
-    _searchController.dispose();
-    super.dispose();
+  String _formatDate(dynamic value) {
+    final date = _toDateTime(value);
+    if (date == null) {
+      final text = value?.toString().trim() ?? '';
+      return text.isEmpty ? 'Not specified' : text;
+    }
+
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
-  List<Map<String, dynamic>> get _visibleShipments {
-    final query = _searchController.text.trim().toLowerCase();
+  String _formatDateTime(dynamic value) {
+    final date = _toDateTime(value);
+    if (date == null) {
+      final text = value?.toString().trim() ?? '';
+      return text.isEmpty ? 'Awaiting update' : text;
+    }
 
-    return _shipments.where((shipment) {
-      final status = shipment['status'] as String;
-      final number = shipment['number'] as String;
-      final origin = shipment['origin'] as String;
-      final destination = shipment['destination'] as String;
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
 
-      final matchesFilter =
-          _selectedFilter == 'All' || status == _selectedFilter;
+    final hour12 = date.hour == 0
+        ? 12
+        : date.hour > 12
+        ? date.hour - 12
+        : date.hour;
+    final minute = date.minute.toString().padLeft(2, '0');
+    final amPm = date.hour >= 12 ? 'PM' : 'AM';
 
-      final searchableText = '$number $origin $destination $status'
-          .toLowerCase();
-
-      final matchesSearch = query.isEmpty || searchableText.contains(query);
-
-      return matchesFilter && matchesSearch;
-    }).toList();
+    return '${date.day} ${months[date.month - 1]} ${date.year} • '
+        '$hour12:$minute $amPm';
   }
 
-  int _countStatus(String status) {
-    return _shipments.where((shipment) => shipment['status'] == status).length;
+  DateTime? _toDateTime(dynamic value) {
+    if (value is Timestamp) return value.toDate().toLocal();
+    if (value is DateTime) return value.toLocal();
+    if (value is String && value.trim().isNotEmpty) {
+      return DateTime.tryParse(value.trim())?.toLocal();
+    }
+    return null;
   }
 
-  Color _statusColor(String status) {
+  _StatusInfo _statusInfo(String status) {
     switch (status) {
-      case 'Delivered':
-        return const Color(0xFF16765C);
-      case 'Pending':
-        return const Color(0xFFC97908);
+      case 'confirmed':
+        return const _StatusInfo(
+          label: 'CONFIRMED',
+          color: _primaryBlue,
+          background: Color(0xFFEAF3FF),
+          icon: Icons.verified_rounded,
+        );
+      case 'prepared':
+        return const _StatusInfo(
+          label: 'PREPARED',
+          color: _primaryBlue,
+          background: Color(0xFFEAF3FF),
+          icon: Icons.fact_check_rounded,
+        );
+      case 'in_transit':
+        return const _StatusInfo(
+          label: 'IN TRANSIT',
+          color: _primaryBlue,
+          background: Color(0xFFEAF3FF),
+          icon: Icons.local_shipping_rounded,
+        );
+      case 'customs':
+      case 'customs_clearance':
+        return const _StatusInfo(
+          label: 'CUSTOMS',
+          color: _warning,
+          background: Color(0xFFFFF4DF),
+          icon: Icons.gavel_rounded,
+        );
+      case 'out_for_delivery':
+        return const _StatusInfo(
+          label: 'OUT FOR DELIVERY',
+          color: _primaryBlue,
+          background: Color(0xFFEAF3FF),
+          icon: Icons.route_rounded,
+        );
+      case 'delivered':
+        return const _StatusInfo(
+          label: 'DELIVERED',
+          color: _success,
+          background: Color(0xFFEAF8F0),
+          icon: Icons.check_circle_rounded,
+        );
+      case 'cancelled':
+        return const _StatusInfo(
+          label: 'CANCELLED',
+          color: _danger,
+          background: Color(0xFFFFECEF),
+          icon: Icons.cancel_rounded,
+        );
       default:
-        return _primaryBlue;
+        return const _StatusInfo(
+          label: 'PENDING',
+          color: _warning,
+          background: Color(0xFFFFF4DF),
+          icon: Icons.schedule_rounded,
+        );
     }
-  }
-
-  Color _statusBackground(String status) {
-    switch (status) {
-      case 'Delivered':
-        return const Color(0xFFE7F7F0);
-      case 'Pending':
-        return const Color(0xFFFFF1D8);
-      default:
-        return const Color(0xFFE8F2FC);
-    }
-  }
-
-  void _openShipmentDetails(Map<String, dynamic> shipment) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ShipmentDetailsScreen(shipment: shipment),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final shipments = _visibleShipments;
-
-    return Scaffold(
-      backgroundColor: _pageBackground,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 34),
-          children: [
-            _buildPremiumHeader(),
-
-            const SizedBox(height: 22),
-
-            _buildSearchField(),
-
-            const SizedBox(height: 18),
-
-            _buildFilters(),
-
-            const SizedBox(height: 26),
-
-            Row(
-              children: [
-                const Text(
-                  'Shipment List',
-                  style: TextStyle(
-                    color: _darkNavy,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '${shipments.length} shipments',
-                  style: const TextStyle(
-                    color: Color(0xFF8993A1),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 15),
-
-            if (_isLoadingShipments)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(
-                  child: CircularProgressIndicator(color: _primaryBlue),
-                ),
-              )
-            else if (shipments.isEmpty)
-              _buildEmptyState()
-            else
-              ...shipments.map(
-                (shipment) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _ShipmentCard(
-                    shipment: shipment,
-                    statusColor: _statusColor(shipment['status'] as String),
-                    statusBackground: _statusBackground(
-                      shipment['status'] as String,
-                    ),
-                    onTap: () {
-                      _openShipmentDetails(shipment);
-                    },
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPremiumHeader() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF0A2747), Color(0xFF07569E), Color(0xFF0874C9)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x3507569E),
-            blurRadius: 30,
-            offset: Offset(0, 16),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Material(
-                color: const Color(0x26FFFFFF),
-                borderRadius: BorderRadius.circular(15),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  borderRadius: BorderRadius.circular(15),
-                  child: const SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Icon(Icons.arrow_back_rounded, color: Colors.white),
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 14),
-
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'My Shipments',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 27,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      'Track every shipment in one place',
-                      style: TextStyle(
-                        color: Color(0xFFD8E8F8),
-                        fontSize: 13.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.inventory_2_outlined,
-                  color: _primaryBlue,
-                  size: 25,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          Row(
-            children: [
-              Expanded(
-                child: _HeaderStat(
-                  value: '${_shipments.length}',
-                  label: 'Total',
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _HeaderStat(
-                  value: '${_countStatus('In Transit')}',
-                  label: 'In Transit',
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _HeaderStat(
-                  value: '${_countStatus('Delivered')}',
-                  label: 'Delivered',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchField() {
-    return TextField(
-      controller: _searchController,
-      onChanged: (_) {
-        setState(() {});
-      },
-      decoration: InputDecoration(
-        hintText: 'Search by tracking number',
-        hintStyle: const TextStyle(color: Color(0xFFA0A8B4)),
-        prefixIcon: const Icon(Icons.search_rounded, color: _primaryBlue),
-        suffixIcon: _searchController.text.isEmpty
-            ? const Icon(Icons.tune_rounded, color: Color(0xFF7F8997))
-            : IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  setState(() {});
-                },
-                icon: const Icon(Icons.close_rounded, color: Color(0xFF7F8997)),
-              ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: _borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: _primaryBlue, width: 1.6),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilters() {
-    return SizedBox(
-      height: 45,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
-        separatorBuilder: (context, index) {
-          return const SizedBox(width: 10);
-        },
-        itemBuilder: (context, index) {
-          final filter = _filters[index];
-          final selected = filter == _selectedFilter;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedFilter = filter;
-              });
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
-              decoration: BoxDecoration(
-                color: selected ? _primaryBlue : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: selected ? _primaryBlue : _borderColor,
-                ),
-                boxShadow: selected
-                    ? const [
-                        BoxShadow(
-                          color: Color(0x2607569E),
-                          blurRadius: 14,
-                          offset: Offset(0, 7),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Text(
-                filter,
-                style: TextStyle(
-                  color: selected ? Colors.white : const Color(0xFF76808E),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 48),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: _borderColor),
-      ),
-      child: const Column(
-        children: [
-          Icon(Icons.inventory_2_outlined, color: Color(0xFF9BA6B4), size: 48),
-          SizedBox(height: 16),
-          Text(
-            'No shipments found',
-            style: TextStyle(
-              color: _darkNavy,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 7),
-          Text(
-            'Try another tracking number or filter.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0xFF929BA8), fontSize: 13),
-          ),
-        ],
-      ),
-    );
   }
 }
 
-class _HeaderStat extends StatelessWidget {
+class _HeroStat extends StatelessWidget {
+  const _HeroStat({
+    required this.value,
+    required this.label,
+    required this.icon,
+  });
+
   final String value;
   final String label;
-
-  const _HeaderStat({required this.value, required this.label});
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
       decoration: BoxDecoration(
-        color: const Color(0x20FFFFFF),
-        borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: const Color(0x25FFFFFF)),
+        color: Colors.white.withValues(alpha: .10),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white.withValues(alpha: .10)),
       ),
       child: Column(
         children: [
+          Icon(icon, color: Colors.white, size: 16),
+          const SizedBox(height: 6),
           Text(
             value,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Color(0xFFDCEAF8),
-              fontSize: 11.5,
-              fontWeight: FontWeight.w600,
+              fontSize: 7.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: .35,
             ),
           ),
         ],
@@ -614,46 +981,99 @@ class _HeaderStat extends StatelessWidget {
 }
 
 class _ShipmentCard extends StatelessWidget {
-  final Map<String, dynamic> shipment;
-  final Color statusColor;
-  final Color statusBackground;
-  final VoidCallback onTap;
-
   const _ShipmentCard({
     required this.shipment,
-    required this.statusColor,
-    required this.statusBackground,
+    required this.statusInfo,
     required this.onTap,
   });
 
+  final Map<String, dynamic> shipment;
+  final _StatusInfo statusInfo;
+  final VoidCallback onTap;
+  String _formatLastUpdate(Object? value) {
+    if (value == null) {
+      return 'Awaiting update';
+    }
+
+    DateTime? date;
+
+    if (value is Timestamp) {
+      date = value.toDate();
+    } else if (value is DateTime) {
+      date = value;
+    } else {
+      date = DateTime.tryParse(value.toString());
+    }
+
+    if (date == null) {
+      final text = value.toString().trim();
+      return text.isEmpty ? 'Awaiting update' : text;
+    }
+
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    final hour12 = date.hour == 0
+        ? 12
+        : date.hour > 12
+        ? date.hour - 12
+        : date.hour;
+
+    final minute = date.minute.toString().padLeft(2, '0');
+    final period = date.hour >= 12 ? 'PM' : 'AM';
+
+    return '${date.day} ${months[date.month - 1]} ${date.year} • '
+        '$hour12:$minute $period';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final number = shipment['number'] as String;
-    final origin = shipment['origin'] as String;
-    final destination = shipment['destination'] as String;
-    final status = shipment['status'] as String;
-    final date = shipment['date'] as String;
-    final type = shipment['type'] as String;
-    final stage = shipment['stage'] as String;
-    final progress = shipment['progress'] as double;
+    final number = (shipment['number'] ?? '-').toString();
+    final origin = (shipment['origin'] ?? 'Not specified').toString();
+    final destination = (shipment['destination'] ?? 'Not specified').toString();
+    final date = (shipment['date'] ?? 'Not specified').toString();
+    final type = (shipment['type'] ?? 'Shipment').toString();
+    final stage = (shipment['stage'] ?? '').toString();
+    final currentLocation =
+        (shipment['currentLocationName'] ??
+                shipment['currentLocation'] ??
+                'Location update pending')
+            .toString();
+    final lastUpdate = _formatLastUpdate(
+      shipment['updatedAt'] ??
+          shipment['lastLocationUpdate'] ??
+          shipment['lastUpdate'],
+    );
+    final progress = (shipment['progress'] as num?)?.toDouble() ?? .10;
 
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(25),
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(22),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: _borderColor),
-            boxShadow: const [
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: _border),
+            boxShadow: [
               BoxShadow(
-                color: Color(0x100B294D),
-                blurRadius: 24,
-                offset: Offset(0, 11),
+                color: _deepBlue.withValues(alpha: .035),
+                blurRadius: 18,
+                offset: const Offset(0, 7),
               ),
             ],
           ),
@@ -662,195 +1082,201 @@ class _ShipmentCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 53,
-                    height: 53,
+                    width: 47,
+                    height: 47,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFFEAF4FD), Color(0xFFDDEEFF)],
-                      ),
-                      borderRadius: BorderRadius.circular(17),
+                      color: _softBlue,
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Icon(
                       Icons.local_shipping_rounded,
                       color: _primaryBlue,
-                      size: 25,
+                      size: 22,
                     ),
                   ),
-
-                  const SizedBox(width: 14),
-
+                  const SizedBox(width: 11),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           number,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: _darkNavy,
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w800,
+                            color: _textDark,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Text(
                           stage,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Color(0xFF929BA8),
-                            fontSize: 12.5,
+                            color: _textGrey,
+                            fontSize: 9.5,
                           ),
                         ),
                       ],
                     ),
                   ),
-
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 7,
+                      horizontal: 9,
+                      vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: statusBackground,
+                      color: statusInfo.background,
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: Text(
-                      status,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          statusInfo.icon,
+                          color: statusInfo.color,
+                          size: 12,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          statusInfo.label,
+                          style: TextStyle(
+                            color: statusInfo.color,
+                            fontSize: 7.7,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 20),
-
+              const SizedBox(height: 14),
               Container(
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7F9FC),
-                  borderRadius: BorderRadius.circular(18),
+                  color: const Color(0xFFF8FAFD),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.radio_button_checked_rounded,
-                      color: _primaryBlue,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-
                     Expanded(
-                      child: Text(
-                        origin,
-                        style: const TextStyle(
-                          color: _darkNavy,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: _RouteSide(
+                        label: 'PICKUP',
+                        value: origin,
+                        alignRight: false,
                       ),
                     ),
-
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(
+                    Container(
+                      width: 35,
+                      height: 35,
+                      decoration: BoxDecoration(
+                        color: _softBlue,
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                      child: const Icon(
                         Icons.arrow_forward_rounded,
-                        color: Color(0xFF9EA7B3),
-                        size: 20,
+                        color: _primaryBlue,
+                        size: 19,
                       ),
                     ),
-
                     Expanded(
-                      child: Text(
-                        destination,
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          color: _darkNavy,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: _RouteSide(
+                        label: 'DELIVERY',
+                        value: destination,
+                        alignRight: true,
                       ),
-                    ),
-
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.location_on_rounded,
-                      color: Color(0xFFD72638),
-                      size: 18,
                     ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 18),
-
+              const SizedBox(height: 13),
               Row(
                 children: [
                   const Text(
-                    'Shipment progress',
+                    'Shipment Progress',
                     style: TextStyle(
-                      color: Color(0xFF788391),
-                      fontSize: 12,
+                      color: _textGrey,
+                      fontSize: 9.5,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const Spacer(),
                   Text(
                     '${(progress * 100).round()}%',
-                    style: const TextStyle(
-                      color: _primaryBlue,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
+                    style: TextStyle(
+                      color: statusInfo.color,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 9),
-
+              const SizedBox(height: 7),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 7,
+                  value: progress.clamp(0.0, 1.0),
+                  minHeight: 6,
                   backgroundColor: const Color(0xFFE8EDF3),
-                  color: status == 'Delivered'
-                      ? const Color(0xFF16765C)
-                      : _primaryBlue,
+                  color: statusInfo.color,
                 ),
               ),
-
-              const SizedBox(height: 19),
-
-              const Divider(color: Color(0xFFE8EDF2), height: 1),
-
-              const SizedBox(height: 17),
-
+              const SizedBox(height: 13),
               Row(
                 children: [
                   Expanded(
-                    child: _ShipmentInfo(
-                      icon: Icons.calendar_today_outlined,
-                      title: 'Expected delivery',
+                    child: _SmallInfo(
+                      icon: Icons.location_on_outlined,
+                      label: 'CURRENT LOCATION',
+                      value: currentLocation,
+                    ),
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: _SmallInfo(
+                      icon: Icons.event_available_outlined,
+                      label: 'EST. DELIVERY',
                       value: date,
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.schedule_rounded,
+                    color: _textGrey,
+                    size: 13,
+                  ),
+                  const SizedBox(width: 5),
                   Expanded(
-                    child: _ShipmentInfo(
-                      icon: Icons.route_outlined,
-                      title: 'Shipment type',
-                      value: type,
+                    child: Text(
+                      'Last update: $lastUpdate',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: _textGrey, fontSize: 8.7),
                     ),
                   ),
+                  const SizedBox(width: 7),
+                  Text(
+                    type,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _primaryBlue,
+                      fontSize: 8.8,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   const Icon(
                     Icons.arrow_forward_ios_rounded,
                     color: Color(0xFFB0B8C2),
-                    size: 16,
+                    size: 12,
                   ),
                 ],
               ),
@@ -862,50 +1288,154 @@ class _ShipmentCard extends StatelessWidget {
   }
 }
 
-class _ShipmentInfo extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
+class _SquareButton extends StatelessWidget {
+  const _SquareButton({required this.icon, required this.onTap});
 
-  const _ShipmentInfo({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+  final IconData icon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F9FC),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: _border),
+        ),
+        child: Icon(icon, color: _deepBlue, size: 22),
+      ),
+    );
+  }
+}
+
+class _LiveDot extends StatelessWidget {
+  const _LiveDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 9,
+      height: 9,
+      decoration: const BoxDecoration(
+        color: Color(0xFF55D6A5),
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+}
+
+class _RouteSide extends StatelessWidget {
+  const _RouteSide({
+    required this.label,
+    required this.value,
+    required this.alignRight,
+  });
+
+  final String label;
+  final String value;
+  final bool alignRight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: alignRight
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: _primaryBlue, size: 17),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Color(0xFF969FAC),
-                  fontSize: 10.5,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: _darkNavy,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+        Text(
+          label,
+          style: const TextStyle(
+            color: _textGrey,
+            fontSize: 7.5,
+            fontWeight: FontWeight.w800,
+            letterSpacing: .5,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: alignRight ? TextAlign.right : TextAlign.left,
+          style: const TextStyle(
+            color: _textDark,
+            fontSize: 10.5,
+            height: 1.25,
+            fontWeight: FontWeight.w800,
           ),
         ),
       ],
     );
   }
+}
+
+class _SmallInfo extends StatelessWidget {
+  const _SmallInfo({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 76),
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFD),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: _primaryBlue, size: 16),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            style: const TextStyle(
+              color: _textGrey,
+              fontSize: 6.8,
+              fontWeight: FontWeight.w800,
+              letterSpacing: .45,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: _textDark,
+              fontSize: 9.3,
+              height: 1.2,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusInfo {
+  const _StatusInfo({
+    required this.label,
+    required this.color,
+    required this.background,
+    required this.icon,
+  });
+
+  final String label;
+  final Color color;
+  final Color background;
+  final IconData icon;
 }
