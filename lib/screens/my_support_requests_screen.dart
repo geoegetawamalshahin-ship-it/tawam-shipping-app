@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
+
 const Color _primaryBlue = Color(0xFF0B4F9C);
 const Color _brightBlue = Color(0xFF1268BC);
 const Color _deepBlue = Color(0xFF062B55);
@@ -27,10 +30,10 @@ class MySupportRequestsScreen extends StatefulWidget {
 }
 
 class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
-  String _selectedFilter = 'All';
+  String _selectedFilter = 'all';
   bool _openedInitialRequest = false;
 
-  final List<String> _filters = const ['All', 'New', 'In Progress', 'Resolved'];
+  final List<String> _filters = const ['all', 'new', 'in_progress', 'resolved'];
 
   @override
   Widget build(BuildContext context) {
@@ -108,11 +111,11 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                           }
                         }
                         final filtered = requests.where((request) {
-                          if (_selectedFilter == 'All') {
+                          if (_selectedFilter == 'all') {
                             return true;
                           }
 
-                          return _displayStatus(
+                          return _normalizeSupportStatus(
                                 (request['status'] ?? 'new').toString(),
                               ) ==
                               _selectedFilter;
@@ -155,6 +158,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 82,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -190,24 +194,24 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
             ),
           ),
           const SizedBox(width: 13),
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'My Support Requests',
-                  style: TextStyle(
+                  l10n.mySupportRequests,
+                  style: const TextStyle(
                     color: _textDark,
                     fontSize: 19,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: _primaryBlue,
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -236,19 +240,26 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   Widget _buildHero(List<Map<String, dynamic>> requests) {
+    final l10n = AppLocalizations.of(context)!;
     final total = requests.length;
     final newCount = requests
-        .where((r) => _displayStatus((r['status'] ?? '').toString()) == 'New')
+        .where(
+          (r) =>
+              _normalizeSupportStatus((r['status'] ?? '').toString()) == 'new',
+        )
         .length;
     final progressCount = requests
         .where(
           (r) =>
-              _displayStatus((r['status'] ?? '').toString()) == 'In Progress',
+              _normalizeSupportStatus((r['status'] ?? '').toString()) ==
+              'in_progress',
         )
         .length;
     final resolvedCount = requests
         .where(
-          (r) => _displayStatus((r['status'] ?? '').toString()) == 'Resolved',
+          (r) =>
+              _normalizeSupportStatus((r['status'] ?? '').toString()) ==
+              'resolved',
         )
         .length;
 
@@ -325,7 +336,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                   Expanded(
                     child: _HeroStat(
                       value: '$total',
-                      label: 'TOTAL',
+                      label: l10n.total,
                       icon: Icons.list_alt_rounded,
                     ),
                   ),
@@ -333,7 +344,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                   Expanded(
                     child: _HeroStat(
                       value: '$newCount',
-                      label: 'NEW',
+                      label: l10n.newBadge,
                       icon: Icons.fiber_new_rounded,
                     ),
                   ),
@@ -341,7 +352,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                   Expanded(
                     child: _HeroStat(
                       value: '$progressCount',
-                      label: 'IN PROGRESS',
+                      label: l10n.statusInProgress,
                       icon: Icons.autorenew_rounded,
                     ),
                   ),
@@ -349,7 +360,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                   Expanded(
                     child: _HeroStat(
                       value: '$resolvedCount',
-                      label: 'RESOLVED',
+                      label: l10n.statusResolved,
                       icon: Icons.check_circle_outline_rounded,
                     ),
                   ),
@@ -363,6 +374,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   Widget _buildFilters() {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -389,7 +401,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                 border: Border.all(color: selected ? _primaryBlue : _border),
               ),
               child: Text(
-                filter,
+                _supportFilterLabel(l10n, filter),
                 style: TextStyle(
                   color: selected ? Colors.white : _textGrey,
                   fontSize: 10.3,
@@ -446,12 +458,14 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   Widget _buildRequestCard(BuildContext context, Map<String, dynamic> request) {
-    final category = (request['category'] ?? 'Support Request').toString();
+    final l10n = AppLocalizations.of(context)!;
+    final category = (request['category'] ?? l10n.supportRequest).toString();
     final shipmentNumber = (request['shipmentNumber'] ?? '').toString().trim();
     final message = (request['message'] ?? '').toString();
-    final status = _displayStatus((request['status'] ?? 'new').toString());
-    final createdAt = _formatDateTime(request['createdAt']);
-    final statusInfo = _statusInfo(status);
+    final rawStatus = (request['status'] ?? 'new').toString();
+    final status = LocaleController.supportStatusLabel(l10n, rawStatus);
+    final createdAt = _formatDateTime(l10n, request['createdAt']);
+    final statusInfo = _statusInfo(_normalizeSupportStatus(rawStatus));
 
     return Material(
       color: Colors.transparent,
@@ -511,7 +525,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                         Text(
                           shipmentNumber.isEmpty
                               ? 'General support case'
-                              : 'Shipment: $shipmentNumber',
+                              : '${l10n.shipment}: $shipmentNumber',
                           style: const TextStyle(
                             color: _textGrey,
                             fontSize: 9.3,
@@ -539,7 +553,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          status.toUpperCase(),
+                          status,
                           style: TextStyle(
                             color: statusInfo.color,
                             fontSize: 7.5,
@@ -587,7 +601,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                     ),
                   ),
                   const Text(
-                    'VIEW DETAILS',
+                    l10n.viewDetailsUpper,
                     style: TextStyle(
                       color: _primaryBlue,
                       fontSize: 8.2,
@@ -611,17 +625,20 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   void _showRequestDetails(BuildContext context, Map<String, dynamic> request) {
-    final category = (request['category'] ?? 'Support Request').toString();
+    final l10n = AppLocalizations.of(context)!;
+    final category = (request['category'] ?? l10n.supportRequest).toString();
     final shipmentNumber = (request['shipmentNumber'] ?? '').toString().trim();
     final message = (request['message'] ?? '').toString();
-    final status = _displayStatus((request['status'] ?? 'new').toString());
-    final createdAt = _formatDateTime(request['createdAt']);
+    final rawStatus = (request['status'] ?? 'new').toString();
+    final status = LocaleController.supportStatusLabel(l10n, rawStatus);
+    final createdAt = _formatDateTime(l10n, request['createdAt']);
     final adminReply = _firstText(request, ['adminReply', 'reply', 'response']);
     final updatedAt = _formatDateTime(
+      l10n,
       request['updatedAt'] ?? request['adminUpdatedAt'],
     );
 
-    final statusInfo = _statusInfo(status);
+    final statusInfo = _statusInfo(_normalizeSupportStatus(rawStatus));
 
     showModalBottomSheet(
       context: context,
@@ -701,7 +718,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
-                        status.toUpperCase(),
+                        status,
                         style: TextStyle(
                           color: statusInfo.color,
                           fontSize: 8,
@@ -715,20 +732,22 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                 if (shipmentNumber.isNotEmpty)
                   _DetailBox(
                     icon: Icons.local_shipping_outlined,
-                    label: 'SHIPMENT NUMBER',
+                    label: l10n.shipmentNumber,
                     value: shipmentNumber,
                   ),
                 if (shipmentNumber.isNotEmpty) const SizedBox(height: 10),
                 _DetailBox(
                   icon: Icons.chat_bubble_outline_rounded,
-                  label: 'YOUR MESSAGE',
+                  label: l10n.yourMessage,
                   value: message.isEmpty ? 'No message provided.' : message,
                 ),
                 const SizedBox(height: 10),
                 _DetailBox(
                   icon: Icons.update_rounded,
-                  label: 'LATEST STATUS UPDATE',
-                  value: updatedAt == 'Awaiting update' ? createdAt : updatedAt,
+                  label: l10n.latestStatusUpdate,
+                  value: updatedAt == l10n.awaitingUpdate
+                      ? createdAt
+                      : updatedAt,
                 ),
                 const SizedBox(height: 14),
                 Container(
@@ -796,8 +815,8 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child: const Text(
-                      'CLOSE',
+                    child: Text(
+                      l10n.closeUpper,
                       style: TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w900,
@@ -871,7 +890,20 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
     );
   }
 
-  String _displayStatus(String raw) {
+  String _supportFilterLabel(AppLocalizations l10n, String filter) {
+    switch (filter) {
+      case 'new':
+        return l10n.statusNew;
+      case 'in_progress':
+        return l10n.statusInProgress;
+      case 'resolved':
+        return l10n.statusResolved;
+      default:
+        return l10n.all;
+    }
+  }
+
+  String _normalizeSupportStatus(String raw) {
     final status = raw
         .trim()
         .toLowerCase()
@@ -879,26 +911,26 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
         .replaceAll(' ', '_');
 
     if (status == 'resolved' || status == 'closed' || status == 'completed') {
-      return 'Resolved';
+      return 'resolved';
     }
 
     if (status == 'in_progress' || status == 'processing' || status == 'open') {
-      return 'In Progress';
+      return 'in_progress';
     }
 
-    return 'New';
+    return 'new';
   }
 
   _StatusInfo _statusInfo(String status) {
     switch (status) {
-      case 'Resolved':
+      case 'resolved':
         return const _StatusInfo(
           color: _success,
           background: Color(0xFFEAF8F0),
           icon: Icons.check_circle_rounded,
         );
 
-      case 'In Progress':
+      case 'in_progress':
         return const _StatusInfo(
           color: _primaryBlue,
           background: Color(0xFFEAF3FF),
@@ -914,7 +946,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
     }
   }
 
-  String _formatDateTime(dynamic value) {
+  String _formatDateTime(AppLocalizations l10n, dynamic value) {
     DateTime? date;
 
     if (value is Timestamp) {
@@ -926,23 +958,8 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
     }
 
     if (date == null) {
-      return 'Awaiting update';
+      return l10n.awaitingUpdate;
     }
-
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
 
     final hour = date.hour == 0
         ? 12
@@ -955,7 +972,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
     final amPm = date.hour >= 12 ? 'PM' : 'AM';
 
     return '${date.day} '
-        '${months[date.month - 1]} '
+        '${LocaleController.monthAbbrev(l10n, date.month)} '
         '${date.year} • '
         '$hour:$minute $amPm';
   }

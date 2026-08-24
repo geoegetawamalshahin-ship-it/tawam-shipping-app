@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
+
 class MyQuotesScreen extends StatefulWidget {
   const MyQuotesScreen({super.key, this.initialQuoteId});
 
@@ -35,10 +38,10 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
             _buildHeader(context),
             Expanded(
               child: user == null
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'Please sign in to view your quotations.',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: textGrey,
                           fontWeight: FontWeight.w600,
                         ),
@@ -109,6 +112,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 84,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -140,23 +144,23 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'My Quotes',
-                  style: TextStyle(
+                  l10n.myQuotes,
+                  style: const TextStyle(
                     color: textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: primaryBlue,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w700,
@@ -181,6 +185,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _buildContent(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) {
+    final l10n = AppLocalizations.of(context)!;
     final waitingCount = docs.where((doc) => !_hasPrice(doc.data())).length;
     final quotedCount = docs.where((doc) => _hasPrice(doc.data())).length;
 
@@ -214,7 +219,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               child: _summaryBox(
                 icon: Icons.receipt_long_outlined,
                 value: '${docs.length}',
-                label: 'Total',
+                label: l10n.total,
               ),
             ),
             const SizedBox(width: 9),
@@ -222,7 +227,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               child: _summaryBox(
                 icon: Icons.hourglass_bottom_rounded,
                 value: '$waitingCount',
-                label: 'Waiting',
+                label: l10n.waiting,
               ),
             ),
             const SizedBox(width: 9),
@@ -230,15 +235,15 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               child: _summaryBox(
                 icon: Icons.price_check_outlined,
                 value: '$quotedCount',
-                label: 'Quoted',
+                label: l10n.quoted,
               ),
             ),
           ],
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Your Quotations',
-          style: TextStyle(
+        Text(
+          l10n.yourQuotations,
+          style: const TextStyle(
             color: textDark,
             fontSize: 21,
             fontWeight: FontWeight.w800,
@@ -382,12 +387,13 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _buildFilters() {
-    const filters = [
-      ('all', 'All'),
-      ('waiting', 'Waiting'),
-      ('quoted', 'Quoted'),
-      ('accepted', 'Accepted'),
-      ('declined', 'Declined'),
+    final l10n = AppLocalizations.of(context)!;
+    final filters = [
+      ('all', l10n.all),
+      ('waiting', l10n.waiting),
+      ('quoted', l10n.quoted),
+      ('accepted', l10n.accepted),
+      ('declined', l10n.declined),
     ];
 
     return SizedBox(
@@ -432,11 +438,13 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _buildQuoteCard(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    final l10n = AppLocalizations.of(context)!;
     final data = doc.data();
-    final service = _fallback(data['serviceType'], 'Shipping Service');
-    final quoteNumber = _fallback(data['quoteNumber'], 'Quotation');
-    final from = _fallback(data['from'], 'Origin');
-    final to = _fallback(data['to'], 'Destination');
+    final serviceRaw = _fallback(data['serviceType'], '');
+    final service = _serviceDisplay(l10n, serviceRaw);
+    final quoteNumber = _fallback(data['quoteNumber'], l10n.quotations);
+    final from = _fallback(data['from'], l10n.origin);
+    final to = _fallback(data['to'], l10n.destination);
     final decision = _text(data['customerDecision']).toLowerCase();
     final hasPrice = _hasPrice(data);
     final currency = _fallback(data['currency'], 'AED');
@@ -473,7 +481,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                       color: softBlue,
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Icon(_serviceIcon(service), color: primaryBlue),
+                    child: Icon(_serviceIcon(serviceRaw), color: primaryBlue),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -517,7 +525,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                 ),
                 child: Row(
                   children: [
-                    Expanded(child: _routePoint('FROM', from)),
+                    Expanded(child: _routePoint(l10n.from, from)),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: Icon(
@@ -526,7 +534,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                         size: 18,
                       ),
                     ),
-                    Expanded(child: _routePoint('TO', to, alignEnd: true)),
+                    Expanded(child: _routePoint(l10n.to, to, alignEnd: true)),
                   ],
                 ),
               ),
@@ -640,22 +648,24 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
     Color fg;
     String text;
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (decision == 'accepted') {
       bg = const Color(0xFFEAF8F0);
       fg = const Color(0xFF16765C);
-      text = 'Accepted';
+      text = l10n.accepted;
     } else if (decision == 'declined') {
       bg = const Color(0xFFFFECEC);
       fg = const Color(0xFFD72638);
-      text = 'Declined';
+      text = l10n.declined;
     } else if (hasPrice) {
       bg = softBlue;
       fg = primaryBlue;
-      text = 'Quote Ready';
+      text = l10n.quoteReady;
     } else {
       bg = const Color(0xFFFFF6E5);
       fg = const Color(0xFFB26A00);
-      text = 'Under Review';
+      text = l10n.underReview;
     }
 
     return Container(
@@ -739,6 +749,8 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _quoteHeader(Map<String, dynamic> data) {
+    final l10n = AppLocalizations.of(context)!;
+    final serviceRaw = _fallback(data['serviceType'], '');
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -748,9 +760,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'TAWAM AL-SHAHIN TRANSPORT',
-            style: TextStyle(
+          Text(
+            l10n.tawamAlShahinTransport,
+            style: const TextStyle(
               color: Color(0xFFD5E5F4),
               fontSize: 9.5,
               fontWeight: FontWeight.w800,
@@ -768,7 +780,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           ),
           const SizedBox(height: 5),
           Text(
-            _fallback(data['serviceType'], 'Shipping Service'),
+            _serviceDisplay(l10n, serviceRaw),
             style: const TextStyle(
               color: Color(0xFFD6E5F4),
               fontSize: 11.5,
@@ -779,7 +791,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           Row(
             children: [
               Expanded(
-                child: _headerRoute('FROM', _fallback(data['from'], 'Origin')),
+                child: _headerRoute(l10n.from, _fallback(data['from'], l10n.origin)),
               ),
               const Icon(
                 Icons.arrow_forward_rounded,
@@ -788,8 +800,8 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               ),
               Expanded(
                 child: _headerRoute(
-                  'TO',
-                  _fallback(data['to'], 'Destination'),
+                  l10n.to,
+                  _fallback(data['to'], l10n.destination),
                   alignEnd: true,
                 ),
               ),
@@ -916,6 +928,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _detailsPanel(Map<String, dynamic> data) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
@@ -926,9 +939,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Shipment Details',
-            style: TextStyle(
+          Text(
+            l10n.shipmentDetails,
+            style: const TextStyle(
               color: textDark,
               fontSize: 16,
               fontWeight: FontWeight.w800,
@@ -936,13 +949,13 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           ),
           const SizedBox(height: 15),
           _detailRow(
-            'Cargo Type',
-            _fallback(data['cargoType'], 'Not provided'),
+            l10n.cargoType,
+            _fallback(data['cargoType'], l10n.notProvided),
           ),
-          _detailRow('Weight', '${_fallback(data['weightKg'], '—')} KG'),
-          _detailRow('Quantity', _fallback(data['quantity'], '—')),
+          _detailRow(l10n.weight, '${_fallback(data['weightKg'], '—')} KG'),
+          _detailRow(l10n.quantity, _fallback(data['quantity'], '—')),
           _detailRow('Dimensions', _dimensions(data)),
-          _detailRow('Pickup Date', _formatDate(data['pickupDate'])),
+          _detailRow(l10n.pickupDate, _formatDate(data['pickupDate'])),
           _detailRow('Requested On', _formatDate(data['createdAt'])),
           _detailRow(
             'Notes',
@@ -1052,6 +1065,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
     String decision,
   ) async {
     final accepted = decision == 'accepted';
+    final l10n = AppLocalizations.of(context)!;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -1077,7 +1091,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(dialogContext, true),
@@ -1203,6 +1217,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _buildError() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Container(
         width: double.infinity,
@@ -1240,10 +1255,10 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               ),
             ),
             const SizedBox(height: 7),
-            const Text(
-              'Please check your connection and try again.',
+            Text(
+              l10n.pleaseCheckConnectionTryAgain,
               textAlign: TextAlign.center,
-              style: TextStyle(color: textGrey, fontSize: 11.5, height: 1.5),
+              style: const TextStyle(color: textGrey, fontSize: 11.5, height: 1.5),
             ),
             const SizedBox(height: 18),
             ElevatedButton.icon(
@@ -1251,7 +1266,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                 setState(() {});
               },
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Try Again'),
+              label: Text(l10n.tryAgain),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryBlue,
                 foregroundColor: Colors.white,
@@ -1269,6 +1284,21 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
         ),
       ),
     );
+  }
+
+  String _serviceDisplay(AppLocalizations l10n, String raw) {
+    if (raw.trim().isEmpty) return l10n.shippingService;
+    switch (raw) {
+      case 'Sea Freight':
+      case 'Air Freight':
+      case 'Land Freight':
+      case 'Car Shipping':
+      case 'International Moving':
+      case 'Parcel Shipping':
+        return LocaleController.serviceLabel(l10n, raw);
+      default:
+        return raw;
+    }
   }
 
   bool _hasPrice(Map<String, dynamic> data) {
@@ -1304,37 +1334,24 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   String _formatDate(dynamic value) {
+    final l10n = AppLocalizations.of(context)!;
     final date = _date(value);
 
     if (date.millisecondsSinceEpoch == 0) {
-      return 'Not provided';
+      return l10n.notProvided;
     }
 
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
   }
 
   String _dimensions(Map<String, dynamic> data) {
+    final l10n = AppLocalizations.of(context)!;
     final l = _text(data['lengthCm']).trim();
     final w = _text(data['widthCm']).trim();
     final h = _text(data['heightCm']).trim();
 
     if (l.isEmpty && w.isEmpty && h.isEmpty) {
-      return 'Not provided';
+      return l10n.notProvided;
     }
 
     return '${l.isEmpty ? '—' : l} × '

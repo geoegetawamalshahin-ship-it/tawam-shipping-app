@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
+
 const Color _primaryBlue = Color(0xFF07569E);
 const Color _darkNavy = Color(0xFF10233F);
 const Color _accentRed = Color(0xFFD72638);
@@ -82,7 +85,20 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
     }
   }
 
+  String _shippingModeLabel(AppLocalizations l10n, String mode) {
+    switch (mode) {
+      case 'Air Freight':
+      case 'Sea Freight':
+        return LocaleController.serviceLabel(l10n, mode);
+      case 'Express':
+        return l10n.express;
+      default:
+        return mode;
+    }
+  }
+
   Future<void> _choosePickupDate() async {
+    final l10n = AppLocalizations.of(context)!;
     final today = DateTime.now();
 
     final selectedDate = await showDatePicker(
@@ -91,7 +107,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
       firstDate: today,
       lastDate: DateTime(today.year + 2),
       helpText: 'Select preferred pickup date',
-      cancelText: 'Cancel',
+      cancelText: l10n.cancel,
       confirmText: 'Select',
       builder: (context, child) {
         return Theme(
@@ -117,23 +133,9 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   String _formatDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
+    final l10n = AppLocalizations.of(context)!;
     final day = date.day.toString().padLeft(2, '0');
-    final month = months[date.month - 1];
+    final month = LocaleController.monthAbbrev(l10n, date.month);
 
     return '$day $month ${date.year}';
   }
@@ -146,9 +148,10 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please sign in before submitting a quote request'),
+        SnackBar(
+          content: Text(l10n.pleaseSignInBeforeQuoteShort),
         ),
       );
       return;
@@ -193,8 +196,8 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not submit quote request. Please try again.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.couldNotSubmitQuoteRetry),
         ),
       );
     } finally {
@@ -207,6 +210,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   void _showSuccessDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -246,10 +250,10 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
                 const SizedBox(height: 20),
 
-                const Text(
-                  'Quote Request Submitted',
+                Text(
+                  l10n.quoteRequestSubmitted,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: _darkNavy,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
@@ -315,9 +319,9 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                         borderRadius: BorderRadius.circular(17),
                       ),
                     ),
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.done,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                       ),
@@ -377,48 +381,51 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   String? _emailValidator(String? value) {
+    final l10n = AppLocalizations.of(context)!;
     final email = value?.trim() ?? '';
 
     if (email.isEmpty) {
-      return 'Please enter your email address';
+      return l10n.pleaseEnterEmail;
     }
 
     final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
 
     if (!validEmail) {
-      return 'Please enter a valid email address';
+      return l10n.pleaseEnterValidEmail;
     }
 
     return null;
   }
 
   String? _weightValidator(String? value) {
+    final l10n = AppLocalizations.of(context)!;
     final weight = value?.trim() ?? '';
 
     if (weight.isEmpty) {
-      return 'Please enter the cargo weight';
+      return l10n.pleaseEnterCargoWeight;
     }
 
     final parsedWeight = double.tryParse(weight);
 
     if (parsedWeight == null || parsedWeight <= 0) {
-      return 'Please enter a valid weight';
+      return l10n.pleaseEnterValidWeight;
     }
 
     return null;
   }
 
   String? _quantityValidator(String? value) {
+    final l10n = AppLocalizations.of(context)!;
     final quantity = value?.trim() ?? '';
 
     if (quantity.isEmpty) {
-      return 'Please enter the number of items';
+      return l10n.pleaseEnterNumberOfItems;
     }
 
     final parsedQuantity = int.tryParse(quantity);
 
     if (parsedQuantity == null || parsedQuantity <= 0) {
-      return 'Please enter a valid quantity';
+      return l10n.pleaseEnterValidQuantity;
     }
 
     return null;
@@ -426,6 +433,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: _pageBackground,
       body: SafeArea(
@@ -440,7 +448,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
               _SectionCard(
                 icon: Icons.route_rounded,
-                title: 'Route Details',
+                title: l10n.routeDetails,
                 subtitle:
                     'Tell us where your shipment will be collected and delivered.',
                 child: Column(
@@ -451,11 +459,11 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       validator: (value) {
                         return _requiredValidator(
                           value,
-                          'Please enter the pickup location',
+                          l10n.pleaseEnterPickupLocation,
                         );
                       },
                       decoration: _fieldDecoration(
-                        hintText: 'Pickup location',
+                        hintText: l10n.pickupLocation,
                         icon: Icons.radio_button_checked_rounded,
                       ),
                     ),
@@ -483,11 +491,11 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       validator: (value) {
                         return _requiredValidator(
                           value,
-                          'Please enter the delivery location',
+                          l10n.pleaseEnterDeliveryLocation,
                         );
                       },
                       decoration: _fieldDecoration(
-                        hintText: 'Delivery location',
+                        hintText: l10n.deliveryLocation,
                         icon: Icons.location_on_rounded,
                       ),
                     ),
@@ -499,7 +507,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
               _SectionCard(
                 icon: Icons.local_shipping_outlined,
-                title: 'Shipping Service',
+                title: l10n.shippingService,
                 subtitle:
                     'Choose the transportation service that fits your shipment.',
                 child: LayoutBuilder(
@@ -513,7 +521,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                         return SizedBox(
                           width: itemWidth,
                           child: _ShippingModeCard(
-                            title: mode,
+                            title: _shippingModeLabel(l10n, mode),
                             icon: _shippingModeIcon(mode),
                             selected: _selectedShippingMode == mode,
                             onTap: () {
@@ -533,7 +541,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
               _SectionCard(
                 icon: Icons.inventory_2_outlined,
-                title: 'Cargo Information',
+                title: l10n.cargoInformation,
                 subtitle:
                     'Provide the cargo details so we can prepare an accurate quote.',
                 child: Column(
@@ -546,7 +554,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       ),
                       isExpanded: true,
                       decoration: _fieldDecoration(
-                        hintText: 'Cargo type',
+                        hintText: l10n.cargoType,
                         icon: Icons.category_outlined,
                       ),
                       items: _cargoTypes.map((cargoType) {
@@ -583,7 +591,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                         );
                       },
                       decoration: _fieldDecoration(
-                        hintText: 'Cargo description',
+                        hintText: l10n.cargoDescription,
                         icon: Icons.description_outlined,
                       ),
                     ),
@@ -602,7 +610,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                             textInputAction: TextInputAction.next,
                             validator: _weightValidator,
                             decoration: _fieldDecoration(
-                              hintText: 'Weight (kg)',
+                              hintText: l10n.weightKg,
                               icon: Icons.scale_outlined,
                             ),
                           ),
@@ -617,7 +625,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                             textInputAction: TextInputAction.next,
                             validator: _quantityValidator,
                             decoration: _fieldDecoration(
-                              hintText: 'Quantity',
+                              hintText: l10n.quantity,
                               icon: Icons.numbers_rounded,
                             ),
                           ),
@@ -632,7 +640,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
               _SectionCard(
                 icon: Icons.calendar_month_outlined,
-                title: 'Pickup Schedule',
+                title: l10n.pickupSchedule,
                 subtitle: 'Choose your preferred date for cargo collection.',
                 child: TextFormField(
                   controller: _dateController,
@@ -646,7 +654,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                     return null;
                   },
                   decoration: _fieldDecoration(
-                    hintText: 'Preferred pickup date',
+                    hintText: l10n.preferredPickupDate,
                     icon: Icons.calendar_today_outlined,
                     suffixIcon: const Icon(
                       Icons.keyboard_arrow_down_rounded,
@@ -660,7 +668,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
               _SectionCard(
                 icon: Icons.person_outline_rounded,
-                title: 'Contact Information',
+                title: l10n.contactInformation,
                 subtitle:
                     'Enter the details our logistics team can use to contact you.',
                 child: Column(
@@ -672,11 +680,11 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       validator: (value) {
                         return _requiredValidator(
                           value,
-                          'Please enter your full name',
+                          l10n.pleaseEnterFullName,
                         );
                       },
                       decoration: _fieldDecoration(
-                        hintText: 'Full name',
+                        hintText: l10n.fullName,
                         icon: Icons.person_outline_rounded,
                       ),
                     ),
@@ -690,11 +698,11 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       validator: (value) {
                         return _requiredValidator(
                           value,
-                          'Please enter your phone number',
+                          l10n.pleaseEnterPhone,
                         );
                       },
                       decoration: _fieldDecoration(
-                        hintText: 'Phone number',
+                        hintText: l10n.phoneNumber,
                         icon: Icons.phone_outlined,
                       ),
                     ),
@@ -707,7 +715,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       textInputAction: TextInputAction.next,
                       validator: _emailValidator,
                       decoration: _fieldDecoration(
-                        hintText: 'Email address',
+                        hintText: l10n.emailAddressHint,
                         icon: Icons.email_outlined,
                       ),
                     ),
@@ -719,7 +727,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
               _SectionCard(
                 icon: Icons.edit_note_rounded,
-                title: 'Additional Notes',
+                title: l10n.additionalNotes,
                 subtitle:
                     'Add any instructions or special requirements for your shipment.',
                 child: TextFormField(
@@ -793,18 +801,18 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                             strokeWidth: 2.5,
                           ),
                         )
-                      : const Row(
+                      : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Submit Quote Request',
-                              style: TextStyle(
+                              l10n.submitQuoteRequest,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            SizedBox(width: 11),
-                            Icon(Icons.arrow_forward_rounded, size: 22),
+                            const SizedBox(width: 11),
+                            const Icon(Icons.arrow_forward_rounded, size: 22),
                           ],
                         ),
                 ),
@@ -817,6 +825,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   Widget _buildPremiumHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
@@ -893,9 +902,9 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
           const SizedBox(height: 18),
 
-          const Text(
-            'Request a Quote',
-            style: TextStyle(
+          Text(
+            l10n.catRequestQuote,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 29,
               fontWeight: FontWeight.w800,
@@ -915,26 +924,26 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
           const SizedBox(height: 22),
 
-          const Row(
+          Row(
             children: [
               Expanded(
                 child: _HeaderBenefit(
                   icon: Icons.lock_outline_rounded,
-                  label: 'Secure',
+                  label: l10n.secure,
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 child: _HeaderBenefit(
                   icon: Icons.tune_rounded,
-                  label: 'Tailored',
+                  label: l10n.tailored,
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 child: _HeaderBenefit(
                   icon: Icons.support_agent_rounded,
-                  label: 'Supported',
+                  label: l10n.supported,
                 ),
               ),
             ],

@@ -6,6 +6,8 @@ import 'dart:async';
 import 'my_support_requests_screen.dart';
 import 'shipment_details_screen.dart';
 import 'my_quotes_screen.dart';
+import '../locale_controller.dart';
+import '../l10n/app_localizations.dart';
 
 // ==========================================================
 // TAWAM PREMIUM BRAND
@@ -79,12 +81,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               return <String, dynamic>{
                 'id': doc.id,
                 'referenceId': (data['referenceId'] ?? '').toString(),
-                'title': (data['title'] ?? 'Notification').toString(),
+                'title': (data['title'] ?? '').toString(),
                 'message': (data['message'] ?? '').toString(),
+                'event': data['event']?.toString(),
+                'params': _notificationParams(data['params']),
                 'type': _normalizeType(data['type']),
                 'isRead': data['isRead'] == true,
-                'time': _formatNotificationTime(date),
-                'group': _notificationGroup(date),
                 'createdAt': date,
               };
             }).toList();
@@ -113,8 +115,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
             setState(() {
               _isLoading = false;
-              _loadError =
-                  'We couldn\'t load your notifications. Please check your connection and try again.';
+              _loadError = 'error';
             });
           },
         );
@@ -129,8 +130,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return 'Shipment';
   }
 
-  String _notificationGroup(DateTime? date) {
-    if (date == null) return 'Earlier';
+  Map<String, dynamic>? _notificationParams(dynamic value) {
+    if (value is Map) {
+      return Map<String, dynamic>.from(value);
+    }
+
+    return null;
+  }
+
+  String _notificationGroupKey(DateTime? date) {
+    if (date == null) return 'earlier';
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -138,34 +147,57 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     final difference = today.difference(notificationDate).inDays;
 
-    if (difference == 0) return 'Today';
-    if (difference == 1) return 'Yesterday';
+    if (difference == 0) return 'today';
+    if (difference == 1) return 'yesterday';
 
-    return 'Earlier';
+    return 'earlier';
   }
 
-  String _formatNotificationTime(DateTime? date) {
+  String _formatNotificationTime(AppLocalizations l10n, DateTime? date) {
     if (date == null) return '';
 
     final difference = DateTime.now().difference(date);
 
     if (difference.inMinutes < 1) {
-      return 'Just now';
+      return l10n.justNow;
     }
 
     if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} minutes ago';
+      return l10n.minutesAgo(difference.inMinutes);
     }
 
     if (difference.inHours < 24) {
-      return '${difference.inHours} hours ago';
+      return l10n.hoursAgo(difference.inHours);
     }
 
     if (difference.inDays == 1) {
-      return 'Yesterday';
+      return l10n.yesterday;
     }
 
-    return '${difference.inDays} days ago';
+    return l10n.daysAgo(difference.inDays);
+  }
+
+  String _displayTitle(
+    AppLocalizations l10n,
+    Map<String, dynamic> notification,
+  ) {
+    final event = notification['event'] as String?;
+    final storedTitle = (notification['title'] ?? '').toString();
+
+    return LocaleController.notificationTitle(l10n, event) ??
+        (storedTitle.isNotEmpty ? storedTitle : l10n.notificationDefault);
+  }
+
+  String _displayMessage(
+    AppLocalizations l10n,
+    Map<String, dynamic> notification,
+  ) {
+    final event = notification['event'] as String?;
+    final params = notification['params'] as Map<String, dynamic>?;
+    final storedMessage = (notification['message'] ?? '').toString();
+
+    return LocaleController.notificationBody(l10n, event, params) ??
+        storedMessage;
   }
 
   @override
@@ -245,7 +277,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     if (snapshot.docs.isEmpty) {
       if (!mounted) return;
-      _showMessage('No unread notifications');
+      _showMessage(AppLocalizations.of(context)!.noUnreadNotifications);
       return;
     }
 
@@ -259,7 +291,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     if (!mounted) return;
 
-    _showMessage('All notifications marked as read');
+    _showMessage(AppLocalizations.of(context)!.allMarkedAsRead);
   }
 
   Future<void> _markAsRead(String id) async {
@@ -282,9 +314,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     if (!mounted) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Notification deleted'),
+        content: Text(l10n.notificationDeleted),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
@@ -305,15 +339,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   // GROUPED NOTIFICATIONS
   // ==========================================================
 
-  List<Widget> _buildGroupedNotifications() {
-    const groups = ['Today', 'Yesterday', 'Earlier'];
+  List<Widget> _buildGroupedNotifications(AppLocalizations l10n) {
+    final groups = <(String, String)>[
+      ('today', l10n.today),
+      ('yesterday', l10n.yesterday),
+      ('earlier', l10n.earlier),
+    ];
 
     final widgets = <Widget>[];
 
     for (final group in groups) {
-      final groupNotifications = _filteredNotifications
-          .where((notification) => notification['group'] == group)
-          .toList();
+      final groupKey = group.$1;
+      final groupLabel = group.$2;
+
+      final groupNotifications = _filteredNotifications.where((notification) {
+        final createdAt = notification['createdAt'] as DateTime?;
+        return _notificationGroupKey(createdAt) == groupKey;
+      }).toList();
 
       if (groupNotifications.isEmpty) continue;
 
@@ -323,7 +365,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           child: Row(
             children: [
               Text(
-                group,
+                groupLabel,
                 style: const TextStyle(
                   color: _darkNavy,
                   fontSize: 15.5,
@@ -375,8 +417,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 _deleteNotification(notification['id']);
               },
               background: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 25),
+                alignment: AlignmentDirectional.centerEnd,
+                padding: const EdgeInsetsDirectional.only(end: 25),
                 decoration: BoxDecoration(
                   color: _accentRed,
                   borderRadius: BorderRadius.circular(23),
@@ -389,9 +431,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
 
               child: _NotificationCard(
-                title: notification['title'],
-                message: notification['message'],
-                time: notification['time'],
+                title: _displayTitle(l10n, notification),
+                message: _displayMessage(l10n, notification),
+                time: _formatNotificationTime(
+                  l10n,
+                  notification['createdAt'] as DateTime?,
+                ),
                 icon: _notificationIcon(notification['type']),
                 color: _notificationColor(notification['type']),
                 isRead: notification['isRead'],
@@ -437,8 +482,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                       if (!document.exists || document.data() == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Shipment could not be found.'),
+                          SnackBar(
+                            content: Text(l10n.shipmentNotFoundShort),
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
@@ -461,8 +506,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       if (!mounted) return;
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Could not open shipment details.'),
+                        SnackBar(
+                          content: Text(l10n.couldNotOpenShipmentDetails),
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
@@ -514,6 +559,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasNotifications = _filteredNotifications.isNotEmpty;
 
     return Scaffold(
@@ -523,34 +569,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(14, 14, 14, 34),
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
 
             const SizedBox(height: 18),
 
-            _buildFilters(),
+            _buildFilters(l10n),
 
             const SizedBox(height: 23),
 
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Notification Center',
-                        style: TextStyle(
+                        l10n.notificationCenter,
+                        style: const TextStyle(
                           color: _darkNavy,
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
                           letterSpacing: -0.4,
                         ),
                       ),
-                      SizedBox(height: 3),
+                      const SizedBox(height: 3),
                       Text(
-                        'Stay informed about your logistics activity',
-                        style: TextStyle(
+                        l10n.stayInformed,
+                        style: const TextStyle(
                           color: _mutedText,
                           fontSize: 10.5,
                           fontWeight: FontWeight.w500,
@@ -571,9 +617,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ),
                     ),
                     icon: const Icon(Icons.done_all_rounded, size: 17),
-                    label: const Text(
-                      'Read all',
-                      style: TextStyle(
+                    label: Text(
+                      l10n.readAll,
+                      style: const TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w900,
                       ),
@@ -612,10 +658,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Unable to load notifications',
+                      Text(
+                        l10n.unableToLoadNotifications,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFF071D36),
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
@@ -625,7 +671,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Text(
-                          _loadError!,
+                          l10n.couldNotLoadNotifications,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Color(0xFF75869B),
@@ -638,7 +684,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ElevatedButton.icon(
                         onPressed: _listenToNotifications,
                         icon: const Icon(Icons.refresh_rounded, size: 18),
-                        label: const Text('Try Again'),
+                        label: Text(l10n.tryAgain),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0B5FB3),
                           foregroundColor: Colors.white,
@@ -656,9 +702,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
               )
             else if (hasNotifications)
-              ..._buildGroupedNotifications()
+              ..._buildGroupedNotifications(l10n)
             else
-              _buildEmptyState(),
+              _buildEmptyState(l10n),
           ],
         ),
       ),
@@ -669,7 +715,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   // PREMIUM HEADER
   // ==========================================================
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -792,9 +838,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                 const SizedBox(height: 22),
 
-                const Text(
-                  'NOTIFICATION CENTER',
-                  style: TextStyle(
+                Text(
+                  l10n.notificationCenter.toUpperCase(),
+                  style: const TextStyle(
                     color: Color(0xFFBFD9F2),
                     fontSize: 8.5,
                     letterSpacing: 2.1,
@@ -804,9 +850,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                 const SizedBox(height: 7),
 
-                const Text(
-                  'Notifications',
-                  style: TextStyle(
+                Text(
+                  l10n.notifications,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 29,
                     fontWeight: FontWeight.w900,
@@ -859,7 +905,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '$_unreadCount unread',
+                            '$_unreadCount ${l10n.unread}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11.5,
@@ -867,9 +913,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          const Text(
-                            'Live notification status',
-                            style: TextStyle(
+                          Text(
+                            l10n.liveNotificationStatus,
+                            style: const TextStyle(
                               color: Color(0xFFC6DCEF),
                               fontSize: 8.5,
                             ),
@@ -888,18 +934,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           color: Colors.white.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.sync_rounded,
                               color: Colors.white,
                               size: 13,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
-                              'LIVE',
-                              style: TextStyle(
+                              l10n.live,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 8,
                                 letterSpacing: 0.8,
@@ -924,18 +970,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   // FILTERS
   // ==========================================================
 
-  Widget _buildFilters() {
-    const filters = ['All', 'Unread', 'Shipments', 'Quotes'];
+  Widget _buildFilters(AppLocalizations l10n) {
+    final filters = <(String, String)>[
+      ('All', l10n.all),
+      ('Unread', l10n.unread),
+      ('Shipments', l10n.shipments),
+      ('Quotes', l10n.quotes),
+    ];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: filters.map((filter) {
-          final selected = _selectedFilter == filter;
+          final filterValue = filter.$1;
+          final filterLabel = filter.$2;
+          final selected = _selectedFilter == filterValue;
 
           IconData icon;
 
-          switch (filter) {
+          switch (filterValue) {
             case 'Unread':
               icon = Icons.mark_email_unread_outlined;
               break;
@@ -959,7 +1012,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: InkWell(
                 onTap: () {
                   setState(() {
-                    _selectedFilter = filter;
+                    _selectedFilter = filterValue;
                   });
                 },
                 borderRadius: BorderRadius.circular(30),
@@ -1006,7 +1059,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       const SizedBox(width: 6),
 
                       Text(
-                        filter,
+                        filterLabel,
                         style: TextStyle(
                           color: selected
                               ? Colors.white
@@ -1030,7 +1083,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   // EMPTY STATE
   // ==========================================================
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 16),
@@ -1066,10 +1119,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
           const SizedBox(height: 18),
 
-          const Text(
-            'No notifications yet',
+          Text(
+            l10n.noNotificationsYet,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(0xFF071D36),
               fontSize: 18,
               fontWeight: FontWeight.w900,
@@ -1078,8 +1131,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
           const SizedBox(height: 8),
 
-          const Text(
-            'Shipment updates, quotations, and important account alerts will appear here automatically.',
+          Text(
+            l10n.notificationEmptyHint,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Color(0xFF75869B),
@@ -1144,6 +1197,8 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1285,8 +1340,8 @@ class _NotificationCard extends StatelessWidget {
 
                                             Text(
                                               isRead
-                                                  ? 'Mark as unread'
-                                                  : 'Mark as read',
+                                                  ? l10n.markAsUnread
+                                                  : l10n.markAsRead,
                                               style: const TextStyle(
                                                 color: _darkNavy,
                                                 fontSize: 12,
@@ -1299,11 +1354,11 @@ class _NotificationCard extends StatelessWidget {
 
                                       const PopupMenuDivider(),
 
-                                      const PopupMenuItem<String>(
+                                      PopupMenuItem<String>(
                                         value: 'delete',
                                         child: Row(
                                           children: [
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 33,
                                               height: 33,
                                               child: Icon(
@@ -1313,11 +1368,11 @@ class _NotificationCard extends StatelessWidget {
                                               ),
                                             ),
 
-                                            SizedBox(width: 10),
+                                            const SizedBox(width: 10),
 
                                             Text(
-                                              'Delete notification',
-                                              style: TextStyle(
+                                              l10n.deleteNotification,
+                                              style: const TextStyle(
                                                 color: _accentRed,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w700,
@@ -1394,9 +1449,9 @@ class _NotificationCard extends StatelessWidget {
                                       color: const Color(0xFFEAF4FD),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: const Text(
-                                      'NEW',
-                                      style: TextStyle(
+                                    child: Text(
+                                      l10n.newBadge,
+                                      style: const TextStyle(
                                         color: _primaryBlue,
                                         fontSize: 8,
                                         letterSpacing: 0.8,

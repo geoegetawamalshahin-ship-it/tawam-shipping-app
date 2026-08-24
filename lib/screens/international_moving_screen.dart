@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
 
 class InternationalMovingScreen extends StatefulWidget {
@@ -226,7 +228,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     if (!mounted) return;
 
     setState(() {
-      _customerName = name.isEmpty ? 'TAWAM Customer' : name;
+      _customerName = name.isEmpty
+          ? AppLocalizations.of(context)!.tawamCustomer
+          : name;
       _customerEmail = email;
       _customerPhone = phone;
       _customerCompany = company;
@@ -241,6 +245,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBg,
       body: SafeArea(
@@ -266,9 +272,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '01',
                       icon: Icons.route_rounded,
-                      title: 'Moving Route',
-                      subtitle:
-                          'Tell us where your move starts and where your new destination is.',
+                      title: l10n.shipmentRoute,
+                      subtitle: l10n.tellUsWhereMoving,
                     ),
 
                     const SizedBox(height: 13),
@@ -336,9 +341,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '06',
                       icon: Icons.add_business_outlined,
-                      title: 'Additional Services',
-                      subtitle:
-                          'Add customs and destination support if required.',
+                      title: l10n.additionalServices,
+                      subtitle: l10n.addOptionalLogistics,
                     ),
 
                     const SizedBox(height: 13),
@@ -350,8 +354,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '07',
                       icon: Icons.person_outline_rounded,
-                      title: 'Contact Details',
-                      subtitle: 'Automatically filled from your account.',
+                      title: l10n.contactDetails,
+                      subtitle: l10n.contactFilledFromAccount,
                     ),
 
                     const SizedBox(height: 13),
@@ -363,9 +367,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '08',
                       icon: Icons.notes_rounded,
-                      title: 'Special Instructions',
-                      subtitle:
-                          'Tell our relocation team anything else that may help planning.',
+                      title: l10n.specialInstructions,
+                      subtitle: l10n.anythingTeamShouldKnow,
                     ),
 
                     const SizedBox(height: 13),
@@ -382,18 +385,18 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                     const SizedBox(height: 13),
 
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.lock_outline_rounded,
                           color: _textGrey,
                           size: 14,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            'Your moving information is securely submitted to our relocation team.',
+                            l10n.infoSubmittedSecurely,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: _textGrey,
@@ -420,6 +423,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 82,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -460,24 +465,24 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           const SizedBox(width: 14),
 
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'International Moving Quote',
-                  style: TextStyle(
+                  l10n.movingQuote,
+                  style: const TextStyle(
                     color: _textDark,
                     fontSize: 19,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'OFFICIAL RELOCATION RATE REQUEST',
-                  style: TextStyle(
+                  l10n.officialRateRequest,
+                  style: const TextStyle(
                     color: _primaryBlue,
                     fontSize: 8.2,
                     fontWeight: FontWeight.w800,
@@ -608,6 +613,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   }
 
   Widget _buildTrustBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       decoration: BoxDecoration(
@@ -615,29 +622,29 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
         borderRadius: BorderRadius.circular(19),
         border: Border.all(color: _border),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Expanded(
+          const Expanded(
             child: _MovingTrustItem(
               icon: Icons.inventory_2_outlined,
               title: 'PACK',
               subtitle: 'Professional Packing',
             ),
           ),
-          _MovingDivider(),
+          const _MovingDivider(),
           Expanded(
             child: _MovingTrustItem(
               icon: Icons.public_rounded,
               title: 'GLOBAL',
-              subtitle: 'International Move',
+              subtitle: l10n.serviceInternationalMoving,
             ),
           ),
-          _MovingDivider(),
+          const _MovingDivider(),
           Expanded(
             child: _MovingTrustItem(
               icon: Icons.home_rounded,
               title: 'D2D',
-              subtitle: 'Door to Door',
+              subtitle: l10n.doorToDoor,
             ),
           ),
         ],
@@ -725,17 +732,19 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildRouteSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         children: [
           _textField(
             controller: _originController,
-            label: 'Moving From',
+            label: l10n.origin,
             hint: 'City, building or current address',
             icon: Icons.home_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter origin';
+                return l10n.pleaseEnterOrigin;
               }
 
               return null;
@@ -776,12 +785,12 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           _textField(
             controller: _destinationController,
-            label: 'Moving To',
+            label: l10n.destination,
             hint: 'City, building or destination address',
             icon: Icons.location_on_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter destination';
+                return l10n.pleaseEnterDestination;
               }
 
               return null;
@@ -791,10 +800,11 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           const SizedBox(height: 16),
 
           _dropdown(
-            label: 'Service Mode',
+            label: l10n.serviceMode,
             icon: Icons.route_outlined,
             value: _serviceMode,
             items: _serviceModes,
+            itemLabel: (item) => _optionLabel(l10n, item),
             onChanged: (value) {
               if (value == null) return;
 
@@ -813,6 +823,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   }
 
   Widget _dateSelector() {
+    final l10n = AppLocalizations.of(context)!;
+
     return InkWell(
       onTap: _selectMovingDate,
       borderRadius: BorderRadius.circular(15),
@@ -845,8 +857,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Preferred Moving Date',
+                  Text(
+                    l10n.preferredPickupDate,
                     style: TextStyle(
                       color: _textGrey,
                       fontSize: 9.5,
@@ -858,7 +870,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                   Text(
                     _movingDate == null
-                        ? 'Select moving date'
+                        ? l10n.selectADate
                         : _formatDate(_movingDate!),
                     style: TextStyle(
                       color: _movingDate == null ? _textGrey : _textDark,
@@ -1348,12 +1360,14 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildMovingServicesSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         children: [
           _optionSwitch(
             icon: Icons.inventory_2_outlined,
-            title: 'Professional Packing',
+            title: l10n.packing,
             subtitle: 'Our moving team packs household or office items.',
             value: _packingRequired,
             onChanged: (value) {
@@ -1410,8 +1424,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           _optionSwitch(
             icon: Icons.shield_outlined,
-            title: 'Moving Insurance',
-            subtitle: 'Request insurance options with the quotation.',
+            title: l10n.cargoInsurance,
+            subtitle: l10n.requestInsuranceHint,
             value: _insuranceRequested,
             onChanged: (value) {
               setState(() {
@@ -1425,13 +1439,15 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   }
 
   Widget _buildAdditionalServicesSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select services',
-            style: TextStyle(
+          Text(
+            l10n.selectServices,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -1440,9 +1456,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           const SizedBox(height: 5),
 
-          const Text(
-            'You can choose more than one.',
-            style: TextStyle(color: _textGrey, fontSize: 9.5),
+          Text(
+            l10n.youCanChooseMoreThanOne,
+            style: const TextStyle(color: _textGrey, fontSize: 9.5),
           ),
 
           const SizedBox(height: 14),
@@ -1454,7 +1470,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               final selected = _additionalServices.contains(service);
 
               return FilterChip(
-                label: Text(service),
+                label: Text(_optionLabel(l10n, service)),
                 selected: selected,
                 showCheckmark: true,
                 checkmarkColor: Colors.white,
@@ -1491,6 +1507,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildCustomerSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: _loadingProfile
           ? const Padding(
@@ -1510,9 +1528,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     color: const Color(0xFFEAF8F0),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.verified_user_outlined,
                         color: _success,
                         size: 18,
@@ -1522,7 +1540,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                       Expanded(
                         child: Text(
-                          'Contact details automatically filled from your account.',
+                          l10n.contactFilledFromAccount,
                           style: TextStyle(
                             color: _success,
                             fontSize: 9.5,
@@ -1539,7 +1557,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                 _contactRow(
                   icon: Icons.person_outline_rounded,
-                  label: 'Full Name',
+                  label: l10n.fullName,
                   value: _customerName,
                 ),
 
@@ -1547,9 +1565,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                 _contactRow(
                   icon: Icons.phone_outlined,
-                  label: 'Phone Number',
+                  label: l10n.phoneNumber,
                   value: _customerPhone.isEmpty
-                      ? 'Not added to profile'
+                      ? l10n.notProvided
                       : _customerPhone,
                 ),
 
@@ -1557,9 +1575,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                 _contactRow(
                   icon: Icons.email_outlined,
-                  label: 'Email Address',
+                  label: l10n.emailAddress,
                   value: _customerEmail.isEmpty
-                      ? 'Not added to profile'
+                      ? l10n.notProvided
                       : _customerEmail,
                 ),
 
@@ -1568,7 +1586,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                   _contactRow(
                     icon: Icons.business_outlined,
-                    label: 'Company',
+                    label: l10n.company,
                     value: _customerCompany,
                   ),
                 ],
@@ -1641,6 +1659,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildNotesSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: TextFormField(
         controller: _notesController,
@@ -1653,8 +1673,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           fontWeight: FontWeight.w600,
         ),
         decoration: InputDecoration(
-          hintText:
-              'Building access, parking restrictions, fragile items, destination timing, storage details, customs notes...',
+          hintText: l10n.specialHandlingHint,
           hintStyle: const TextStyle(
             color: Color(0xFFA1ACB9),
             fontSize: 10,
@@ -1688,12 +1707,14 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildSummary() {
+    final l10n = AppLocalizations.of(context)!;
+
     final origin = _originController.text.trim().isEmpty
-        ? 'Moving From'
+        ? l10n.origin
         : _originController.text.trim();
 
     final destination = _destinationController.text.trim().isEmpty
-        ? 'Moving To'
+        ? l10n.destination
         : _destinationController.text.trim();
 
     return Container(
@@ -1794,7 +1815,10 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                 spacing: 7,
                 runSpacing: 7,
                 children: [
-                  _summaryBadge(Icons.public_rounded, 'International Moving'),
+                  _summaryBadge(
+                    Icons.public_rounded,
+                    LocaleController.serviceLabel(l10n, 'International Moving'),
+                  ),
 
                   _summaryBadge(Icons.home_work_outlined, _moveType),
 
@@ -1805,7 +1829,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     '$_roomsCount Room${_roomsCount == 1 ? '' : 's'}',
                   ),
 
-                  _summaryBadge(Icons.inventory_2_outlined, '$_boxCount Boxes'),
+                  _summaryBadge(Icons.inventory_2_outlined, '$_boxCount ${l10n.boxes}'),
                 ],
               ),
 
@@ -1925,6 +1949,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildSubmitButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       width: double.infinity,
       height: 60,
@@ -1956,7 +1982,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                   SizedBox(width: 10),
 
                   Text(
-                    'REQUEST OFFICIAL QUOTE',
+                    l10n.submitQuoteRequest,
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w900,
@@ -1978,23 +2004,25 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       _showMessage(
-        'Please complete the required moving information.',
+        l10n.pleaseCompleteShipmentInfo,
         error: true,
       );
       return;
     }
 
     if (_movingDate == null) {
-      _showMessage('Please select your preferred moving date.', error: true);
+      _showMessage(l10n.pleaseSelectPickupDate, error: true);
       return;
     }
 
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showMessage('Please sign in before requesting a quote.', error: true);
+      _showMessage(l10n.pleaseSignInBeforeQuote, error: true);
       return;
     }
 
@@ -2164,7 +2192,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       });
 
       _showMessage(
-        error.message ?? 'Could not submit moving quote request.',
+        error.message ?? l10n.couldNotSubmitQuote,
         error: true,
       );
     } catch (_) {
@@ -2174,7 +2202,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
         _submitting = false;
       });
 
-      _showMessage('Something went wrong. Please try again.', error: true);
+      _showMessage(l10n.somethingWentWrong, error: true);
     }
   }
 
@@ -2187,6 +2215,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
+        final dialogL10n = AppLocalizations.of(dialogContext)!;
+
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 23),
@@ -2222,8 +2252,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                 const SizedBox(height: 17),
 
-                const Text(
-                  'Moving Request Received',
+                Text(
+                  dialogL10n.quoteRequestSubmitted,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _textDark,
@@ -2234,8 +2264,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Your international relocation request has been sent securely to our moving team.',
+                Text(
+                  dialogL10n.quoteSentToTawam,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _textGrey,
@@ -2256,9 +2286,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        'REQUEST NUMBER',
-                        style: TextStyle(
+                      Text(
+                        dialogL10n.reference,
+                        style: const TextStyle(
                           color: _textGrey,
                           fontSize: 8,
                           letterSpacing: 1,
@@ -2304,9 +2334,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'VIEW MY QUOTES',
-                      style: TextStyle(
+                    child: Text(
+                      dialogL10n.myQuotes,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
                       ),
@@ -2331,9 +2361,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'DONE',
-                      style: TextStyle(
+                    child: Text(
+                      dialogL10n.doneUpper,
+                      style: const TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w800,
                       ),
@@ -2408,6 +2438,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     required String value,
     required List<String> items,
     required ValueChanged<String?> onChanged,
+    String Function(String item)? itemLabel,
   }) {
     return DropdownButtonFormField<String>(
       initialValue: value,
@@ -2422,7 +2453,10 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       decoration: _inputDecoration(label: label, hint: '', icon: icon),
       items: items
           .map(
-            (item) => DropdownMenuItem<String>(value: item, child: Text(item)),
+            (item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(itemLabel?.call(item) ?? item),
+            ),
           )
           .toList(),
       onChanged: onChanged,
@@ -2641,22 +2675,51 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   }
 
   String _formatDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    final l10n = AppLocalizations.of(context)!;
 
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+  }
+
+  // Map stored English option values to localized display labels.
+  String _optionLabel(AppLocalizations l10n, String value) {
+    switch (value) {
+      case 'Door to Door':
+        return l10n.doorToDoor;
+      case 'Port to Port':
+        return l10n.portToPort;
+      case 'Door to Port':
+        return l10n.doorToPort;
+      case 'Port to Door':
+        return l10n.portToDoor;
+      case 'Customs Clearance':
+        return l10n.customsClearance;
+      case 'Pickup':
+        return l10n.pickup;
+      case 'Delivery':
+        return l10n.delivery;
+      case 'Export Documentation':
+        return l10n.exportDocumentation;
+      case 'Packing':
+        return l10n.packing;
+      case 'Open Carrier':
+        return l10n.openCarrier;
+      case 'Standard':
+        return l10n.standard;
+      case 'Express':
+        return l10n.express;
+      case 'Priority':
+        return l10n.priority;
+      case 'Boxes':
+        return l10n.boxes;
+      case 'Pallets':
+        return l10n.pallets;
+      case 'Loose Cargo':
+        return l10n.looseCargo;
+      case 'Crates':
+        return l10n.crates;
+      default:
+        return value;
+    }
   }
 
   String _formatNumber(double value) {

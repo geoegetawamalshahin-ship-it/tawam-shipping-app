@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
+
 class MyBookingsScreen extends StatefulWidget {
   const MyBookingsScreen({super.key});
 
@@ -145,9 +148,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
                           const SizedBox(height: 24),
 
-                          const Text(
-                            'Your Bookings',
-                            style: TextStyle(
+                          Text(
+                            l10n.yourBookings,
+                            style: const TextStyle(
                               color: textDark,
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
@@ -193,6 +196,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   // =========================================================
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 84,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -226,23 +230,23 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
           const SizedBox(width: 14),
 
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'My Bookings',
-                  style: TextStyle(
+                  l10n.myBookings,
+                  style: const TextStyle(
                     color: textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: primaryBlue,
                     fontSize: 9,
                     letterSpacing: .8,
@@ -367,13 +371,14 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     required int pending,
     required int approved,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: _statCard(
             icon: Icons.receipt_long_outlined,
             value: total.toString(),
-            label: 'Total',
+            label: l10n.total,
           ),
         ),
         const SizedBox(width: 9),
@@ -381,7 +386,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           child: _statCard(
             icon: Icons.hourglass_top_rounded,
             value: pending.toString(),
-            label: 'Pending',
+            label: l10n.statusPending,
           ),
         ),
         const SizedBox(width: 9),
@@ -389,7 +394,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           child: _statCard(
             icon: Icons.verified_outlined,
             value: approved.toString(),
-            label: 'Confirmed',
+            label: l10n.statusConfirmed,
           ),
         ),
       ],
@@ -439,10 +444,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   // =========================================================
 
   Widget _buildFilters() {
-    const filters = [
-      ['all', 'All'],
-      ['pending', 'Pending'],
-      ['approved', 'Confirmed'],
+    final l10n = AppLocalizations.of(context)!;
+    final filters = [
+      ['all', l10n.all],
+      ['pending', l10n.statusPending],
+      ['approved', l10n.statusConfirmed],
       ['rejected', 'Rejected'],
     ];
 
@@ -498,6 +504,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   // =========================================================
 
   Widget _buildBookingCard(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    final l10n = AppLocalizations.of(context)!;
     final data = doc.data();
 
     final bookingReference = _value(data, 'bookingReference');
@@ -512,7 +519,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
     final status = _normalizedStatus(data['status']);
 
-    final statusInfo = _statusInfo(status);
+    final statusInfo = _statusInfo(l10n, status);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -566,7 +573,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      service,
+                      _serviceDisplay(l10n, service),
                       style: const TextStyle(
                         color: textGrey,
                         fontSize: 10,
@@ -616,7 +623,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               children: [
                 Expanded(
                   child: _routeSide(
-                    label: 'FROM',
+                    label: l10n.from,
                     value: pickup,
                     alignment: CrossAxisAlignment.start,
                   ),
@@ -638,7 +645,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
                 Expanded(
                   child: _routeSide(
-                    label: 'TO',
+                    label: l10n.to,
                     value: delivery,
                     alignment: CrossAxisAlignment.end,
                   ),
@@ -657,9 +664,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 size: 16,
               ),
               const SizedBox(width: 7),
-              const Text(
-                'Cargo:',
-                style: TextStyle(
+              Text(
+                '${l10n.cargo}:',
+                style: const TextStyle(
                   color: textGrey,
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -734,8 +741,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         Text(
           value,
           textAlign: alignment == CrossAxisAlignment.end
-              ? TextAlign.right
-              : TextAlign.left,
+              ? TextAlign.end
+              : TextAlign.start,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
@@ -756,6 +763,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     BuildContext context,
     Map<String, dynamic> data,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final bookingReference = _value(data, 'bookingReference');
 
     final service = _value(data, 'serviceType');
@@ -788,7 +796,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
     final status = _normalizedStatus(data['status']);
 
-    final statusInfo = _statusInfo(status);
+    final statusInfo = _statusInfo(l10n, status);
 
     await showModalBottomSheet<void>(
       context: context,
@@ -833,9 +841,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'TAWAM AL-SHAHIN TRANSPORT',
-                              style: TextStyle(
+                            Text(
+                              l10n.tawamAlShahinTransport,
+                              style: const TextStyle(
                                 color: Color(0xFFD6E6F6),
                                 fontSize: 8.5,
                                 letterSpacing: .8,
@@ -853,7 +861,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              service,
+                              _serviceDisplay(l10n, service),
                               style: const TextStyle(
                                 color: Color(0xFFD6E6F6),
                                 fontSize: 10.5,
@@ -914,19 +922,22 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                       const SizedBox(height: 14),
 
                       _detailCard(
-                        title: 'Shipment Details',
+                        title: l10n.shipmentDetails,
                         children: [
-                          _detailLine('Cargo Type', cargo),
-                          _detailLine('Weight', '$weight KG'),
-                          _detailLine('Quantity', quantity),
+                          _detailLine(l10n.cargoType, cargo),
+                          _detailLine(l10n.weight, '$weight KG'),
+                          _detailLine(l10n.quantity, quantity),
                           _detailLine(
                             'Dimensions',
                             '$length × $width × $height CM',
                           ),
-                          _detailLine('Pickup Date', pickupDate),
-                          _detailLine('Preferred Time', preferredTime),
+                          _detailLine(l10n.pickupDate, pickupDate),
                           _detailLine(
-                            'Contact Phone',
+                            'Preferred Time',
+                            _preferredTimeLabel(l10n, preferredTime),
+                          ),
+                          _detailLine(
+                            l10n.contactPhone,
                             phone,
                             showDivider: false,
                           ),
@@ -936,7 +947,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                       const SizedBox(height: 14),
 
                       _detailCard(
-                        title: 'Special Instructions',
+                        title: l10n.specialInstructions,
                         children: [
                           _detailLine(
                             'Customer Notes',
@@ -970,7 +981,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                             ),
                           ),
                           child: const Text(
-                            'CLOSE',
+                            l10n.closeUpper,
                             style: TextStyle(fontWeight: FontWeight.w900),
                           ),
                         ),
@@ -1088,6 +1099,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   }
 
   Widget _buildError(String error) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Container(
         width: double.infinity,
@@ -1128,10 +1140,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
             const SizedBox(height: 7),
 
-            const Text(
-              'Please check your connection and try again.',
+            Text(
+              l10n.pleaseCheckConnectionTryAgain,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: textGrey,
                 fontSize: 11.5,
                 height: 1.5,
@@ -1146,7 +1158,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 setState(() {});
               },
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Try Again'),
+              label: Text(l10n.tryAgain),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryBlue,
                 foregroundColor: Colors.white,
@@ -1189,26 +1201,12 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   }
 
   String _formatDate(dynamic value) {
+    final l10n = AppLocalizations.of(context)!;
     if (value is Timestamp) {
       final date = value.toDate();
 
-      const months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ];
-
       return '${date.day} '
-          '${months[date.month - 1]} '
+          '${LocaleController.monthAbbrev(l10n, date.month)} '
           '${date.year}';
     }
 
@@ -1234,32 +1232,61 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     }
   }
 
-  _BookingStatusInfo _statusInfo(String status) {
+  String _serviceDisplay(AppLocalizations l10n, String raw) {
+    switch (raw) {
+      case 'Sea Freight':
+      case 'Air Freight':
+      case 'Land Freight':
+      case 'Car Shipping':
+      case 'International Moving':
+      case 'Parcel Shipping':
+        return LocaleController.serviceLabel(l10n, raw);
+      default:
+        return raw;
+    }
+  }
+
+  String _preferredTimeLabel(AppLocalizations l10n, String raw) {
+    switch (raw) {
+      case 'Morning':
+        return l10n.morning;
+      case 'Afternoon':
+        return l10n.afternoon;
+      case 'Evening':
+        return l10n.evening;
+      case 'Flexible':
+        return l10n.flexible;
+      default:
+        return raw;
+    }
+  }
+
+  _BookingStatusInfo _statusInfo(AppLocalizations l10n, String status) {
     switch (status) {
       case 'approved':
       case 'confirmed':
-        return const _BookingStatusInfo(
-          label: 'CONFIRMED',
-          color: Color(0xFF16765C),
-          background: Color(0xFFEAF8F0),
+        return _BookingStatusInfo(
+          label: l10n.confirmedUpper,
+          color: const Color(0xFF16765C),
+          background: const Color(0xFFEAF8F0),
           icon: Icons.check_circle_rounded,
         );
 
       case 'rejected':
-        return const _BookingStatusInfo(
-          label: 'REJECTED',
-          color: Color(0xFFD72638),
-          background: Color(0xFFFFECEF),
+        return _BookingStatusInfo(
+          label: l10n.rejectedUpper,
+          color: const Color(0xFFD72638),
+          background: const Color(0xFFFFECEF),
           icon: Icons.cancel_rounded,
         );
 
       case 'pending_review':
       case 'pending':
       default:
-        return const _BookingStatusInfo(
-          label: 'PENDING',
-          color: Color(0xFFB26A00),
-          background: Color(0xFFFFF4DF),
+        return _BookingStatusInfo(
+          label: l10n.pendingUpper,
+          color: const Color(0xFFB26A00),
+          background: const Color(0xFFFFF4DF),
           icon: Icons.schedule_rounded,
         );
     }

@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
 import 'my_support_requests_screen.dart';
 
 // ==========================================================
@@ -54,6 +57,27 @@ class _SupportScreenState extends State<SupportScreen> {
 
   String _selectedCategory = 'Shipment Tracking';
   bool _isSubmitting = false;
+
+  String _categoryLabel(AppLocalizations l10n, String value) {
+    switch (value) {
+      case 'Shipment Tracking':
+        return l10n.catShipmentTracking;
+      case 'Delivery Delay':
+        return l10n.catDeliveryDelay;
+      case 'Request a Quote':
+        return l10n.catRequestQuote;
+      case 'Customs Clearance':
+        return l10n.catCustoms;
+      case 'Payment & Invoice':
+        return l10n.catPaymentInvoice;
+      case 'Damaged Shipment':
+        return l10n.catDamagedShipment;
+      case 'General Inquiry':
+        return l10n.catGeneralInquiry;
+      default:
+        return value;
+    }
+  }
 
   // ==========================================================
   // INIT / DISPOSE
@@ -114,34 +138,35 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   Future<void> _openWhatsApp() async {
-    final message = Uri.encodeComponent(
-      'Hello TAWAM AL-SHAHIN TRANSPORT, I need assistance.',
-    );
+    final l10n = AppLocalizations.of(context)!;
+    final message = Uri.encodeComponent(l10n.whatsappPrefill);
 
     final uri = Uri.parse('https://wa.me/971509106107?text=$message');
 
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      _showMessage('Could not open WhatsApp.');
+      _showMessage(l10n.couldNotOpenWhatsapp);
     }
   }
 
   Future<void> _callSupport() async {
+    final l10n = AppLocalizations.of(context)!;
     final uri = Uri.parse('tel:+971509106107');
 
     if (!await launchUrl(uri)) {
-      _showMessage('Could not open the phone app.');
+      _showMessage(l10n.couldNotOpenPhone);
     }
   }
 
   Future<void> _emailSupport() async {
+    final l10n = AppLocalizations.of(context)!;
     final uri = Uri(
       scheme: 'mailto',
       path: 'info@tawam-alshahin.ae',
-      queryParameters: {'subject': 'TAWAM AL-SHAHIN TRANSPORT Support Request'},
+      queryParameters: {'subject': l10n.supportEmailSubject},
     );
 
     if (!await launchUrl(uri)) {
-      _showMessage('Could not open the email app.');
+      _showMessage(l10n.couldNotOpenEmail);
     }
   }
 
@@ -158,16 +183,17 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   String? _emailValidator(String? value) {
+    final l10n = AppLocalizations.of(context)!;
     final email = value?.trim() ?? '';
 
     if (email.isEmpty) {
-      return 'Please enter your email address';
+      return l10n.pleaseEnterEmail;
     }
 
     final isValid = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
 
     if (!isValid) {
-      return 'Please enter a valid email address';
+      return l10n.pleaseEnterValidEmail;
     }
 
     return null;
@@ -187,7 +213,9 @@ class _SupportScreenState extends State<SupportScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showMessage('Please sign in before sending a support request.');
+      _showMessage(
+        AppLocalizations.of(context)!.pleaseSignInBeforeSupport,
+      );
       return;
     }
 
@@ -219,7 +247,7 @@ class _SupportScreenState extends State<SupportScreen> {
     } catch (_) {
       if (!mounted) return;
 
-      _showMessage('Could not send your support request. Please try again.');
+      _showMessage(AppLocalizations.of(context)!.couldNotSendSupport);
     } finally {
       if (mounted) {
         setState(() {
@@ -238,6 +266,8 @@ class _SupportScreenState extends State<SupportScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
+        final dialogL10n = AppLocalizations.of(dialogContext)!;
+
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -273,10 +303,10 @@ class _SupportScreenState extends State<SupportScreen> {
 
                 const SizedBox(height: 19),
 
-                const Text(
-                  'Request Successfully Sent',
+                Text(
+                  dialogL10n.requestSuccessfullySent,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: _textDark,
                     fontSize: 21,
                     fontWeight: FontWeight.w900,
@@ -285,10 +315,10 @@ class _SupportScreenState extends State<SupportScreen> {
 
                 const SizedBox(height: 9),
 
-                const Text(
-                  'Your support case has been securely submitted to the TAWAM operations team.',
+                Text(
+                  dialogL10n.supportCaseSubmitted,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: _textGrey, fontSize: 12, height: 1.5),
+                  style: const TextStyle(color: _textGrey, fontSize: 12, height: 1.5),
                 ),
 
                 const SizedBox(height: 18),
@@ -323,9 +353,9 @@ class _SupportScreenState extends State<SupportScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'REQUEST CATEGORY',
-                              style: TextStyle(
+                            Text(
+                              dialogL10n.requestCategory,
+                              style: const TextStyle(
                                 color: _textGrey,
                                 fontSize: 8,
                                 fontWeight: FontWeight.w800,
@@ -334,7 +364,7 @@ class _SupportScreenState extends State<SupportScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _selectedCategory,
+                              _categoryLabel(dialogL10n, _selectedCategory),
                               style: const TextStyle(
                                 color: _textDark,
                                 fontSize: 12,
@@ -365,8 +395,8 @@ class _SupportScreenState extends State<SupportScreen> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child: const Text(
-                      'DONE',
+                    child: Text(
+                      dialogL10n.doneUpper,
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
@@ -431,6 +461,8 @@ class _SupportScreenState extends State<SupportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBg,
       body: SafeArea(
@@ -450,8 +482,8 @@ class _SupportScreenState extends State<SupportScreen> {
                     const SizedBox(height: 18),
 
                     _sectionHeading(
-                      title: 'Instant Assistance',
-                      subtitle: 'Choose the fastest channel for your request.',
+                      title: l10n.instantAssistance,
+                      subtitle: l10n.chooseFastestChannel,
                     ),
 
                     const SizedBox(height: 11),
@@ -461,8 +493,8 @@ class _SupportScreenState extends State<SupportScreen> {
                         Expanded(
                           child: _QuickContactCard(
                             icon: Icons.chat_rounded,
-                            label: 'WhatsApp',
-                            subtitle: 'Start chat',
+                            label: l10n.whatsapp,
+                            subtitle: l10n.startChat,
                             color: _success,
                             background: const Color(0xFFEAF8F0),
                             onTap: _openWhatsApp,
@@ -472,8 +504,8 @@ class _SupportScreenState extends State<SupportScreen> {
                         Expanded(
                           child: _QuickContactCard(
                             icon: Icons.phone_in_talk_outlined,
-                            label: 'Call',
-                            subtitle: 'Call support',
+                            label: l10n.call,
+                            subtitle: l10n.callSupport,
                             color: _primaryBlue,
                             background: _softBlue,
                             onTap: _callSupport,
@@ -483,8 +515,8 @@ class _SupportScreenState extends State<SupportScreen> {
                         Expanded(
                           child: _QuickContactCard(
                             icon: Icons.email_outlined,
-                            label: 'Email',
-                            subtitle: 'Send email',
+                            label: l10n.email,
+                            subtitle: l10n.sendEmail,
                             color: _deepBlue,
                             background: const Color(0xFFF0F3F8),
                             onTap: _emailSupport,
@@ -504,9 +536,8 @@ class _SupportScreenState extends State<SupportScreen> {
                     const SizedBox(height: 20),
 
                     _sectionHeading(
-                      title: 'Open a Support Case',
-                      subtitle:
-                          'Send your request directly to our operations team.',
+                      title: l10n.openSupportCase,
+                      subtitle: l10n.sendRequestToOps,
                     ),
 
                     const SizedBox(height: 11),
@@ -520,40 +551,36 @@ class _SupportScreenState extends State<SupportScreen> {
                     const SizedBox(height: 20),
 
                     _sectionHeading(
-                      title: 'Frequently Asked Questions',
-                      subtitle: 'Quick answers to common logistics questions.',
+                      title: l10n.faq,
+                      subtitle: l10n.faqSubtitle,
                     ),
 
                     const SizedBox(height: 11),
 
-                    const _FaqCard(
-                      question: 'Where can I find my tracking number?',
-                      answer:
-                          'Your tracking number is included in your shipment confirmation and can also be found in My Shipments.',
+                    _FaqCard(
+                      question: l10n.faqTrackingQ,
+                      answer: l10n.faqTrackingA,
                     ),
 
                     const SizedBox(height: 9),
 
-                    const _FaqCard(
-                      question: 'Why has my shipment status not changed?',
-                      answer:
-                          'Tracking updates may appear after your shipment reaches the next logistics checkpoint or after an operations update.',
+                    _FaqCard(
+                      question: l10n.faqStatusQ,
+                      answer: l10n.faqStatusA,
                     ),
 
                     const SizedBox(height: 9),
 
-                    const _FaqCard(
-                      question: 'How do I request a shipping quotation?',
-                      answer:
-                          'Open Get a Quote from the home page and submit your shipment details.',
+                    _FaqCard(
+                      question: l10n.faqQuoteQ,
+                      answer: l10n.faqQuoteA,
                     ),
 
                     const SizedBox(height: 9),
 
-                    const _FaqCard(
-                      question: 'Can I update my delivery information?',
-                      answer:
-                          'Contact support and include your tracking number together with the new delivery information.',
+                    _FaqCard(
+                      question: l10n.faqDeliveryQ,
+                      answer: l10n.faqDeliveryA,
                     ),
                   ],
                 ),
@@ -570,6 +597,8 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   Widget _buildTopHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 82,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -593,24 +622,24 @@ class _SupportScreenState extends State<SupportScreen> {
 
           const SizedBox(width: 13),
 
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Customer Support',
-                  style: TextStyle(
+                  l10n.customerSupport,
+                  style: const TextStyle(
                     color: _textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: _primaryBlue,
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -644,6 +673,8 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(19, 20, 19, 18),
@@ -674,16 +705,16 @@ class _SupportScreenState extends State<SupportScreen> {
             ),
           ),
 
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  _LiveDot(),
-                  SizedBox(width: 7),
+                  const _LiveDot(),
+                  const SizedBox(width: 7),
                   Text(
-                    'LOGISTICS SUPPORT CENTER',
-                    style: TextStyle(
+                    l10n.logisticsSupportCenter,
+                    style: const TextStyle(
                       color: Color(0xFFD2E3F3),
                       fontSize: 8.5,
                       fontWeight: FontWeight.w800,
@@ -693,11 +724,11 @@ class _SupportScreenState extends State<SupportScreen> {
                 ],
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               Text(
-                'How Can We Help?',
-                style: TextStyle(
+                l10n.howCanWeHelp,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 25,
                   height: 1.05,
@@ -706,11 +737,11 @@ class _SupportScreenState extends State<SupportScreen> {
                 ),
               ),
 
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
 
               Text(
-                'Professional assistance for shipments, quotations, customs and delivery requests.',
-                style: TextStyle(
+                l10n.supportHeroSubtitle,
+                style: const TextStyle(
                   color: Color(0xFFD7E6F5),
                   fontSize: 10.9,
                   height: 1.45,
@@ -718,21 +749,21 @@ class _SupportScreenState extends State<SupportScreen> {
                 ),
               ),
 
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
 
               Row(
                 children: [
                   _HeroFeature(
                     icon: Icons.lock_outline_rounded,
-                    label: 'Secure',
+                    label: l10n.secure,
                   ),
-                  SizedBox(width: 18),
+                  const SizedBox(width: 18),
                   _HeroFeature(
                     icon: Icons.support_agent_rounded,
-                    label: 'Expert Team',
+                    label: l10n.expertTeam,
                   ),
-                  SizedBox(width: 18),
-                  _HeroFeature(icon: Icons.sync_rounded, label: 'Connected'),
+                  const SizedBox(width: 18),
+                  _HeroFeature(icon: Icons.sync_rounded, label: l10n.connected),
                 ],
               ),
             ],
@@ -772,6 +803,8 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   Widget _buildServiceAssurance() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(15),
@@ -780,29 +813,29 @@ class _SupportScreenState extends State<SupportScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _border),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: _AssuranceItem(
               icon: Icons.verified_user_outlined,
-              title: 'Secure',
-              subtitle: 'Protected request',
+              title: l10n.secure,
+              subtitle: l10n.protectedRequest,
             ),
           ),
-          _VerticalDivider(),
+          const _VerticalDivider(),
           Expanded(
             child: _AssuranceItem(
               icon: Icons.support_agent_rounded,
-              title: 'Specialists',
-              subtitle: 'Logistics team',
+              title: l10n.specialists,
+              subtitle: l10n.logisticsTeam,
             ),
           ),
-          _VerticalDivider(),
+          const _VerticalDivider(),
           Expanded(
             child: _AssuranceItem(
               icon: Icons.task_alt_rounded,
-              title: 'Tracked',
-              subtitle: 'Case submitted',
+              title: l10n.tracked,
+              subtitle: l10n.caseSubmitted,
             ),
           ),
         ],
@@ -811,6 +844,8 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   Widget _buildMySupportRequestsCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -857,22 +892,22 @@ class _SupportScreenState extends State<SupportScreen> {
 
               const SizedBox(width: 13),
 
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'My Support Requests',
-                      style: TextStyle(
+                      l10n.mySupportRequests,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'View your cases and latest updates',
-                      style: TextStyle(
+                      l10n.viewCasesAndUpdates,
+                      style: const TextStyle(
                         color: Color(0xFFD6E5F4),
                         fontSize: 9.5,
                         fontWeight: FontWeight.w500,
@@ -906,6 +941,8 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   Widget _buildSupportForm() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(17),
@@ -942,22 +979,22 @@ class _SupportScreenState extends State<SupportScreen> {
 
               const SizedBox(width: 11),
 
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Support Request',
-                      style: TextStyle(
+                      l10n.supportRequest,
+                      style: const TextStyle(
                         color: _textDark,
                         fontSize: 15.5,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
-                      'Provide the details below.',
-                      style: TextStyle(color: _textGrey, fontSize: 9.5),
+                      l10n.provideDetailsBelow,
+                      style: const TextStyle(color: _textGrey, fontSize: 9.5),
                     ),
                   ],
                 ),
@@ -975,14 +1012,14 @@ class _SupportScreenState extends State<SupportScreen> {
               color: _deepBlue,
             ),
             decoration: _fieldDecoration(
-              hintText: 'Support category',
+              hintText: l10n.supportCategory,
               icon: Icons.category_outlined,
             ),
             items: _supportCategories.map((category) {
               return DropdownMenuItem<String>(
                 value: category,
                 child: Text(
-                  category,
+                  _categoryLabel(l10n, category),
                   style: const TextStyle(
                     color: _textDark,
                     fontSize: 12,
@@ -1007,7 +1044,7 @@ class _SupportScreenState extends State<SupportScreen> {
             textInputAction: TextInputAction.next,
             textCapitalization: TextCapitalization.characters,
             decoration: _fieldDecoration(
-              hintText: 'Tracking / shipment number — optional',
+              hintText: l10n.trackingOptional,
               icon: Icons.local_shipping_outlined,
             ),
           ),
@@ -1019,10 +1056,10 @@ class _SupportScreenState extends State<SupportScreen> {
             textInputAction: TextInputAction.next,
             textCapitalization: TextCapitalization.words,
             validator: (value) {
-              return _requiredValidator(value, 'Please enter your full name');
+              return _requiredValidator(value, l10n.pleaseEnterFullName);
             },
             decoration: _fieldDecoration(
-              hintText: 'Full name',
+              hintText: l10n.fullName,
               icon: Icons.person_outline_rounded,
             ),
           ),
@@ -1035,7 +1072,7 @@ class _SupportScreenState extends State<SupportScreen> {
             textInputAction: TextInputAction.next,
             validator: _emailValidator,
             decoration: _fieldDecoration(
-              hintText: 'Email address',
+              hintText: l10n.emailAddressHint,
               icon: Icons.email_outlined,
             ),
           ),
@@ -1049,11 +1086,11 @@ class _SupportScreenState extends State<SupportScreen> {
             validator: (value) {
               return _requiredValidator(
                 value,
-                'Please enter your phone number',
+                l10n.pleaseEnterPhone,
               );
             },
             decoration: _fieldDecoration(
-              hintText: 'Phone number',
+              hintText: l10n.phoneNumber,
               icon: Icons.phone_outlined,
             ),
           ),
@@ -1068,7 +1105,7 @@ class _SupportScreenState extends State<SupportScreen> {
             validator: (value) {
               final required = _requiredValidator(
                 value,
-                'Please describe your request',
+                l10n.pleaseDescribeRequest,
               );
 
               if (required != null) {
@@ -1076,13 +1113,13 @@ class _SupportScreenState extends State<SupportScreen> {
               }
 
               if (value!.trim().length < 10) {
-                return 'Please add more details';
+                return l10n.pleaseAddMoreDetails;
               }
 
               return null;
             },
             decoration: _fieldDecoration(
-              hintText: 'Describe the issue or assistance you need...',
+              hintText: l10n.describeIssueHint,
               icon: Icons.edit_note_rounded,
             ),
           ),
@@ -1096,15 +1133,15 @@ class _SupportScreenState extends State<SupportScreen> {
               color: const Color(0xFFF8FAFD),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline_rounded, color: _primaryBlue, size: 17),
-                SizedBox(width: 8),
+                const Icon(Icons.info_outline_rounded, color: _primaryBlue, size: 17),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'For shipment-related requests, include the tracking number to help our team review the case faster.',
-                    style: TextStyle(
+                    l10n.includeTrackingHint,
+                    style: const TextStyle(
                       color: _textGrey,
                       fontSize: 9,
                       height: 1.35,
@@ -1133,7 +1170,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     )
                   : const Icon(Icons.send_rounded, size: 18),
               label: Text(
-                _isSubmitting ? 'SUBMITTING...' : 'SUBMIT SUPPORT REQUEST',
+                _isSubmitting ? l10n.submitting : l10n.submitSupportRequest,
                 style: const TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w900,
@@ -1162,6 +1199,8 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   Widget _buildHoursCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(17),
@@ -1174,16 +1213,16 @@ class _SupportScreenState extends State<SupportScreen> {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: const Color(0xFFDDE9F4)),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.schedule_rounded, color: _primaryBlue, size: 20),
-              SizedBox(width: 8),
+              const Icon(Icons.schedule_rounded, color: _primaryBlue, size: 20),
+              const SizedBox(width: 8),
               Text(
-                'Support Hours',
-                style: TextStyle(
+                l10n.supportHours,
+                style: const TextStyle(
                   color: _textDark,
                   fontSize: 15.5,
                   fontWeight: FontWeight.w900,
@@ -1192,32 +1231,32 @@ class _SupportScreenState extends State<SupportScreen> {
             ],
           ),
 
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
 
-          _HoursRow(day: 'Monday – Friday', time: '08:00 AM – 08:00 PM'),
+          _HoursRow(day: l10n.mondayFriday, time: '08:00 AM – 08:00 PM'),
 
-          SizedBox(height: 10),
-          Divider(color: Color(0xFFDDE6EF)),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          const Divider(color: Color(0xFFDDE6EF)),
+          const SizedBox(height: 10),
 
-          _HoursRow(day: 'Saturday', time: '09:00 AM – 05:00 PM'),
+          _HoursRow(day: l10n.saturday, time: '09:00 AM – 05:00 PM'),
 
-          SizedBox(height: 10),
-          Divider(color: Color(0xFFDDE6EF)),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          const Divider(color: Color(0xFFDDE6EF)),
+          const SizedBox(height: 10),
 
-          _HoursRow(day: 'Sunday', time: 'Emergency support'),
+          _HoursRow(day: l10n.sunday, time: l10n.emergencySupport),
 
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
 
           Row(
             children: [
-              Icon(Icons.public_rounded, color: _primaryBlue, size: 17),
-              SizedBox(width: 7),
+              const Icon(Icons.public_rounded, color: _primaryBlue, size: 17),
+              const SizedBox(width: 7),
               Expanded(
                 child: Text(
-                  'Times shown in UAE local time.',
-                  style: TextStyle(
+                  l10n.timesUae,
+                  style: const TextStyle(
                     color: _textGrey,
                     fontSize: 9.2,
                     fontWeight: FontWeight.w600,
@@ -1400,7 +1439,7 @@ class _FaqCard extends StatelessWidget {
           ),
           children: [
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: AlignmentDirectional.centerStart,
               child: Text(
                 answer,
                 style: const TextStyle(

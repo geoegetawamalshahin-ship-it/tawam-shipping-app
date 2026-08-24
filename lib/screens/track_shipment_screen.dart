@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
 import 'shipment_details_screen.dart';
 
 // ==========================================================
@@ -83,19 +85,20 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Future<void> _trackShipment() async {
+    final l10n = AppLocalizations.of(context)!;
     final trackingNumber = _trackingController.text.trim().toUpperCase();
 
     FocusScope.of(context).unfocus();
 
     if (trackingNumber.isEmpty) {
-      _showMessage('Please enter your tracking number.');
+      _showMessage(l10n.pleaseEnterTrackingNumber);
       return;
     }
 
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showMessage('Please sign in to track your shipment.');
+      _showMessage(l10n.pleaseSignInToTrack);
       return;
     }
 
@@ -134,7 +137,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           _shipment = null;
         });
 
-        _showMessage('Shipment not found. Please check the tracking number.');
+        _showMessage(l10n.shipmentNotFoundCheck);
 
         return;
       }
@@ -158,7 +161,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
               _shipment = null;
             });
 
-            _showMessage('This shipment is no longer available.');
+            _showMessage(l10n.shipmentNoLongerAvailable);
             return;
           }
 
@@ -167,7 +170,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         onError: (Object error) {
           if (!mounted) return;
 
-          _showMessage('Live tracking connection was interrupted.');
+          _showMessage(l10n.liveTrackingInterrupted);
         },
       );
     } catch (_) {
@@ -179,7 +182,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         _shipment = null;
       });
 
-      _showMessage('Could not track shipment. Please try again.');
+      _showMessage(l10n.couldNotTrackShipment);
     }
   }
 
@@ -230,7 +233,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   }
 
   void _scanCode() {
-    _showMessage('QR code scanning will be available soon.');
+    final l10n = AppLocalizations.of(context)!;
+    _showMessage(l10n.qrScanningSoon);
   }
 
   // ==========================================================
@@ -280,6 +284,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Widget _buildTopHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 82,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -303,24 +308,24 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
           const SizedBox(width: 13),
 
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Shipment Tracking',
-                  style: TextStyle(
+                  l10n.shipmentTracking,
+                  style: const TextStyle(
                     color: _textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: _primaryBlue,
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -354,6 +359,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
@@ -383,16 +389,16 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
               color: Colors.white.withValues(alpha: .055),
             ),
           ),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  _LiveDot(),
-                  SizedBox(width: 8),
+                  const _LiveDot(),
+                  const SizedBox(width: 8),
                   Text(
-                    'LIVE SHIPMENT VISIBILITY',
-                    style: TextStyle(
+                    l10n.liveShipmentVisibility,
+                    style: const TextStyle(
                       color: Color(0xFFD6E6F6),
                       fontSize: 9.2,
                       fontWeight: FontWeight.w800,
@@ -402,11 +408,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 ],
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               Text(
-                'Track Every Move',
-                style: TextStyle(
+                l10n.trackEveryMove,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 25,
                   height: 1.05,
@@ -415,11 +421,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 ),
               ),
 
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
 
               Text(
-                'Enter your tracking number to view the latest status, location and shipment journey.',
-                style: TextStyle(
+                l10n.trackEveryMoveSubtitle,
+                style: const TextStyle(
                   color: Color(0xFFD7E6F5),
                   fontSize: 11.8,
                   height: 1.45,
@@ -427,18 +433,24 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 ),
               ),
 
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
 
               Row(
                 children: [
                   _HeroFeature(
                     icon: Icons.lock_outline_rounded,
-                    label: 'Private',
+                    label: l10n.private,
                   ),
-                  SizedBox(width: 18),
-                  _HeroFeature(icon: Icons.sync_rounded, label: 'Live Updates'),
-                  SizedBox(width: 18),
-                  _HeroFeature(icon: Icons.verified_outlined, label: 'Secure'),
+                  const SizedBox(width: 18),
+                  _HeroFeature(
+                    icon: Icons.sync_rounded,
+                    label: l10n.liveUpdates,
+                  ),
+                  const SizedBox(width: 18),
+                  _HeroFeature(
+                    icon: Icons.verified_outlined,
+                    label: l10n.secure,
+                  ),
                 ],
               ),
             ],
@@ -453,6 +465,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Widget _buildTrackingSearch() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
@@ -470,9 +483,9 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Tracking Number',
-            style: TextStyle(
+          Text(
+            l10n.trackingNumber,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 15.5,
               fontWeight: FontWeight.w900,
@@ -481,9 +494,9 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
           const SizedBox(height: 5),
 
-          const Text(
-            'Only shipments assigned to your account can be displayed.',
-            style: TextStyle(
+          Text(
+            l10n.onlyAssignedShipments,
+            style: const TextStyle(
               color: _textGrey,
               fontSize: 10.3,
               height: 1.35,
@@ -505,7 +518,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
               letterSpacing: .35,
             ),
             decoration: InputDecoration(
-              hintText: 'Enter tracking number',
+              hintText: l10n.enterTrackingNumber,
               hintStyle: const TextStyle(
                 color: Color(0xFFA0A9B5),
                 fontSize: 11.5,
@@ -558,7 +571,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                     )
                   : const Icon(Icons.location_searching_rounded, size: 20),
               label: Text(
-                _isSearching ? 'TRACKING...' : 'TRACK SHIPMENT',
+                _isSearching ? l10n.trackingInProgress : l10n.trackShipment,
                 style: const TextStyle(
                   fontWeight: FontWeight.w900,
                   letterSpacing: .45,
@@ -587,6 +600,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Widget _buildBeforeTracking() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       key: const ValueKey('before-tracking'),
       width: double.infinity,
@@ -596,50 +610,50 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: _border),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Professional Shipment Visibility',
-            style: TextStyle(
+            l10n.professionalVisibility,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 16,
               fontWeight: FontWeight.w900,
             ),
           ),
 
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
 
           Text(
-            'Your tracking view is protected and connected directly to your shipment record.',
-            style: TextStyle(color: _textGrey, fontSize: 10.5, height: 1.4),
+            l10n.trackingViewProtected,
+            style: const TextStyle(color: _textGrey, fontSize: 10.5, height: 1.4),
           ),
 
-          SizedBox(height: 17),
+          const SizedBox(height: 17),
 
           Row(
             children: [
               Expanded(
                 child: _FeatureBox(
                   icon: Icons.location_on_outlined,
-                  title: 'Location',
-                  subtitle: 'Latest update',
+                  title: l10n.location,
+                  subtitle: l10n.latestUpdate,
                 ),
               ),
-              SizedBox(width: 9),
+              const SizedBox(width: 9),
               Expanded(
                 child: _FeatureBox(
                   icon: Icons.timeline_rounded,
-                  title: 'Timeline',
-                  subtitle: 'Shipment journey',
+                  title: l10n.timeline,
+                  subtitle: l10n.shipmentJourneyShort,
                 ),
               ),
-              SizedBox(width: 9),
+              const SizedBox(width: 9),
               Expanded(
                 child: _FeatureBox(
                   icon: Icons.schedule_rounded,
-                  title: 'Delivery',
-                  subtitle: 'ETA details',
+                  title: l10n.delivery,
+                  subtitle: l10n.etaDetails,
                 ),
               ),
             ],
@@ -654,6 +668,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Widget _buildShipmentExperience() {
+    final l10n = AppLocalizations.of(context)!;
     final shipment = _shipment;
 
     if (shipment == null) {
@@ -668,26 +683,27 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     final pickup = _stringValue(shipment, [
       'pickupLocation',
       'origin',
-    ], fallback: 'Not specified');
+    ], fallback: l10n.notSpecified);
 
     final delivery = _stringValue(shipment, [
       'deliveryLocation',
       'destination',
-    ], fallback: 'Not specified');
+    ], fallback: l10n.notSpecified);
 
     final cargo = _stringValue(shipment, [
       'cargo',
       'cargoType',
       'type',
-    ], fallback: 'Shipment');
+    ], fallback: l10n.shipment);
 
-    final status = _normalizeStatus(
+    final status = LocaleController.normalizeStatus(
       _stringValue(shipment, ['status'], fallback: 'pending'),
     );
 
-    final statusInfo = _statusInfo(status);
+    final statusInfo = _statusInfo(l10n, status);
 
     final expectedDelivery = _formatDate(
+      l10n,
       _firstValue(shipment, ['expectedDelivery', 'estimatedDelivery']),
     );
 
@@ -699,6 +715,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     );
 
     final lastUpdate = _formatDateTime(
+      l10n,
       _firstValue(shipment, [
         'updatedAt',
         'lastUpdatedAt',
@@ -734,7 +751,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             Expanded(
               child: _InformationCard(
                 icon: Icons.inventory_2_outlined,
-                label: 'CARGO',
+                label: l10n.cargoUpper,
                 value: cargo,
               ),
             ),
@@ -742,7 +759,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             Expanded(
               child: _InformationCard(
                 icon: Icons.event_available_outlined,
-                label: 'EST. DELIVERY',
+                label: l10n.estDelivery,
                 value: expectedDelivery,
               ),
             ),
@@ -772,6 +789,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     required String trackingNumber,
     required _StatusInfo statusInfo,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -818,9 +836,9 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'TRACKING NUMBER',
-                      style: TextStyle(
+                    Text(
+                      l10n.trackingNumberUpper,
+                      style: const TextStyle(
                         color: Color(0xFFBED6EC),
                         fontSize: 8.5,
                         fontWeight: FontWeight.w800,
@@ -877,9 +895,9 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             children: [
               const _LiveDot(),
               const SizedBox(width: 7),
-              const Text(
-                'LIVE TRACKING',
-                style: TextStyle(
+              Text(
+                l10n.liveTracking,
+                style: const TextStyle(
                   color: Color(0xFFD4E4F3),
                   fontSize: 8.5,
                   fontWeight: FontWeight.w700,
@@ -923,6 +941,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     required String lastUpdate,
     required _StatusInfo statusInfo,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(17),
@@ -954,18 +973,20 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'CURRENT LOCATION',
-                  style: TextStyle(
-                    color: _textGrey,
-                    fontSize: 8.8,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: .65,
+                  Text(
+                    l10n.currentLocation,
+                    style: const TextStyle(
+                      color: _textGrey,
+                      fontSize: 8.8,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: .65,
+                    ),
                   ),
-                ),
                 const SizedBox(height: 5),
                 Text(
-                  currentLocation,
+                  currentLocation.isEmpty
+                      ? l10n.locationUpdatePending
+                      : currentLocation,
                   style: const TextStyle(
                     color: _textDark,
                     fontSize: 14,
@@ -984,7 +1005,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
                     const SizedBox(width: 5),
                     Expanded(
                       child: Text(
-                        'Last update: $lastUpdate',
+                        l10n.lastUpdatePrefix(lastUpdate),
                         style: const TextStyle(
                           color: _textGrey,
                           fontSize: 9.8,
@@ -1011,6 +1032,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Widget _buildRouteCard({required String pickup, required String delivery}) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -1023,7 +1045,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         children: [
           Expanded(
             child: _RouteSide(
-              label: 'PICKUP',
+              label: l10n.pickupUpper,
               value: pickup,
               icon: Icons.radio_button_checked_rounded,
               alignRight: false,
@@ -1046,7 +1068,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
           Expanded(
             child: _RouteSide(
-              label: 'DELIVERY',
+              label: l10n.deliveryUpper,
               value: delivery,
               icon: Icons.location_on_outlined,
               alignRight: true,
@@ -1066,7 +1088,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     required String status,
     required String lastUpdate,
   }) {
-    final history = _historyItems(shipment);
+    final l10n = AppLocalizations.of(context)!;
+    final history = _historyItems(l10n, shipment);
 
     return Container(
       width: double.infinity,
@@ -1079,13 +1102,13 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.timeline_rounded, color: _primaryBlue, size: 20),
-              SizedBox(width: 8),
+              const Icon(Icons.timeline_rounded, color: _primaryBlue, size: 20),
+              const SizedBox(width: 8),
               Text(
-                'Shipment Timeline',
-                style: TextStyle(
+                l10n.shipmentTimeline,
+                style: const TextStyle(
                   color: _textDark,
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -1096,9 +1119,9 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
           const SizedBox(height: 4),
 
-          const Text(
-            'Latest milestones from your shipment journey.',
-            style: TextStyle(color: _textGrey, fontSize: 9.8),
+          Text(
+            l10n.latestMilestones,
+            style: const TextStyle(color: _textGrey, fontSize: 9.8),
           ),
 
           const SizedBox(height: 17),
@@ -1119,21 +1142,26 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
               );
             })
           else
-            ..._fallbackTimeline(status: status, lastUpdate: lastUpdate),
+            ..._fallbackTimeline(
+              l10n: l10n,
+              status: status,
+              lastUpdate: lastUpdate,
+            ),
         ],
       ),
     );
   }
 
   Widget _buildDetailsButton() {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 52,
       child: ElevatedButton.icon(
         onPressed: _openShipmentDetails,
         icon: const Icon(Icons.receipt_long_outlined, size: 19),
-        label: const Text(
-          'VIEW FULL SHIPMENT DETAILS',
+        label: Text(
+          l10n.viewFullShipmentDetails,
           style: TextStyle(
             fontSize: 10.5,
             fontWeight: FontWeight.w900,
@@ -1157,60 +1185,61 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   List<Widget> _fallbackTimeline({
+    required AppLocalizations l10n,
     required String status,
     required String lastUpdate,
   }) {
-    const stages = [
+    final stages = [
       _TimelineStage(
         keyName: 'pending',
-        title: 'Shipment Created',
-        description: 'Shipment information has been registered.',
+        title: l10n.timelineCreatedTitle,
+        description: l10n.timelineCreatedDesc,
         icon: Icons.inventory_2_outlined,
       ),
       _TimelineStage(
         keyName: 'confirmed',
-        title: 'Booking Confirmed',
-        description: 'Shipment has been confirmed by our operations team.',
+        title: l10n.timelineConfirmedTitle,
+        description: l10n.timelineConfirmedDesc,
         icon: Icons.verified_outlined,
       ),
       _TimelineStage(
         keyName: 'prepared',
-        title: 'Prepared',
-        description: 'Shipment is prepared and ready for movement.',
+        title: l10n.timelinePreparedTitle,
+        description: l10n.timelinePreparedDesc,
         icon: Icons.fact_check_outlined,
       ),
       _TimelineStage(
         keyName: 'in_transit',
-        title: 'In Transit',
-        description: 'Shipment is moving toward the destination.',
+        title: l10n.timelineInTransitTitle,
+        description: l10n.timelineInTransitDesc,
         icon: Icons.local_shipping_outlined,
       ),
       _TimelineStage(
         keyName: 'customs_clearance',
-        title: 'Customs Clearance',
-        description: 'Shipment is undergoing border or customs processing.',
+        title: l10n.timelineCustomsTitle,
+        description: l10n.timelineCustomsDesc,
         icon: Icons.gavel_outlined,
       ),
       _TimelineStage(
         keyName: 'out_for_delivery',
-        title: 'Out for Delivery',
-        description: 'Shipment is on the final delivery route.',
+        title: l10n.timelineOutForDeliveryTitle,
+        description: l10n.timelineOutForDeliveryDesc,
         icon: Icons.route_outlined,
       ),
       _TimelineStage(
         keyName: 'delivered',
-        title: 'Delivered',
-        description: 'Shipment has been delivered successfully.',
+        title: l10n.timelineDeliveredTitle,
+        description: l10n.timelineDeliveredDesc,
         icon: Icons.check_circle_outline_rounded,
       ),
     ];
 
     if (status == 'cancelled') {
-      return const [
+      return [
         _TimelineRow(
-          title: 'Shipment Cancelled',
-          description: 'This shipment has been cancelled.',
-          time: 'Latest update',
+          title: l10n.timelineCancelledTitle,
+          description: l10n.timelineCancelledDesc,
+          time: l10n.latestUpdate,
           completed: false,
           active: true,
           isLast: true,
@@ -1242,8 +1271,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         time: active
             ? lastUpdate
             : completed
-            ? 'Completed'
-            : 'Waiting',
+            ? l10n.completed
+            : l10n.waiting,
         completed: completed,
         active: active,
         isLast: isLast,
@@ -1256,7 +1285,10 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // OPTIONAL REAL TIMELINE FROM FIRESTORE
   // ==========================================================
 
-  List<_HistoryItem> _historyItems(Map<String, dynamic> shipment) {
+  List<_HistoryItem> _historyItems(
+    AppLocalizations l10n,
+    Map<String, dynamic> shipment,
+  ) {
     final raw = _firstValue(shipment, [
       'trackingHistory',
       'timeline',
@@ -1278,22 +1310,23 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         'title',
         'status',
         'event',
-      ], fallback: 'Shipment Update');
+      ], fallback: l10n.shipmentUpdate);
 
       final description = _stringValue(map, [
         'description',
         'note',
         'details',
         'location',
-      ], fallback: 'Shipment status updated.');
+      ], fallback: l10n.shipmentStatusUpdated);
 
       final time = _formatDateTime(
+        l10n,
         _firstValue(map, ['timestamp', 'updatedAt', 'date', 'time']),
       );
 
       result.add(
         _HistoryItem(
-          title: _prettyStatus(title),
+          title: _prettyStatus(l10n, title),
           description: description,
           time: time,
           icon: _timelineIcon(title),
@@ -1369,157 +1402,109 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       return pickup;
     }
 
-    return 'Location update pending';
+    return '';
   }
 
-  String _normalizeStatus(String value) {
-    final normalized = value
-        .trim()
-        .toLowerCase()
-        .replaceAll('-', '_')
-        .replaceAll(' ', '_');
-
-    if (normalized == 'approved') {
-      return 'confirmed';
-    }
-
-    if (normalized == 'canceled') {
-      return 'cancelled';
-    }
-
-    return normalized;
-  }
-
-  _StatusInfo _statusInfo(String status) {
+  _StatusInfo _statusInfo(AppLocalizations l10n, String status) {
     switch (status) {
       case 'confirmed':
-        return const _StatusInfo(
-          label: 'CONFIRMED',
+        return _StatusInfo(
+          label: l10n.confirmedUpper,
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.verified_rounded,
           progress: .25,
         );
 
       case 'prepared':
-        return const _StatusInfo(
-          label: 'PREPARED',
+        return _StatusInfo(
+          label: l10n.preparedUpper,
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.fact_check_rounded,
           progress: .36,
         );
 
       case 'in_transit':
-        return const _StatusInfo(
-          label: 'IN TRANSIT',
+        return _StatusInfo(
+          label: l10n.inTransitUpper,
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.local_shipping_rounded,
           progress: .58,
         );
 
       case 'customs':
       case 'customs_clearance':
-        return const _StatusInfo(
-          label: 'CUSTOMS',
+        return _StatusInfo(
+          label: l10n.customsUpper,
           color: _warning,
-          background: Color(0xFFFFF4DF),
+          background: const Color(0xFFFFF4DF),
           icon: Icons.gavel_rounded,
           progress: .72,
         );
 
       case 'out_for_delivery':
-        return const _StatusInfo(
-          label: 'OUT FOR DELIVERY',
+        return _StatusInfo(
+          label: l10n.outForDeliveryUpper,
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.route_rounded,
           progress: .88,
         );
 
       case 'delivered':
-        return const _StatusInfo(
-          label: 'DELIVERED',
+        return _StatusInfo(
+          label: l10n.deliveredUpper,
           color: _success,
-          background: Color(0xFFEAF8F0),
+          background: const Color(0xFFEAF8F0),
           icon: Icons.check_circle_rounded,
           progress: 1,
         );
 
       case 'cancelled':
-        return const _StatusInfo(
-          label: 'CANCELLED',
+        return _StatusInfo(
+          label: l10n.cancelledUpper,
           color: _danger,
-          background: Color(0xFFFFECEF),
+          background: const Color(0xFFFFECEF),
           icon: Icons.cancel_rounded,
           progress: 0,
         );
 
       case 'pending':
       default:
-        return const _StatusInfo(
-          label: 'PENDING',
+        return _StatusInfo(
+          label: l10n.pendingUpper,
           color: _warning,
-          background: Color(0xFFFFF4DF),
+          background: const Color(0xFFFFF4DF),
           icon: Icons.schedule_rounded,
           progress: .10,
         );
     }
   }
 
-  String _formatDate(Object? value) {
+  String _formatDate(AppLocalizations l10n, Object? value) {
     final date = _toDateTime(value);
 
     if (date == null) {
       final text = value?.toString().trim() ?? '';
 
-      return text.isEmpty ? 'Not specified' : text;
+      return text.isEmpty ? l10n.notSpecified : text;
     }
 
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
     return '${date.day} '
-        '${months[date.month - 1]} '
+        '${LocaleController.monthAbbrev(l10n, date.month)} '
         '${date.year}';
   }
 
-  String _formatDateTime(Object? value) {
+  String _formatDateTime(AppLocalizations l10n, Object? value) {
     final date = _toDateTime(value);
 
     if (date == null) {
       final text = value?.toString().trim() ?? '';
 
-      return text.isEmpty ? 'Awaiting update' : text;
+      return text.isEmpty ? l10n.awaitingUpdate : text;
     }
-
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
 
     final hour12 = date.hour == 0
         ? 12
@@ -1532,7 +1517,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     final amPm = date.hour >= 12 ? 'PM' : 'AM';
 
     return '${date.day} '
-        '${months[date.month - 1]} '
+        '${LocaleController.monthAbbrev(l10n, date.month)} '
         '${date.year} • '
         '$hour12:$minute $amPm';
   }
@@ -1553,26 +1538,33 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     return null;
   }
 
-  String _prettyStatus(String value) {
-    final normalized = value.trim().replaceAll('_', ' ').replaceAll('-', ' ');
-
-    if (normalized.isEmpty) {
-      return 'Shipment Update';
+  String _prettyStatus(AppLocalizations l10n, String value) {
+    final raw = value.trim();
+    if (raw.isEmpty) {
+      return l10n.shipmentUpdate;
     }
 
-    return normalized
-        .split(' ')
-        .where((part) => part.isNotEmpty)
-        .map(
-          (part) =>
-              '${part[0].toUpperCase()}'
-              '${part.substring(1).toLowerCase()}',
-        )
-        .join(' ');
+    final normalized = LocaleController.normalizeStatus(raw);
+    const known = {
+      'pending',
+      'confirmed',
+      'prepared',
+      'in_transit',
+      'customs_clearance',
+      'out_for_delivery',
+      'delivered',
+      'cancelled',
+    };
+
+    if (known.contains(normalized)) {
+      return LocaleController.statusLabel(l10n, raw);
+    }
+
+    return raw;
   }
 
   IconData _timelineIcon(String value) {
-    final status = _normalizeStatus(value);
+    final status = LocaleController.normalizeStatus(value);
 
     if (status.contains('deliver')) {
       return Icons.check_circle_outline_rounded;
@@ -1757,7 +1749,7 @@ class _RouteSide extends StatelessWidget {
           value,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          textAlign: alignRight ? TextAlign.right : TextAlign.left,
+          textAlign: alignRight ? TextAlign.end : TextAlign.start,
           style: const TextStyle(
             color: _textDark,
             fontSize: 10.8,

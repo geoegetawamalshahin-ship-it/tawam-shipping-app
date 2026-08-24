@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../l10n/app_localizations.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -34,6 +35,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _createAccount() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -59,21 +62,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Account created successfully')),
+        SnackBar(content: Text(l10n.accountCreated)),
       );
 
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
-      String message = 'Could not create account';
+      String message = l10n.couldNotCreateAccount;
 
-      if (e.code == 'email-already-in-use') {
-        message = 'This email is already registered';
-      } else if (e.code == 'weak-password') {
-        message = 'Password is too weak';
+      if (e.code == 'weak-password') {
+        message = l10n.passwordTooShort;
       } else if (e.code == 'invalid-email') {
-        message = 'Please enter a valid email address';
+        message = l10n.pleaseEnterValidEmail;
       }
 
       ScaffoldMessenger.of(
@@ -134,6 +135,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -182,9 +185,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: const Color(0xFFEAF3FC),
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      child: const Text(
-                        'CREATE ACCOUNT',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.createAccount,
+                        style: const TextStyle(
                           color: Color(0xFF07569E),
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
@@ -195,9 +198,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 20),
 
-                    const Text(
-                      'Join Tawam AL-SHAHIN TRANSPORT',
-                      style: TextStyle(
+                    Text(
+                      l10n.registerTitle,
+                      style: const TextStyle(
                         color: Color(0xFF172033),
                         fontSize: 31,
                         fontWeight: FontWeight.w800,
@@ -206,9 +209,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 10),
 
-                    const Text(
-                      'Create your account to manage shipments, track deliveries and receive updates.',
-                      style: TextStyle(
+                    Text(
+                      l10n.registerSubtitle,
+                      style: const TextStyle(
                         color: Color(0xFF7B8493),
                         fontSize: 15.5,
                         height: 1.5,
@@ -217,22 +220,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 30),
 
-                    _fieldTitle('Full name'),
+                    _fieldTitle(l10n.fullName),
 
                     TextFormField(
                       controller: _nameController,
                       textInputAction: TextInputAction.next,
                       decoration: _fieldDecoration(
-                        hintText: 'Enter your full name',
+                        hintText: l10n.fullName,
                         icon: Icons.person_outline_rounded,
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your full name';
+                          return l10n.pleaseEnterFullName;
                         }
 
                         if (value.trim().length < 3) {
-                          return 'Please enter a valid name';
+                          return l10n.pleaseEnterValidName;
                         }
 
                         return null;
@@ -241,7 +244,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 21),
 
-                    _fieldTitle('Phone number'),
+                    _fieldTitle(l10n.phoneNumber),
 
                     TextFormField(
                       controller: _phoneController,
@@ -255,11 +258,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         final phone = value?.trim() ?? '';
 
                         if (phone.isEmpty) {
-                          return 'Please enter your phone number';
+                          return l10n.pleaseEnterPhone;
                         }
 
                         if (phone.length < 8) {
-                          return 'Please enter a valid phone number';
+                          return l10n.pleaseEnterValidPhone;
                         }
 
                         return null;
@@ -268,7 +271,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 21),
 
-                    _fieldTitle('Email address'),
+                    _fieldTitle(l10n.emailAddress),
 
                     TextFormField(
                       controller: _emailController,
@@ -282,11 +285,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         final email = value?.trim() ?? '';
 
                         if (email.isEmpty) {
-                          return 'Please enter your email address';
+                          return l10n.pleaseEnterEmail;
                         }
 
                         if (!email.contains('@') || !email.contains('.')) {
-                          return 'Please enter a valid email address';
+                          return l10n.pleaseEnterValidEmail;
                         }
 
                         return null;
@@ -295,14 +298,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 21),
 
-                    _fieldTitle('Password'),
+                    _fieldTitle(l10n.password),
 
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _hidePassword,
                       textInputAction: TextInputAction.next,
                       decoration: _fieldDecoration(
-                        hintText: 'Create a password',
+                        hintText: l10n.pleaseCreatePassword,
                         icon: Icons.lock_outline_rounded,
                         suffixIcon: IconButton(
                           onPressed: () {
@@ -320,11 +323,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please create a password';
+                          return l10n.pleaseCreatePassword;
                         }
 
                         if (value.length < 6) {
-                          return 'Password must contain at least 6 characters';
+                          return l10n.passwordTooShort;
                         }
 
                         return null;
@@ -333,7 +336,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 21),
 
-                    _fieldTitle('Confirm password'),
+                    _fieldTitle(l10n.confirmPassword),
 
                     TextFormField(
                       controller: _confirmPasswordController,
@@ -341,7 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _createAccount(),
                       decoration: _fieldDecoration(
-                        hintText: 'Enter your password again',
+                        hintText: l10n.confirmPassword,
                         icon: Icons.lock_reset_rounded,
                         suffixIcon: IconButton(
                           onPressed: () {
@@ -359,11 +362,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please confirm your password';
+                          return l10n.pleaseConfirmPassword;
                         }
 
                         if (value != _passwordController.text) {
-                          return 'Passwords do not match';
+                          return l10n.passwordsDoNotMatch;
                         }
 
                         return null;
@@ -385,18 +388,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Create Account',
-                              style: TextStyle(
+                              l10n.createAccount,
+                              style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            SizedBox(width: 12),
-                            Icon(Icons.arrow_forward_rounded, size: 23),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.arrow_forward_rounded, size: 23),
                           ],
                         ),
                       ),
@@ -404,30 +407,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 22),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Already have an account?',
-                          style: TextStyle(
-                            color: Color(0xFF7B8493),
-                            fontSize: 14,
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          l10n.alreadyHaveAccount,
+                          style: const TextStyle(
+                            color: Color(0xFFD72638),
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              color: Color(0xFFD72638),
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),

@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
 import 'shipment_details_screen.dart';
 
 const Color _primaryBlue = Color(0xFF0B4F9C);
@@ -18,6 +20,27 @@ const Color _success = Color(0xFF16765C);
 const Color _warning = Color(0xFFB26A00);
 const Color _danger = Color(0xFFD72638);
 
+String _shipmentStatusDescription(AppLocalizations l10n, String status) {
+  switch (LocaleController.normalizeStatus(status)) {
+    case 'confirmed':
+      return l10n.statusDescConfirmed;
+    case 'prepared':
+      return l10n.statusDescPrepared;
+    case 'in_transit':
+      return l10n.statusDescInTransit;
+    case 'customs_clearance':
+      return l10n.statusDescCustoms;
+    case 'out_for_delivery':
+      return l10n.statusDescOutForDelivery;
+    case 'delivered':
+      return l10n.statusDescDelivered;
+    case 'cancelled':
+      return l10n.statusDescCancelled;
+    default:
+      return l10n.statusDescPending;
+  }
+}
+
 class ShipmentsScreen extends StatefulWidget {
   const ShipmentsScreen({super.key});
 
@@ -30,19 +53,19 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
   String? _loadError;
   bool _isLoading = true;
-  String _selectedFilter = 'All';
+  String _selectedFilter = 'all';
   List<Map<String, dynamic>> _shipments = [];
 
   final List<String> _filters = const [
-    'All',
-    'Pending',
-    'Confirmed',
-    'Prepared',
-    'In Transit',
-    'Customs',
-    'Out for Delivery',
-    'Delivered',
-    'Cancelled',
+    'all',
+    'pending',
+    'confirmed',
+    'prepared',
+    'in_transit',
+    'customs_clearance',
+    'out_for_delivery',
+    'delivered',
+    'cancelled',
   ];
 
   @override
@@ -84,9 +107,12 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           (snapshot) {
             final items = snapshot.docs.map((doc) {
               final data = doc.data();
-              final rawStatus = _normalizeStatus(
+              final rawStatus = LocaleController.normalizeStatus(
                 (data['status'] ?? 'pending').toString(),
               );
+              final cargo = (data['cargo'] ?? data['cargoType'] ?? '')
+                  .toString()
+                  .trim();
 
               return <String, dynamic>{
                 ...data,
@@ -95,21 +121,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 'origin': (data['pickupLocation'] ?? '').toString(),
                 'destination': (data['deliveryLocation'] ?? '').toString(),
                 'rawStatus': rawStatus,
-                'displayStatus': _displayStatus(rawStatus),
                 'progress': _statusProgress(rawStatus),
-                'stage': _statusStage(rawStatus),
-                'type': (data['cargo'] ?? data['cargoType'] ?? 'Shipment')
-                    .toString(),
-                'date': _formatDate(
-                  data['expectedDelivery'] ?? data['estimatedDelivery'],
-                ),
+                'type': cargo,
                 'currentLocation': _currentLocation(data, rawStatus),
-                'lastUpdate': _formatDateTime(
-                  data['updatedAt'] ??
-                      data['lastUpdatedAt'] ??
-                      data['lastUpdate'] ??
-                      data['createdAt'],
-                ),
               };
             }).toList();
 
@@ -133,8 +147,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
             setState(() {
               _isLoading = false;
-              _loadError =
-                  'We couldn\'t load your shipments. Please check your connection and try again.';
+              _loadError = 'error';
             });
           },
         );
@@ -142,20 +155,22 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   List<Map<String, dynamic>> get _visibleShipments {
     final query = _searchController.text.trim().toLowerCase();
+    final l10n = AppLocalizations.of(context)!;
 
     return _shipments.where((shipment) {
-      final status = (shipment['displayStatus'] ?? '').toString();
+      final rawStatus = (shipment['rawStatus'] ?? '').toString();
       final searchable = [
         shipment['number'],
         shipment['origin'],
         shipment['destination'],
         shipment['type'],
         shipment['currentLocation'],
-        status,
+        rawStatus,
+        LocaleController.statusLabel(l10n, rawStatus),
       ].join(' ').toLowerCase();
 
       final matchesFilter =
-          _selectedFilter == 'All' || status == _selectedFilter;
+          _selectedFilter == 'all' || rawStatus == _selectedFilter;
       final matchesSearch = query.isEmpty || searchable.contains(query);
 
       return matchesFilter && matchesSearch;
@@ -164,7 +179,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   int _countStatus(String status) {
     return _shipments
-        .where((shipment) => shipment['displayStatus'] == status)
+        .where((shipment) => shipment['rawStatus'] == status)
         .length;
   }
 
@@ -178,6 +193,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final visible = _visibleShipments;
 
     return Scaffold(
@@ -227,9 +243,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            const Text(
-                              'Unable to load shipments',
-                              style: TextStyle(
+                            Text(
+                              l10n.unableToLoadShipments,
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
                                 color: _deepBlue,
@@ -241,7 +257,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                                 horizontal: 24,
                               ),
                               child: Text(
-                                _loadError!,
+                                l10n.couldNotLoadShipments,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 13,
@@ -254,7 +270,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                             ElevatedButton.icon(
                               onPressed: _listenToShipments,
                               icon: const Icon(Icons.refresh_rounded),
-                              label: const Text('Try Again'),
+                              label: Text(l10n.tryAgain),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: _primaryBlue,
                                 foregroundColor: Colors.white,
@@ -280,6 +296,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                         child: _ShipmentCard(
                           shipment: shipment,
                           statusInfo: _statusInfo(
+                            l10n,
                             shipment['rawStatus'] as String,
                           ),
                           onTap: () => _openShipmentDetails(shipment),
@@ -296,6 +313,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   }
 
   Widget _buildTopHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 82,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -317,24 +335,24 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
             onTap: () => Navigator.pop(context),
           ),
           const SizedBox(width: 13),
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'My Shipments',
-                  style: TextStyle(
+                  l10n.myShipments,
+                  style: const TextStyle(
                     color: _textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: _primaryBlue,
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -363,6 +381,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   }
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(19, 20, 19, 18),
@@ -395,13 +414,13 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  _LiveDot(),
-                  SizedBox(width: 7),
+                  const _LiveDot(),
+                  const SizedBox(width: 7),
                   Text(
-                    'LIVE CUSTOMER SHIPMENT PORTAL',
-                    style: TextStyle(
+                    l10n.liveCustomerShipmentPortal,
+                    style: const TextStyle(
                       color: Color(0xFFD2E3F3),
                       fontSize: 8.5,
                       fontWeight: FontWeight.w800,
@@ -411,9 +430,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Your Shipping Network',
-                style: TextStyle(
+              Text(
+                l10n.yourShippingNetwork,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   height: 1.05,
@@ -422,9 +441,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 ),
               ),
               const SizedBox(height: 7),
-              const Text(
-                'Monitor every active and completed shipment from one secure place.',
-                style: TextStyle(
+              Text(
+                l10n.monitorShipmentsSubtitle,
+                style: const TextStyle(
                   color: Color(0xFFD7E6F5),
                   fontSize: 10.8,
                   height: 1.4,
@@ -437,23 +456,23 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                   Expanded(
                     child: _HeroStat(
                       value: '${_shipments.length}',
-                      label: 'TOTAL',
+                      label: l10n.total,
                       icon: Icons.inventory_2_outlined,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: _HeroStat(
-                      value: '${_countStatus('In Transit')}',
-                      label: 'IN TRANSIT',
+                      value: '${_countStatus('in_transit')}',
+                      label: l10n.inTransitUpper,
                       icon: Icons.local_shipping_outlined,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: _HeroStat(
-                      value: '${_countStatus('Delivered')}',
-                      label: 'DELIVERED',
+                      value: '${_countStatus('delivered')}',
+                      label: l10n.deliveredUpper,
                       icon: Icons.check_circle_outline_rounded,
                     ),
                   ),
@@ -467,6 +486,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   }
 
   Widget _buildSearchField() {
+    final l10n = AppLocalizations.of(context)!;
     return TextField(
       controller: _searchController,
       onChanged: (_) => setState(() {}),
@@ -476,7 +496,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
         fontWeight: FontWeight.w700,
       ),
       decoration: InputDecoration(
-        hintText: 'Search tracking number, route or cargo',
+        hintText: l10n.searchTrackingRouteCargo,
         hintStyle: const TextStyle(color: Color(0xFFA0A8B4), fontSize: 11.5),
         prefixIcon: const Icon(Icons.search_rounded, color: _primaryBlue),
         suffixIcon: _searchController.text.isEmpty
@@ -511,6 +531,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   }
 
   Widget _buildFilters() {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -542,7 +563,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                     : null,
               ),
               child: Text(
-                filter,
+                _filterLabel(l10n, filter),
                 style: TextStyle(
                   color: selected ? Colors.white : const Color(0xFF748090),
                   fontSize: 10.5,
@@ -557,24 +578,25 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   }
 
   Widget _buildListHeader(int count) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Shipment Portfolio',
-                style: TextStyle(
+                l10n.shipmentPortfolio,
+                style: const TextStyle(
                   color: _textDark,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
               ),
-              SizedBox(height: 3),
+              const SizedBox(height: 3),
               Text(
-                'Select a shipment to view full details.',
-                style: TextStyle(color: _textGrey, fontSize: 9.5),
+                l10n.selectShipmentDetails,
+                style: const TextStyle(color: _textGrey, fontSize: 9.5),
               ),
             ],
           ),
@@ -599,8 +621,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     final hasSearch = _searchController.text.trim().isNotEmpty;
-    final hasFilter = _selectedFilter != 'All';
+    final hasFilter = _selectedFilter != 'all';
     final isFiltered = hasSearch || hasFilter;
 
     return Container(
@@ -641,7 +664,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           const SizedBox(height: 18),
 
           Text(
-            isFiltered ? 'No matching shipments' : 'No shipments yet',
+            isFiltered ? l10n.noMatchingShipments : l10n.noShipmentsYet,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: _textDark,
@@ -654,8 +677,8 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
           Text(
             isFiltered
-                ? 'We could not find any shipments matching your current search or filter.'
-                : 'Your shipments will appear here as soon as they are created by our operations team.',
+                ? l10n.noMatchingShipmentsBody
+                : l10n.noShipmentsYetBody,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: _textGrey,
@@ -672,11 +695,11 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 _searchController.clear();
 
                 setState(() {
-                  _selectedFilter = 'All';
+                  _selectedFilter = 'all';
                 });
               },
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Clear Search & Filters'),
+              label: Text(l10n.clearSearchFilters),
               style: OutlinedButton.styleFrom(
                 foregroundColor: _primaryBlue,
                 side: const BorderSide(color: _primaryBlue),
@@ -695,38 +718,9 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     );
   }
 
-  String _normalizeStatus(String value) {
-    final normalized = value
-        .trim()
-        .toLowerCase()
-        .replaceAll('-', '_')
-        .replaceAll(' ', '_');
-
-    if (normalized == 'approved') return 'confirmed';
-    if (normalized == 'canceled') return 'cancelled';
-    return normalized;
-  }
-
-  String _displayStatus(String status) {
-    switch (status) {
-      case 'confirmed':
-        return 'Confirmed';
-      case 'prepared':
-        return 'Prepared';
-      case 'in_transit':
-        return 'In Transit';
-      case 'customs':
-      case 'customs_clearance':
-        return 'Customs';
-      case 'out_for_delivery':
-        return 'Out for Delivery';
-      case 'delivered':
-        return 'Delivered';
-      case 'cancelled':
-        return 'Cancelled';
-      default:
-        return 'Pending';
-    }
+  String _filterLabel(AppLocalizations l10n, String filter) {
+    if (filter == 'all') return l10n.all;
+    return LocaleController.statusLabel(l10n, filter);
   }
 
   double _statusProgress(String status) {
@@ -751,25 +745,24 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     }
   }
 
-  String _statusStage(String status) {
-    switch (status) {
+  String _statusUpperLabel(AppLocalizations l10n, String status) {
+    switch (LocaleController.normalizeStatus(status)) {
       case 'confirmed':
-        return 'Shipment confirmed by operations';
+        return l10n.confirmedUpper;
       case 'prepared':
-        return 'Shipment prepared for movement';
+        return l10n.preparedUpper;
       case 'in_transit':
-        return 'Shipment moving toward destination';
-      case 'customs':
+        return l10n.inTransitUpper;
       case 'customs_clearance':
-        return 'Shipment under customs processing';
+        return l10n.customsUpper;
       case 'out_for_delivery':
-        return 'Shipment on final delivery route';
+        return l10n.outForDeliveryUpper;
       case 'delivered':
-        return 'Shipment delivered successfully';
+        return l10n.deliveredUpper;
       case 'cancelled':
-        return 'Shipment has been cancelled';
+        return l10n.cancelledUpper;
       default:
-        return 'Shipment awaiting processing';
+        return l10n.pendingUpper;
     }
   }
 
@@ -790,141 +783,73 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     final delivery = (data['deliveryLocation'] ?? '').toString().trim();
 
     if (status == 'delivered' || status == 'out_for_delivery') {
-      return delivery.isEmpty ? 'Location update pending' : delivery;
+      return delivery;
     }
 
     if (status == 'pending' || status == 'confirmed' || status == 'prepared') {
-      return pickup.isEmpty ? 'Location update pending' : pickup;
+      return pickup;
     }
 
-    return 'Location update pending';
+    return '';
   }
 
-  String _formatDate(dynamic value) {
-    final date = _toDateTime(value);
-    if (date == null) {
-      final text = value?.toString().trim() ?? '';
-      return text.isEmpty ? 'Not specified' : text;
-    }
-
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-  String _formatDateTime(dynamic value) {
-    final date = _toDateTime(value);
-    if (date == null) {
-      final text = value?.toString().trim() ?? '';
-      return text.isEmpty ? 'Awaiting update' : text;
-    }
-
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    final hour12 = date.hour == 0
-        ? 12
-        : date.hour > 12
-        ? date.hour - 12
-        : date.hour;
-    final minute = date.minute.toString().padLeft(2, '0');
-    final amPm = date.hour >= 12 ? 'PM' : 'AM';
-
-    return '${date.day} ${months[date.month - 1]} ${date.year} • '
-        '$hour12:$minute $amPm';
-  }
-
-  DateTime? _toDateTime(dynamic value) {
-    if (value is Timestamp) return value.toDate().toLocal();
-    if (value is DateTime) return value.toLocal();
-    if (value is String && value.trim().isNotEmpty) {
-      return DateTime.tryParse(value.trim())?.toLocal();
-    }
-    return null;
-  }
-
-  _StatusInfo _statusInfo(String status) {
+  _StatusInfo _statusInfo(AppLocalizations l10n, String status) {
     switch (status) {
       case 'confirmed':
-        return const _StatusInfo(
-          label: 'CONFIRMED',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.verified_rounded,
         );
       case 'prepared':
-        return const _StatusInfo(
-          label: 'PREPARED',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.fact_check_rounded,
         );
       case 'in_transit':
-        return const _StatusInfo(
-          label: 'IN TRANSIT',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.local_shipping_rounded,
         );
       case 'customs':
       case 'customs_clearance':
-        return const _StatusInfo(
-          label: 'CUSTOMS',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _warning,
-          background: Color(0xFFFFF4DF),
+          background: const Color(0xFFFFF4DF),
           icon: Icons.gavel_rounded,
         );
       case 'out_for_delivery':
-        return const _StatusInfo(
-          label: 'OUT FOR DELIVERY',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _primaryBlue,
-          background: Color(0xFFEAF3FF),
+          background: const Color(0xFFEAF3FF),
           icon: Icons.route_rounded,
         );
       case 'delivered':
-        return const _StatusInfo(
-          label: 'DELIVERED',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _success,
-          background: Color(0xFFEAF8F0),
+          background: const Color(0xFFEAF8F0),
           icon: Icons.check_circle_rounded,
         );
       case 'cancelled':
-        return const _StatusInfo(
-          label: 'CANCELLED',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _danger,
-          background: Color(0xFFFFECEF),
+          background: const Color(0xFFFFECEF),
           icon: Icons.cancel_rounded,
         );
       default:
-        return const _StatusInfo(
-          label: 'PENDING',
+        return _StatusInfo(
+          label: _statusUpperLabel(l10n, status),
           color: _warning,
-          background: Color(0xFFFFF4DF),
+          background: const Color(0xFFFFF4DF),
           icon: Icons.schedule_rounded,
         );
     }
@@ -990,9 +915,9 @@ class _ShipmentCard extends StatelessWidget {
   final Map<String, dynamic> shipment;
   final _StatusInfo statusInfo;
   final VoidCallback onTap;
-  String _formatLastUpdate(Object? value) {
+  String _formatLastUpdate(Object? value, AppLocalizations l10n) {
     if (value == null) {
-      return 'Awaiting update';
+      return l10n.awaitingUpdate;
     }
 
     DateTime? date;
@@ -1007,23 +932,8 @@ class _ShipmentCard extends StatelessWidget {
 
     if (date == null) {
       final text = value.toString().trim();
-      return text.isEmpty ? 'Awaiting update' : text;
+      return text.isEmpty ? l10n.awaitingUpdate : text;
     }
-
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
 
     final hour12 = date.hour == 0
         ? 12
@@ -1034,28 +944,58 @@ class _ShipmentCard extends StatelessWidget {
     final minute = date.minute.toString().padLeft(2, '0');
     final period = date.hour >= 12 ? 'PM' : 'AM';
 
-    return '${date.day} ${months[date.month - 1]} ${date.year} • '
+    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year} • '
         '$hour12:$minute $period';
+  }
+
+  String _formatDate(dynamic value, AppLocalizations l10n) {
+    DateTime? date;
+    if (value is Timestamp) {
+      date = value.toDate().toLocal();
+    } else if (value is DateTime) {
+      date = value.toLocal();
+    } else if (value is String && value.trim().isNotEmpty) {
+      date = DateTime.tryParse(value.trim())?.toLocal();
+    }
+
+    if (date == null) {
+      final text = value?.toString().trim() ?? '';
+      return text.isEmpty ? l10n.notSpecified : text;
+    }
+
+    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final number = (shipment['number'] ?? '-').toString();
-    final origin = (shipment['origin'] ?? 'Not specified').toString();
-    final destination = (shipment['destination'] ?? 'Not specified').toString();
-    final date = (shipment['date'] ?? 'Not specified').toString();
-    final type = (shipment['type'] ?? 'Shipment').toString();
-    final stage = (shipment['stage'] ?? '').toString();
-    final currentLocation =
-        (shipment['currentLocationName'] ??
-                shipment['currentLocation'] ??
-                'Location update pending')
-            .toString();
+    final originRaw = (shipment['origin'] ?? '').toString().trim();
+    final destinationRaw = (shipment['destination'] ?? '').toString().trim();
+    final origin = originRaw.isEmpty ? l10n.notSpecified : originRaw;
+    final destination =
+        destinationRaw.isEmpty ? l10n.notSpecified : destinationRaw;
+    final date = _formatDate(
+      shipment['expectedDelivery'] ?? shipment['estimatedDelivery'],
+      l10n,
+    );
+    final typeRaw = (shipment['type'] ?? '').toString().trim();
+    final type = typeRaw.isEmpty ? l10n.shipment : typeRaw;
+    final rawStatus = (shipment['rawStatus'] ?? 'pending').toString();
+    final stage = _shipmentStatusDescription(l10n, rawStatus);
+    final currentLocationRaw =
+        (shipment['currentLocationName'] ?? shipment['currentLocation'] ?? '')
+            .toString()
+            .trim();
+    final currentLocation = currentLocationRaw.isEmpty
+        ? l10n.locationUpdatePending
+        : currentLocationRaw;
     final lastUpdate = _formatLastUpdate(
       shipment['lastLocatorUpdate'] ??
           shipment['lastLocationUpdate'] ??
           shipment['updatedAt'] ??
           shipment['lastUpdate'],
+      l10n,
     );
     final progress = (shipment['progress'] as num?)?.toDouble() ?? .10;
 
@@ -1165,7 +1105,7 @@ class _ShipmentCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _RouteSide(
-                        label: 'PICKUP',
+                        label: l10n.pickupUpper,
                         value: origin,
                         alignRight: false,
                       ),
@@ -1185,7 +1125,7 @@ class _ShipmentCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: _RouteSide(
-                        label: 'DELIVERY',
+                        label: l10n.deliveryUpper,
                         value: destination,
                         alignRight: true,
                       ),
@@ -1196,8 +1136,8 @@ class _ShipmentCard extends StatelessWidget {
               const SizedBox(height: 13),
               Row(
                 children: [
-                  const Text(
-                    'Shipment Progress',
+                  Text(
+                    l10n.shipmentProgress,
                     style: TextStyle(
                       color: _textGrey,
                       fontSize: 9.5,
@@ -1231,7 +1171,7 @@ class _ShipmentCard extends StatelessWidget {
                   Expanded(
                     child: _SmallInfo(
                       icon: Icons.location_on_outlined,
-                      label: 'CURRENT LOCATION',
+                      label: l10n.currentLocation,
                       value: currentLocation,
                     ),
                   ),
@@ -1239,7 +1179,7 @@ class _ShipmentCard extends StatelessWidget {
                   Expanded(
                     child: _SmallInfo(
                       icon: Icons.event_available_outlined,
-                      label: 'EST. DELIVERY',
+                      label: l10n.estDelivery,
                       value: date,
                     ),
                   ),
@@ -1256,7 +1196,7 @@ class _ShipmentCard extends StatelessWidget {
                   const SizedBox(width: 5),
                   Expanded(
                     child: Text(
-                      'Last update: $lastUpdate',
+                      l10n.lastUpdatePrefix(lastUpdate),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: _textGrey, fontSize: 8.7),
@@ -1362,7 +1302,7 @@ class _RouteSide extends StatelessWidget {
           value,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          textAlign: alignRight ? TextAlign.right : TextAlign.left,
+          textAlign: alignRight ? TextAlign.end : TextAlign.start,
           style: const TextStyle(
             color: _textDark,
             fontSize: 10.5,

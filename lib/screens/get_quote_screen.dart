@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
+
 class GetQuoteScreen extends StatefulWidget {
   const GetQuoteScreen({
     super.key,
@@ -103,6 +106,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: pageBackground,
       body: SafeArea(
@@ -122,40 +126,40 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                       const SizedBox(height: 24),
                       _sectionTitle(
                         icon: Icons.local_shipping_outlined,
-                        title: 'Shipping Service',
-                        subtitle: 'Choose the service that fits your shipment',
+                        title: l10n.shippingService,
+                        subtitle: l10n.chooseServiceFits,
                       ),
                       const SizedBox(height: 14),
                       _buildServiceSelector(),
                       const SizedBox(height: 24),
                       _sectionTitle(
                         icon: Icons.route_outlined,
-                        title: 'Route',
-                        subtitle: 'Where is your shipment moving from and to?',
+                        title: l10n.route,
+                        subtitle: l10n.whereShipmentMoving,
                       ),
                       const SizedBox(height: 14),
                       _buildRouteCard(),
                       const SizedBox(height: 24),
                       _sectionTitle(
                         icon: Icons.inventory_2_outlined,
-                        title: 'Shipment Details',
-                        subtitle: 'Tell us about your cargo',
+                        title: l10n.shipmentDetailsSection,
+                        subtitle: l10n.tellUsAboutCargo,
                       ),
                       const SizedBox(height: 14),
                       _buildShipmentDetailsCard(),
                       const SizedBox(height: 24),
                       _sectionTitle(
                         icon: Icons.calendar_month_outlined,
-                        title: 'Pickup',
-                        subtitle: 'Select your preferred pickup date',
+                        title: l10n.pickup,
+                        subtitle: l10n.selectPreferredPickup,
                       ),
                       const SizedBox(height: 14),
                       _buildPickupCard(),
                       const SizedBox(height: 24),
                       _sectionTitle(
                         icon: Icons.notes_rounded,
-                        title: 'Additional Notes',
-                        subtitle: 'Add any special instructions for our team',
+                        title: l10n.additionalNotes,
+                        subtitle: l10n.addSpecialInstructions,
                       ),
                       const SizedBox(height: 14),
                       _buildNotesCard(),
@@ -164,9 +168,9 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                       const SizedBox(height: 22),
                       _buildSubmitButton(),
                       const SizedBox(height: 10),
-                      const Center(
+                      Center(
                         child: Text(
-                          'Our team will review your request and send you the best available rate.',
+                          l10n.teamWillReviewRate,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: textGrey,
@@ -188,6 +192,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 82,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -223,24 +228,24 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Get a Quote',
-                  style: TextStyle(
+                  l10n.getAQuoteTitle,
+                  style: const TextStyle(
                     color: textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.3,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: primaryBlue,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w700,
@@ -269,6 +274,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
@@ -298,14 +304,14 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
               color: Colors.white.withValues(alpha: .055),
             ),
           ),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.request_quote_outlined, color: Colors.white, size: 32),
-              SizedBox(height: 14),
+              const Icon(Icons.request_quote_outlined, color: Colors.white, size: 32),
+              const SizedBox(height: 14),
               Text(
-                'Request Your Best Rate',
-                style: TextStyle(
+                l10n.requestYourBestRate,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 23,
                   height: 1.05,
@@ -313,10 +319,10 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   letterSpacing: -0.4,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Tell us about your shipment and our logistics team will prepare a tailored quotation.',
-                style: TextStyle(
+                l10n.quoteHeroSubtitle,
+                style: const TextStyle(
                   color: Color(0xFFD5E3F3),
                   fontSize: 12.5,
                   height: 1.45,
@@ -403,6 +409,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
           childAspectRatio: 3.05,
         ),
         itemBuilder: (context, index) {
+          final l10n = AppLocalizations.of(context)!;
           final service = _services[index];
           final selected = service == _selectedService;
 
@@ -431,7 +438,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      service,
+                      LocaleController.serviceLabel(l10n, service),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -476,17 +483,18 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildRouteCard() {
+    final l10n = AppLocalizations.of(context)!;
     return _card(
       child: Column(
         children: [
           _textField(
             controller: _fromController,
-            label: 'From',
-            hint: 'City, Country',
+            label: l10n.from,
+            hint: l10n.cityCountry,
             icon: Icons.trip_origin_rounded,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter pickup location';
+                return l10n.pleaseEnterPickupLocation;
               }
               return null;
             },
@@ -516,12 +524,12 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
           const SizedBox(height: 14),
           _textField(
             controller: _toController,
-            label: 'To',
-            hint: 'City, Country',
+            label: l10n.to,
+            hint: l10n.cityCountry,
             icon: Icons.location_on_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter delivery location';
+                return l10n.pleaseEnterDeliveryLocation;
               }
               return null;
             },
@@ -532,17 +540,18 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildShipmentDetailsCard() {
+    final l10n = AppLocalizations.of(context)!;
     return _card(
       child: Column(
         children: [
           _textField(
             controller: _cargoController,
-            label: 'Cargo Type',
+            label: l10n.cargoType,
             hint: 'e.g. General Cargo, Steel, Furniture',
             icon: Icons.category_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter cargo type';
+                return l10n.pleaseEnterCargoType;
               }
               return null;
             },
@@ -553,7 +562,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
               Expanded(
                 child: _textField(
                   controller: _weightController,
-                  label: 'Weight',
+                  label: l10n.weight,
                   hint: '0',
                   suffix: 'KG',
                   icon: Icons.monitor_weight_outlined,
@@ -563,7 +572,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   validator: (value) {
                     final weight = double.tryParse(value?.trim() ?? '');
                     if (weight == null || weight <= 0) {
-                      return 'Enter weight';
+                      return l10n.enterWeight;
                     }
                     return null;
                   },
@@ -573,14 +582,14 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
               Expanded(
                 child: _textField(
                   controller: _quantityController,
-                  label: 'Quantity',
+                  label: l10n.quantity,
                   hint: '1',
                   icon: Icons.numbers_rounded,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     final quantity = int.tryParse(value?.trim() ?? '');
                     if (quantity == null || quantity <= 0) {
-                      return 'Enter quantity';
+                      return l10n.enterQuantity;
                     }
                     return null;
                   },
@@ -590,9 +599,9 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
           ),
           const SizedBox(height: 18),
           const Align(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             child: Text(
-              'Dimensions (optional)',
+              l10n.dimensionsOptional,
               style: TextStyle(
                 color: textDark,
                 fontSize: 12.5,
@@ -606,30 +615,30 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
               Expanded(
                 child: _dimensionField(
                   controller: _lengthController,
-                  label: 'Length',
+                  label: l10n.length,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _dimensionField(
                   controller: _widthController,
-                  label: 'Width',
+                  label: l10n.width,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _dimensionField(
                   controller: _heightController,
-                  label: 'Height',
+                  label: l10n.height,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 9),
           const Align(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             child: Text(
-              'Dimensions are recorded in centimeters (CM).',
+              l10n.dimensionsInCm,
               style: TextStyle(
                 color: textGrey,
                 fontSize: 9.5,
@@ -643,6 +652,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildPickupCard() {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: _selectPickupDate,
       borderRadius: BorderRadius.circular(20),
@@ -667,8 +677,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Preferred Pickup Date',
+                  Text(
+                    l10n.preferredPickupDate,
                     style: TextStyle(
                       color: textGrey,
                       fontSize: 10,
@@ -678,8 +688,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   const SizedBox(height: 4),
                   Text(
                     _pickupDate == null
-                        ? 'Select a date'
-                        : _formatDate(_pickupDate!),
+                        ? l10n.selectADate
+                        : _formatDate(l10n, _pickupDate!),
                     style: TextStyle(
                       color: _pickupDate == null ? textGrey : textDark,
                       fontSize: 14,
@@ -701,6 +711,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildNotesCard() {
+    final l10n = AppLocalizations.of(context)!;
     return _card(
       child: TextFormField(
         controller: _notesController,
@@ -708,8 +719,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         maxLines: 7,
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
-          hintText:
-              'Special handling, customs information, vehicle details, packing notes, or anything else we should know...',
+          hintText: l10n.specialHandlingHint,
           hintStyle: const TextStyle(
             color: Color(0xFF9AA5B4),
             fontSize: 11,
@@ -736,6 +746,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildTrustStrip() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
@@ -744,24 +755,24 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: _TrustItem(
               icon: Icons.verified_user_outlined,
-              title: 'Secure Request',
+              title: l10n.secureRequest,
             ),
           ),
           Expanded(
             child: _TrustItem(
               icon: Icons.price_check_outlined,
-              title: 'Best Rate',
+              title: l10n.bestRate,
             ),
           ),
           Expanded(
             child: _TrustItem(
               icon: Icons.support_agent_rounded,
-              title: 'Expert Support',
+              title: l10n.expertSupport,
             ),
           ),
         ],
@@ -770,6 +781,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _buildSubmitButton() {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 60,
@@ -793,21 +805,21 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   color: Colors.white,
                 ),
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.send_rounded, size: 20),
-                  SizedBox(width: 10),
+                  const Icon(Icons.send_rounded, size: 20),
+                  const SizedBox(width: 10),
                   Text(
-                    'SUBMIT QUOTE REQUEST',
-                    style: TextStyle(
+                    l10n.submitQuoteRequest,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
                       letterSpacing: .4,
                     ),
                   ),
-                  SizedBox(width: 9),
-                  Icon(Icons.arrow_forward_rounded, size: 20),
+                  const SizedBox(width: 9),
+                  const Icon(Icons.arrow_forward_rounded, size: 20),
                 ],
               ),
       ),
@@ -817,11 +829,12 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   Future<void> _submitQuote() async {
     if (_submitting) return;
 
+    final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
       _showMessage(
-        'Please complete the required shipment information.',
+        l10n.pleaseCompleteShipmentInfo,
         isError: true,
       );
       return;
@@ -830,7 +843,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showMessage('Please sign in before requesting a quote.', isError: true);
+      _showMessage(l10n.pleaseSignInBeforeQuote, isError: true);
       return;
     }
 
@@ -930,7 +943,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       });
 
       _showMessage(
-        error.message ?? 'Could not submit your quote request.',
+        error.message ?? l10n.couldNotSubmitQuote,
         isError: true,
       );
     } catch (_) {
@@ -940,7 +953,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         _submitting = false;
       });
 
-      _showMessage('Something went wrong. Please try again.', isError: true);
+      _showMessage(l10n.somethingWentWrong, isError: true);
     }
   }
 
@@ -952,6 +965,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext)!;
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -985,8 +999,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                const Text(
-                  'Quote Request Submitted',
+                Text(
+                  l10n.quoteRequestSubmitted,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: textDark,
@@ -995,8 +1009,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   ),
                 ),
                 const SizedBox(height: 9),
-                const Text(
-                  'Your request has been sent to TAWAM AL-SHAHIN TRANSPORT.',
+                Text(
+                  l10n.quoteSentToTawam,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: textGrey,
@@ -1016,8 +1030,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        'REFERENCE',
+                      Text(
+                        l10n.reference,
                         style: TextStyle(
                           color: textGrey,
                           fontSize: 9,
@@ -1054,8 +1068,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
-                      'DONE',
+                    child: Text(
+                      l10n.doneUpper,
                       style: TextStyle(fontWeight: FontWeight.w800),
                     ),
                   ),
@@ -1196,6 +1210,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Future<void> _selectPickupDate() async {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
 
     final selected = await showDatePicker(
@@ -1203,7 +1218,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       initialDate: _pickupDate ?? now,
       firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(now.year + 2),
-      helpText: 'SELECT PICKUP DATE',
+      helpText: l10n.selectPickupDate,
     );
 
     if (selected == null || !mounted) return;
@@ -1213,23 +1228,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     });
   }
 
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  String _formatDate(AppLocalizations l10n, DateTime date) {
+    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
   }
 
   String _two(int value) {

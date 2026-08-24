@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
+
 class CreateBookingScreen extends StatefulWidget {
   const CreateBookingScreen({super.key, this.initialServiceType});
 
@@ -128,6 +131,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: pageBg,
       body: SafeArea(
@@ -148,9 +152,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       _sectionHeading(
                         number: '01',
                         icon: Icons.local_shipping_outlined,
-                        title: 'Select Service',
-                        subtitle:
-                            'Choose how you would like us to move your shipment.',
+                        title: l10n.selectService,
+                        subtitle: l10n.chooseHowToMove,
                       ),
                       const SizedBox(height: 14),
                       _buildServiceSelector(),
@@ -158,9 +161,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       _sectionHeading(
                         number: '02',
                         icon: Icons.route_outlined,
-                        title: 'Route & Schedule',
-                        subtitle:
-                            'Tell our operations team where and when to collect your cargo.',
+                        title: l10n.routeAndSchedule,
+                        subtitle: l10n.tellOperationsWhereWhen,
                       ),
                       const SizedBox(height: 14),
                       _buildRouteAndSchedule(),
@@ -168,9 +170,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       _sectionHeading(
                         number: '03',
                         icon: Icons.inventory_2_outlined,
-                        title: 'Shipment Details',
-                        subtitle:
-                            'Provide the cargo information needed to prepare your booking.',
+                        title: l10n.shipmentDetails,
+                        subtitle: l10n.provideCargoForBooking,
                       ),
                       const SizedBox(height: 14),
                       _buildCargoDetails(),
@@ -178,9 +179,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       _sectionHeading(
                         number: '04',
                         icon: Icons.verified_user_outlined,
-                        title: 'Contact & Instructions',
-                        subtitle:
-                            'Your account details are securely attached to this booking.',
+                        title: l10n.contactAndInstructions,
+                        subtitle: l10n.accountAttachedToBooking,
                       ),
                       const SizedBox(height: 14),
                       _buildCustomerCard(),
@@ -191,9 +191,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                       const SizedBox(height: 20),
                       _buildSubmitButton(),
                       const SizedBox(height: 10),
-                      const Center(
+                      Center(
                         child: Text(
-                          'Your request will be reviewed by the TAWAM operations team.',
+                          l10n.bookingReviewedByOps,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: textGrey,
@@ -215,6 +215,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 84,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -250,24 +251,24 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Create a Booking',
-                  style: TextStyle(
+                  l10n.createBookingTitle,
+                  style: const TextStyle(
                     color: textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: primaryBlue,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w700,
@@ -296,6 +297,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
@@ -325,15 +327,15 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
               color: Colors.white.withValues(alpha: .055),
             ),
           ),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.shield_outlined, color: Colors.white, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.shield_outlined, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
                   Text(
-                    'GLOBAL BOOKING DESK',
+                    l10n.globalBookingDesk,
                     style: TextStyle(
                       color: Color(0xFFD5E5F4),
                       fontSize: 9.5,
@@ -345,7 +347,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
               ),
               SizedBox(height: 16),
               Text(
-                'Schedule Your Shipment',
+                l10n.scheduleYourShipment,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -356,7 +358,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
               ),
               SizedBox(height: 8),
               Text(
-                'Book with our logistics team and let TAWAM coordinate your shipment from pickup to delivery.',
+                l10n.bookingHeroSubtitle,
                 style: TextStyle(
                   color: Color(0xFFD7E6F5),
                   fontSize: 12.3,
@@ -364,16 +366,19 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 17),
+              const SizedBox(height: 17),
               Row(
                 children: [
-                  _HeroFeature(icon: Icons.verified_outlined, label: 'Secure'),
-                  SizedBox(width: 18),
-                  _HeroFeature(icon: Icons.public_rounded, label: 'Global'),
-                  SizedBox(width: 18),
+                  _HeroFeature(
+                    icon: Icons.verified_outlined,
+                    label: l10n.secure,
+                  ),
+                  const SizedBox(width: 18),
+                  _HeroFeature(icon: Icons.public_rounded, label: l10n.global),
+                  const SizedBox(width: 18),
                   _HeroFeature(
                     icon: Icons.support_agent_rounded,
-                    label: 'Expert Team',
+                    label: l10n.expertTeam,
                   ),
                 ],
               ),
@@ -473,6 +478,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
           childAspectRatio: 2.65,
         ),
         itemBuilder: (context, index) {
+          final l10n = AppLocalizations.of(context)!;
           final service = _services[index];
           final selected = service == _selectedService;
           return InkWell(
@@ -509,7 +515,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      service,
+                      LocaleController.serviceLabel(l10n, service),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -536,16 +542,17 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildRouteAndSchedule() {
+    final l10n = AppLocalizations.of(context)!;
     return _premiumCard(
       child: Column(
         children: [
           _input(
             controller: _pickupController,
-            label: 'Pickup Location',
-            hint: 'City, Country',
+            label: l10n.pickupLocation,
+            hint: l10n.cityCountry,
             icon: Icons.trip_origin_rounded,
             validator: (value) => value == null || value.trim().isEmpty
-                ? 'Please enter pickup location'
+                ? l10n.pleaseEnterPickupLocation
                 : null,
           ),
           const SizedBox(height: 12),
@@ -573,11 +580,11 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
           const SizedBox(height: 12),
           _input(
             controller: _deliveryController,
-            label: 'Delivery Location',
-            hint: 'City, Country',
+            label: l10n.deliveryLocation,
+            hint: l10n.cityCountry,
             icon: Icons.location_on_outlined,
             validator: (value) => value == null || value.trim().isEmpty
-                ? 'Please enter delivery location'
+                ? l10n.pleaseEnterDeliveryLocation
                 : null,
           ),
           const SizedBox(height: 16),
@@ -594,6 +601,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _dateSelector() {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: _selectPickupDate,
       borderRadius: BorderRadius.circular(15),
@@ -618,8 +626,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Pickup Date',
+                  Text(
+                    l10n.pickupDate,
                     style: TextStyle(
                       color: textGrey,
                       fontSize: 9.5,
@@ -629,8 +637,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   const SizedBox(height: 4),
                   Text(
                     _pickupDate == null
-                        ? 'Select date'
-                        : _formatDate(_pickupDate!),
+                        ? l10n.selectDate
+                        : _formatDate(l10n, _pickupDate!),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -649,6 +657,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _timeSelector() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 62,
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -678,7 +687,10 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                 items: _preferredTimes
                     .map(
                       (time) =>
-                          DropdownMenuItem(value: time, child: Text(time)),
+                          DropdownMenuItem(
+                            value: time,
+                            child: Text(_preferredTimeLabel(l10n, time)),
+                          ),
                     )
                     .toList(),
                 onChanged: (value) {
@@ -693,17 +705,18 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildCargoDetails() {
+    final l10n = AppLocalizations.of(context)!;
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _input(
             controller: _cargoController,
-            label: 'Cargo Type',
-            hint: 'Vehicle, General Cargo, Furniture...',
+            label: l10n.cargoType,
+            hint: l10n.vehicleGeneralCargoHint,
             icon: Icons.category_outlined,
             validator: (value) => value == null || value.trim().isEmpty
-                ? 'Please enter cargo type'
+                ? l10n.pleaseEnterCargoType
                 : null,
           ),
           const SizedBox(height: 14),
@@ -712,7 +725,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
               Expanded(
                 child: _input(
                   controller: _weightController,
-                  label: 'Weight',
+                  label: l10n.weight,
                   hint: '0',
                   suffix: 'KG',
                   icon: Icons.monitor_weight_outlined,
@@ -722,7 +735,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   validator: (value) {
                     final weight = double.tryParse(value?.trim() ?? '');
                     return weight == null || weight <= 0
-                        ? 'Enter weight'
+                        ? l10n.enterWeight
                         : null;
                   },
                 ),
@@ -731,14 +744,14 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
               Expanded(
                 child: _input(
                   controller: _quantityController,
-                  label: 'Quantity',
+                  label: l10n.quantity,
                   hint: '1',
                   icon: Icons.numbers_rounded,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     final quantity = int.tryParse(value?.trim() ?? '');
                     return quantity == null || quantity <= 0
-                        ? 'Enter quantity'
+                        ? l10n.enterQuantity
                         : null;
                   },
                 ),
@@ -746,25 +759,16 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
             ],
           ),
           const SizedBox(height: 17),
-          const Row(
+          Row(
             children: [
-              Icon(Icons.straighten_rounded, color: primaryBlue, size: 18),
-              SizedBox(width: 7),
+              const Icon(Icons.straighten_rounded, color: primaryBlue, size: 18),
+              const SizedBox(width: 7),
               Text(
-                'Dimensions',
-                style: TextStyle(
+                l10n.dimensionsOptional,
+                style: const TextStyle(
                   color: textDark,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w800,
-                ),
-              ),
-              SizedBox(width: 6),
-              Text(
-                '(optional)',
-                style: TextStyle(
-                  color: textGrey,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -775,21 +779,21 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
               Expanded(
                 child: _dimensionInput(
                   controller: _lengthController,
-                  label: 'Length',
+                  label: l10n.length,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _dimensionInput(
                   controller: _widthController,
-                  label: 'Width',
+                  label: l10n.width,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _dimensionInput(
                   controller: _heightController,
-                  label: 'Height',
+                  label: l10n.height,
                 ),
               ),
             ],
@@ -800,6 +804,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildCustomerCard() {
+    final l10n = AppLocalizations.of(context)!;
     return _premiumCard(
       child: _loadingProfile
           ? const SizedBox(
@@ -849,7 +854,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                           const SizedBox(height: 3),
                           Text(
                             _customerEmail.isEmpty
-                                ? 'Signed-in customer'
+                                ? l10n.signedInCustomer
                                 : _customerEmail,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -871,17 +876,17 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                         color: const Color(0xFFEAF8F0),
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.verified_rounded,
                             color: Color(0xFF16765C),
                             size: 14,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            'Verified',
-                            style: TextStyle(
+                            l10n.verified,
+                            style: const TextStyle(
                               color: Color(0xFF16765C),
                               fontSize: 9,
                               fontWeight: FontWeight.w800,
@@ -895,12 +900,12 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                 const SizedBox(height: 16),
                 _input(
                   controller: _phoneController,
-                  label: 'Contact Phone',
+                  label: l10n.contactPhone,
                   hint: '+971 ...',
                   icon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
                   validator: (value) => value == null || value.trim().isEmpty
-                      ? 'Please enter phone number'
+                      ? l10n.pleaseEnterPhoneNumber
                       : null,
                 ),
               ],
@@ -909,6 +914,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildNotesCard() {
+    final l10n = AppLocalizations.of(context)!;
     return _premiumCard(
       child: TextFormField(
         controller: _notesController,
@@ -916,9 +922,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         maxLines: 7,
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
-          labelText: 'Special Instructions',
+          labelText: l10n.specialInstructions,
           hintText:
-              'Pickup access, packing notes, customs information or anything our team should know...',
+              l10n.pickupAccessHint,
           labelStyle: const TextStyle(
             color: textGrey,
             fontSize: 11,
@@ -950,6 +956,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildTrustPanel() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
@@ -958,26 +965,26 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         borderRadius: BorderRadius.circular(21),
         border: Border.all(color: borderColor),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: _TrustFeature(
               icon: Icons.verified_user_outlined,
-              title: 'Secure Booking',
+              title: l10n.secureBooking,
             ),
           ),
-          _MiniDivider(),
+          const _MiniDivider(),
           Expanded(
             child: _TrustFeature(
               icon: Icons.handshake_outlined,
-              title: 'Professional Care',
+              title: l10n.professionalCare,
             ),
           ),
-          _MiniDivider(),
+          const _MiniDivider(),
           Expanded(
             child: _TrustFeature(
               icon: Icons.support_agent_rounded,
-              title: 'Expert Support',
+              title: l10n.expertSupport,
             ),
           ),
         ],
@@ -986,6 +993,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _buildSubmitButton() {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 62,
@@ -1009,21 +1017,21 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   color: Colors.white,
                 ),
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.calendar_month_rounded, size: 20),
-                  SizedBox(width: 10),
+                  const Icon(Icons.calendar_month_rounded, size: 20),
+                  const SizedBox(width: 10),
                   Text(
-                    'CONFIRM BOOKING',
-                    style: TextStyle(
+                    l10n.confirmBooking,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                       letterSpacing: .5,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Icon(Icons.arrow_forward_rounded, size: 20),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.arrow_forward_rounded, size: 20),
                 ],
               ),
       ),
@@ -1032,24 +1040,25 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
 
   Future<void> _submitBooking() async {
     if (_submitting) return;
+    final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
       _showMessage(
-        'Please complete the required booking information.',
+        l10n.pleaseCompleteBooking,
         isError: true,
       );
       return;
     }
 
     if (_pickupDate == null) {
-      _showMessage('Please select your preferred pickup date.', isError: true);
+      _showMessage(l10n.pleaseSelectPickupDate, isError: true);
       return;
     }
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      _showMessage('Please sign in before creating a booking.', isError: true);
+      _showMessage(l10n.pleaseSignInBeforeBooking, isError: true);
       return;
     }
 
@@ -1106,13 +1115,13 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       if (!mounted) return;
       setState(() => _submitting = false);
       _showMessage(
-        error.message ?? 'Unable to submit your booking.',
+        error.message ?? l10n.unableToSubmitBooking,
         isError: true,
       );
     } catch (_) {
       if (!mounted) return;
       setState(() => _submitting = false);
-      _showMessage('Something went wrong. Please try again.', isError: true);
+      _showMessage(l10n.somethingWentWrong, isError: true);
     }
   }
 
@@ -1121,6 +1130,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext)!;
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1154,8 +1164,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                const Text(
-                  'Booking Request Submitted',
+                Text(
+                  l10n.bookingRequestSubmitted,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: textDark,
@@ -1164,8 +1174,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   ),
                 ),
                 const SizedBox(height: 9),
-                const Text(
-                  'Your booking has been sent securely to TAWAM AL-SHAHIN TRANSPORT for review.',
+                Text(
+                  l10n.bookingSentToTawam,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: textGrey,
@@ -1185,9 +1195,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        'BOOKING REFERENCE',
-                        style: TextStyle(
+                      Text(
+                        l10n.bookingReference,
+                        style: const TextStyle(
                           color: textGrey,
                           fontSize: 8.8,
                           letterSpacing: 1,
@@ -1213,9 +1223,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                           color: const Color(0xFFFFF6E5),
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: const Text(
-                          'PENDING CONFIRMATION',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.pendingConfirmation,
+                          style: const TextStyle(
                             color: Color(0xFFB26A00),
                             fontSize: 8.5,
                             fontWeight: FontWeight.w800,
@@ -1242,8 +1252,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
-                      'DONE',
+                    child: Text(
+                      l10n.doneUpper,
                       style: TextStyle(fontWeight: FontWeight.w900),
                     ),
                   ),
@@ -1395,7 +1405,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       initialDate: _pickupDate ?? now,
       firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(now.year + 2),
-      helpText: 'SELECT PICKUP DATE',
+      helpText: AppLocalizations.of(context)!.selectPickupDate,
     );
     if (selected == null || !mounted) return;
     setState(() => _pickupDate = selected);
@@ -1420,22 +1430,21 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     }
   }
 
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  String _preferredTimeLabel(AppLocalizations l10n, String time) {
+    switch (time) {
+      case 'Morning':
+        return l10n.morning;
+      case 'Afternoon':
+        return l10n.afternoon;
+      case 'Evening':
+        return l10n.evening;
+      default:
+        return l10n.flexible;
+    }
+  }
+
+  String _formatDate(AppLocalizations l10n, DateTime date) {
+    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
   }
 
   String _two(int value) => value.toString().padLeft(2, '0');

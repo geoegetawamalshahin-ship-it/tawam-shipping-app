@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 class TermsConditionsScreen extends StatelessWidget {
   const TermsConditionsScreen({super.key});
 
@@ -11,6 +13,8 @@ class TermsConditionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBackground,
       body: SafeArea(
@@ -53,11 +57,11 @@ class TermsConditionsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Terms & Conditions',
+                          l10n.termsConditions,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 19,
                             fontWeight: FontWeight.w800,
@@ -87,10 +91,10 @@ class TermsConditionsScreen extends StatelessWidget {
 
                   const SizedBox(height: 17),
 
-                  const Text(
-                    'Terms of Service',
+                  Text(
+                    l10n.termsOfService,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
@@ -99,12 +103,12 @@ class TermsConditionsScreen extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      'Please review the terms governing your use of the TAWAM AL-SHAHIN TRANSPORT mobile application and services.',
+                      l10n.reviewTermsSubtitle,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFFD7E8F8),
                         fontSize: 12.5,
                         height: 1.5,
@@ -153,160 +157,160 @@ class TermsConditionsScreen extends StatelessWidget {
 
                   const SizedBox(height: 18),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '01',
                     icon: Icons.apartment_rounded,
-                    title: 'About Our Services',
+                    title: l10n.aboutOurServices,
                     text:
                         'TAWAM AL-SHAHIN TRANSPORT provides transportation, logistics and shipment-related services. The Tawam mobile application provides customers with digital access to selected account, shipment, quotation, tracking, document and support services.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '02',
                     icon: Icons.person_outline_rounded,
-                    title: 'Customer Accounts',
+                    title: l10n.customerAccounts,
                     text:
                         'Customers may be required to create an account to access certain application features. Information provided during registration should be accurate and kept reasonably up to date.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '03',
                     icon: Icons.lock_outline_rounded,
-                    title: 'Account Security',
+                    title: l10n.accountSecurity,
                     text:
                         'Customers are responsible for protecting their account credentials and for activity performed through their account. Passwords and password-reset links should not be shared with unauthorized persons.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '04',
                     icon: Icons.local_shipping_outlined,
-                    title: 'Shipment Services',
+                    title: l10n.shipmentServices,
                     text:
                         'Shipment availability, routes, schedules, transportation methods, documentation requirements and service conditions may vary according to shipment characteristics, origin, destination and applicable operational requirements.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '05',
                     icon: Icons.request_quote_outlined,
-                    title: 'Quotations',
+                    title: l10n.quotations,
                     text:
                         'Quotation requests submitted through the application may require review by TAWAM AL-SHAHIN TRANSPORT. A displayed or requested quotation is not necessarily a confirmed booking until the required details and service arrangements have been accepted.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '06',
                     icon: Icons.route_outlined,
-                    title: 'Shipment Tracking',
+                    title: l10n.shipmentTracking,
                     text:
                         'Tracking information is provided to assist customers in following shipment progress. Status information may depend on operational updates and may not always reflect events instantly.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '07',
                     icon: Icons.description_outlined,
-                    title: 'Shipping Documents',
+                    title: l10n.shippingDocuments,
                     text:
                         'Invoices, shipment records and other transportation documents made available through the application are associated with the relevant customer or shipment account. Customers should not attempt to access documents belonging to another account.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '08',
                     icon: Icons.inventory_2_outlined,
-                    title: 'Shipment Information',
+                    title: l10n.shipmentInformation,
                     text:
                         'Customers are responsible for providing accurate information about shipments, including descriptions, quantities, dimensions, weight, origin, destination and other information reasonably required to arrange transportation services.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '09',
                     icon: Icons.block_outlined,
-                    title: 'Restricted or Prohibited Items',
+                    title: l10n.restrictedItems,
                     text:
                         'Customers must not use the application or transportation services to request shipment of goods that are unlawful or prohibited under applicable requirements. Additional restrictions may apply depending on the shipment, route and destination.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '10',
                     icon: Icons.schedule_rounded,
-                    title: 'Transit & Delivery',
+                    title: l10n.transitDelivery,
                     text:
                         'Estimated transit and delivery times are provided for planning purposes. Actual timing may be affected by customs procedures, border processing, inspections, operational conditions, weather, traffic or other circumstances affecting transportation.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '11',
                     icon: Icons.payments_outlined,
-                    title: 'Charges & Payments',
+                    title: l10n.chargesPayments,
                     text:
                         'Transportation charges and applicable fees depend on the service provided and agreed quotation or arrangement. Additional charges may apply where services or requirements change after confirmation.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '12',
                     icon: Icons.support_agent_rounded,
-                    title: 'Customer Support',
+                    title: l10n.customerSupport,
                     text:
                         'Customers may contact TAWAM AL-SHAHIN TRANSPORT through the Help Center for assistance relating to accounts, shipment services, quotations, documents or other application-related matters.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '13',
                     icon: Icons.security_rounded,
-                    title: 'Acceptable Use',
+                    title: l10n.acceptableUse,
                     text:
                         'The application must not be used to interfere with its operation, attempt unauthorized access to customer or company information, misuse another person’s account, or engage in activity that may compromise application security.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '14',
                     icon: Icons.cloud_outlined,
-                    title: 'Application Availability',
+                    title: l10n.applicationAvailability,
                     text:
                         'We aim to provide reliable access to the application, but availability may occasionally be affected by maintenance, updates, network conditions, third-party services or technical issues.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '15',
                     icon: Icons.update_rounded,
-                    title: 'Changes to These Terms',
+                    title: l10n.changesToTerms,
                     text:
                         'TAWAM AL-SHAHIN TRANSPORT may update these Terms & Conditions when application features, services or applicable requirements change. The latest version may be made available through the application.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _TermsCard(
+                  _TermsCard(
                     number: '16',
                     icon: Icons.handshake_outlined,
-                    title: 'Contact Us',
+                    title: l10n.contactUs,
                     text:
                         'If you have questions regarding these Terms & Conditions or a transportation service, please contact TAWAM AL-SHAHIN TRANSPORT through the Help Center in the application.',
                   ),
@@ -320,39 +324,39 @@ class TermsConditionsScreen extends StatelessWidget {
                       color: _darkNavy,
                       borderRadius: BorderRadius.circular(23),
                     ),
-                    child: const Column(
+                    child: Column(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.handshake_outlined,
                           color: Colors.white,
                           size: 29,
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text(
-                          'TAWAM AL-SHAHIN TRANSPORT',
+                          l10n.tawamAlShahinTransport,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             letterSpacing: .3,
                           ),
                         ),
-                        SizedBox(height: 7),
+                        const SizedBox(height: 7),
                         Text(
-                          'Transportation • Logistics • Shipment Services',
+                          l10n.transportLogisticsServices,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFFB8C7D8),
                             fontSize: 11,
                           ),
                         ),
-                        SizedBox(height: 15),
-                        Divider(color: Color(0x25FFFFFF), height: 1),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
+                        const Divider(color: Color(0x25FFFFFF), height: 1),
+                        const SizedBox(height: 15),
                         Text(
-                          'Last updated: August 2026',
-                          style: TextStyle(
+                          l10n.lastUpdatedAugust2026,
+                          style: const TextStyle(
                             color: Color(0xFFAEBBCC),
                             fontSize: 10.5,
                           ),

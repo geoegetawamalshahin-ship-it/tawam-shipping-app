@@ -13,55 +13,6 @@ import 'app_localizations_fr.dart';
 
 /// Callers can lookup localized strings with an instance of AppLocalizations
 /// returned by `AppLocalizations.of(context)`.
-///
-/// Applications need to include `AppLocalizations.delegate()` in their app's
-/// `localizationDelegates` list, and the locales they support in the app's
-/// `supportedLocales` list. For example:
-///
-/// ```dart
-/// import 'l10n/app_localizations.dart';
-///
-/// return MaterialApp(
-///   localizationsDelegates: AppLocalizations.localizationsDelegates,
-///   supportedLocales: AppLocalizations.supportedLocales,
-///   home: MyApplicationHome(),
-/// );
-/// ```
-///
-/// ## Update pubspec.yaml
-///
-/// Please make sure to update your pubspec.yaml to include the following
-/// packages:
-///
-/// ```yaml
-/// dependencies:
-///   # Internationalization support.
-///   flutter_localizations:
-///     sdk: flutter
-///   intl: any # Use the pinned version from flutter_localizations
-///
-///   # Rest of dependencies
-/// ```
-///
-/// ## iOS Applications
-///
-/// iOS applications define key application metadata, including supported
-/// locales, in an Info.plist file that is built into the application bundle.
-/// To configure the locales supported by your app, you’ll need to edit this
-/// file.
-///
-/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
-/// Then, in the Project Navigator, open the Info.plist file under the Runner
-/// project’s Runner folder.
-///
-/// Next, select the Information Property List item, select Add Item from the
-/// Editor menu, then select Localizations from the pop-up menu.
-///
-/// Select and expand the newly-created Localizations item then, for each
-/// locale your application supports, add a new item and select the locale
-/// you wish to add from the pop-up menu in the Value field. This list should
-/// be consistent with the languages listed in the AppLocalizations.supportedLocales
-/// property.
 abstract class AppLocalizations {
   AppLocalizations(String locale)
     : localeName = intl.Intl.canonicalizedLocale(locale.toString());
@@ -75,16 +26,6 @@ abstract class AppLocalizations {
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 
-  /// A list of this localizations delegate along with the default localizations
-  /// delegates.
-  ///
-  /// Returns a list of localizations delegates containing this delegate along with
-  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
-  /// and GlobalWidgetsLocalizations.delegate.
-  ///
-  /// Additional delegates can be added by appending to this list in
-  /// MaterialApp. This list does not have to be used at all if a custom list
-  /// of delegates is preferred or required.
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
         delegate,
@@ -93,186 +34,2262 @@ abstract class AppLocalizations {
         GlobalWidgetsLocalizations.delegate,
       ];
 
-  /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
     Locale('en'),
     Locale('fr'),
   ];
 
-  /// No description provided for @myProfile.
-  ///
-  /// In en, this message translates to:
-  /// **'My Profile'**
+  /// **"My Profile"**
   String get myProfile;
 
-  /// No description provided for @verifiedCustomer.
-  ///
-  /// In en, this message translates to:
-  /// **'Verified Tawam Customer'**
+  /// **"Verified Tawam Customer"**
   String get verifiedCustomer;
 
-  /// No description provided for @shipments.
-  ///
-  /// In en, this message translates to:
-  /// **'Shipments'**
+  /// **"Shipments"**
   String get shipments;
 
-  /// No description provided for @inTransit.
-  ///
-  /// In en, this message translates to:
-  /// **'In Transit'**
+  /// **"In Transit"**
   String get inTransit;
 
-  /// No description provided for @quotes.
-  ///
-  /// In en, this message translates to:
-  /// **'Quotes'**
+  /// **"Quotes"**
   String get quotes;
 
-  /// No description provided for @accountInformation.
-  ///
-  /// In en, this message translates to:
-  /// **'Account Information'**
+  /// **"Account Information"**
   String get accountInformation;
 
-  /// No description provided for @emailAddress.
-  ///
-  /// In en, this message translates to:
-  /// **'Email Address'**
+  /// **"Email Address"**
   String get emailAddress;
 
-  /// No description provided for @phoneNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Phone Number'**
+  /// **"Phone Number"**
   String get phoneNumber;
 
-  /// No description provided for @company.
-  ///
-  /// In en, this message translates to:
-  /// **'Company'**
+  /// **"Company"**
   String get company;
 
-  /// No description provided for @defaultAddress.
-  ///
-  /// In en, this message translates to:
-  /// **'Default Address'**
+  /// **"Default Address"**
   String get defaultAddress;
 
-  /// No description provided for @notProvided.
-  ///
-  /// In en, this message translates to:
-  /// **'Not provided'**
+  /// **"Not provided"**
   String get notProvided;
 
-  /// No description provided for @preferences.
-  ///
-  /// In en, this message translates to:
-  /// **'Preferences'**
+  /// **"Preferences"**
   String get preferences;
 
-  /// No description provided for @pushNotifications.
-  ///
-  /// In en, this message translates to:
-  /// **'Push Notifications'**
+  /// **"Push Notifications"**
   String get pushNotifications;
 
-  /// No description provided for @pushNotificationsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'General application notifications'**
+  /// **"General application notifications"**
   String get pushNotificationsSubtitle;
 
-  /// No description provided for @shipmentUpdates.
-  ///
-  /// In en, this message translates to:
-  /// **'Shipment Updates'**
+  /// **"Shipment Updates"**
   String get shipmentUpdates;
 
-  /// No description provided for @shipmentUpdatesSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Status and delivery notifications'**
+  /// **"Status and delivery notifications"**
   String get shipmentUpdatesSubtitle;
 
-  /// No description provided for @language.
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
+  /// **"Language"**
   String get language;
 
-  /// No description provided for @securityAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Security & Account'**
+  /// **"Security & Account"**
   String get securityAccount;
 
-  /// No description provided for @biometricSignIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Biometric Sign In'**
+  /// **"Biometric Sign In"**
   String get biometricSignIn;
 
-  /// No description provided for @biometricSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Use fingerprint or Face ID'**
+  /// **"Use fingerprint or Face ID"**
   String get biometricSubtitle;
 
-  /// No description provided for @changePassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Change Password'**
+  /// **"Change Password"**
   String get changePassword;
 
-  /// No description provided for @changePasswordSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Update your account password'**
+  /// **"Update your account password"**
   String get changePasswordSubtitle;
 
-  /// No description provided for @shippingDocuments.
-  ///
-  /// In en, this message translates to:
-  /// **'Shipping Documents'**
+  /// **"Shipping Documents"**
   String get shippingDocuments;
 
-  /// No description provided for @shippingDocumentsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'View invoices and shipment files'**
+  /// **"View invoices and shipment files"**
   String get shippingDocumentsSubtitle;
 
-  /// No description provided for @supportLegal.
-  ///
-  /// In en, this message translates to:
-  /// **'Support & Legal'**
+  /// **"Support & Legal"**
   String get supportLegal;
 
-  /// No description provided for @helpCenter.
-  ///
-  /// In en, this message translates to:
-  /// **'Help Center'**
+  /// **"Help Center"**
   String get helpCenter;
 
-  /// No description provided for @privacyPolicy.
-  ///
-  /// In en, this message translates to:
-  /// **'Privacy Policy'**
+  /// **"Privacy Policy"**
   String get privacyPolicy;
 
-  /// No description provided for @termsConditions.
-  ///
-  /// In en, this message translates to:
-  /// **'Terms & Conditions'**
+  /// **"Terms & Conditions"**
   String get termsConditions;
 
-  /// No description provided for @signOut.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign Out'**
+  /// **"Sign Out"**
   String get signOut;
+
+  /// **"Cancel"**
+  String get cancel;
+
+  /// **"Update"**
+  String get update;
+
+  /// **"Done"**
+  String get done;
+
+  /// **"Try Again"**
+  String get tryAgain;
+
+  /// **"Try again"**
+  String get tryAgainLower;
+
+  /// **"Delete"**
+  String get delete;
+
+  /// **"Confirm"**
+  String get confirm;
+
+  /// **"Save"**
+  String get save;
+
+  /// **"Next"**
+  String get next;
+
+  /// **"Submit"**
+  String get submit;
+
+  /// **"Loading..."**
+  String get loading;
+
+  /// **"Optional"**
+  String get optional;
+
+  /// **"Not specified"**
+  String get notSpecified;
+
+  /// **"Verified"**
+  String get verified;
+
+  /// **"Home"**
+  String get home;
+
+  /// **"Track"**
+  String get track;
+
+  /// **"Support"**
+  String get support;
+
+  /// **"Profile"**
+  String get profile;
+
+  /// **"Documents"**
+  String get documents;
+
+  /// **"Phone"**
+  String get phone;
+
+  /// **"Address"**
+  String get address;
+
+  /// **"Origin"**
+  String get origin;
+
+  /// **"Destination"**
+  String get destination;
+
+  /// **"Pickup"**
+  String get pickup;
+
+  /// **"Delivery"**
+  String get delivery;
+
+  /// **"Cargo"**
+  String get cargo;
+
+  /// **"Weight"**
+  String get weight;
+
+  /// **"Quantity"**
+  String get quantity;
+
+  /// **"Length"**
+  String get length;
+
+  /// **"Width"**
+  String get width;
+
+  /// **"Height"**
+  String get height;
+
+  /// **"From"**
+  String get from;
+
+  /// **"To"**
+  String get to;
+
+  /// **"All"**
+  String get all;
+
+  /// **"Unread"**
+  String get unread;
+
+  /// **"Today"**
+  String get today;
+
+  /// **"Yesterday"**
+  String get yesterday;
+
+  /// **"Earlier"**
+  String get earlier;
+
+  /// **"LIVE"**
+  String get live;
+
+  /// **"NEW"**
+  String get newBadge;
+
+  /// **"Secure"**
+  String get secure;
+
+  /// **"Global"**
+  String get global;
+
+  /// **"Expert Team"**
+  String get expertTeam;
+
+  /// **"Tawam Customer"**
+  String get tawamCustomer;
+
+  /// **"TAWAM AL-SHAHIN TRANSPORT"**
+  String get tawamAlShahinTransport;
+
+  /// **"Customer Account"**
+  String get customerAccount;
+
+  /// **"CUSTOMER ID"**
+  String get customerId;
+
+  /// **"ACTIVE CUSTOMER"**
+  String get activeCustomer;
+
+  /// **"Signed-in customer"**
+  String get signedInCustomer;
+
+  /// **"Contact Phone"**
+  String get contactPhone;
+
+  /// **"Full name"**
+  String get fullName;
+
+  /// **"Email address"**
+  String get emailAddressHint;
+
+  /// **"Something went wrong. Please try again."**
+  String get somethingWentWrong;
+
+  /// **"Please sign in again."**
+  String get pleaseSignInAgain;
+
+  /// **"Please check your internet connection."**
+  String get pleaseCheckConnection;
+
+  /// **"Please check your connection and try again."**
+  String get pleaseCheckConnectionTryAgain;
+
+  /// **"Could not open this link."**
+  String get couldNotOpenLink;
+
+  /// **"Could not open our website."**
+  String get couldNotOpenWebsite;
+
+  /// **"Could not open Google reviews."**
+  String get couldNotOpenReviews;
+
+  /// **"Too many attempts. Please try again later"**
+  String get tooManyAttempts;
+
+  /// **"Please enter a valid email address"**
+  String get pleaseEnterValidEmail;
+
+  /// **"Please enter your email address"**
+  String get pleaseEnterEmail;
+
+  /// **"Please enter your full name"**
+  String get pleaseEnterFullName;
+
+  /// **"Please enter a valid name"**
+  String get pleaseEnterValidName;
+
+  /// **"Please enter your phone number"**
+  String get pleaseEnterPhone;
+
+  /// **"Please enter a valid phone number"**
+  String get pleaseEnterValidPhone;
+
+  /// **"Please create a password"**
+  String get pleaseCreatePassword;
+
+  /// **"Please confirm your password"**
+  String get pleaseConfirmPassword;
+
+  /// **"Please enter your password"**
+  String get pleaseEnterPassword;
+
+  /// **"Please enter origin"**
+  String get pleaseEnterOrigin;
+
+  /// **"Please enter destination"**
+  String get pleaseEnterDestination;
+
+  /// **"Please enter pickup location"**
+  String get pleaseEnterPickupLocation;
+
+  /// **"Please enter delivery location"**
+  String get pleaseEnterDeliveryLocation;
+
+  /// **"Please enter cargo type"**
+  String get pleaseEnterCargoType;
+
+  /// **"Please enter phone number"**
+  String get pleaseEnterPhoneNumber;
+
+  /// **"Please complete the required information."**
+  String get pleaseCompleteRequired;
+
+  /// **"Please sign in before requesting a quote."**
+  String get pleaseSignInBeforeQuote;
+
+  /// **"Please sign in before creating a booking."**
+  String get pleaseSignInBeforeBooking;
+
+  /// **"Please sign in before sending a support request."**
+  String get pleaseSignInBeforeSupport;
+
+  /// **"Please sign in before submitting a quote request"**
+  String get pleaseSignInBeforeQuoteShort;
+
+  /// **"Please select your preferred pickup date."**
+  String get pleaseSelectPickupDate;
+
+  /// **"City, Country"**
+  String get cityCountry;
+
+  /// **"Select date"**
+  String get selectDate;
+
+  /// **"Select a date"**
+  String get selectADate;
+
+  /// **"Enter weight"**
+  String get enterWeight;
+
+  /// **"Enter quantity"**
+  String get enterQuantity;
+
+  /// **"Cargo Type"**
+  String get cargoType;
+
+  /// **"Pickup Location"**
+  String get pickupLocation;
+
+  /// **"Delivery Location"**
+  String get deliveryLocation;
+
+  /// **"Special Instructions"**
+  String get specialInstructions;
+
+  /// **"Additional Notes"**
+  String get additionalNotes;
+
+  /// **"Additional Services"**
+  String get additionalServices;
+
+  /// **"Contact Details"**
+  String get contactDetails;
+
+  /// **"Automatically filled from your account."**
+  String get contactFilledFromAccount;
+
+  /// **"Service Mode"**
+  String get serviceMode;
+
+  /// **"Door to Door"**
+  String get doorToDoor;
+
+  /// **"Standard"**
+  String get standard;
+
+  /// **"Express"**
+  String get express;
+
+  /// **"Priority"**
+  String get priority;
+
+  /// **"Customs Clearance"**
+  String get customsClearance;
+
+  /// **"Export Documentation"**
+  String get exportDocumentation;
+
+  /// **"Packing"**
+  String get packing;
+
+  /// **"Boxes"**
+  String get boxes;
+
+  /// **"Pallets"**
+  String get pallets;
+
+  /// **"Select ready date"**
+  String get selectReadyDate;
+
+  /// **"Gross Weight"**
+  String get grossWeight;
+
+  /// **"Number of Pieces"**
+  String get numberOfPieces;
+
+  /// **"Package Type"**
+  String get packageType;
+
+  /// **"Dangerous Goods"**
+  String get dangerousGoods;
+
+  /// **"Cargo Insurance"**
+  String get cargoInsurance;
+
+  /// **"Select services"**
+  String get selectServices;
+
+  /// **"You can choose more than one."**
+  String get youCanChooseMoreThanOne;
+
+  /// **"Dimensions & Weight"**
+  String get dimensionsWeight;
+
+  /// **"Actual"**
+  String get actual;
+
+  /// **"Volumetric"**
+  String get volumetric;
+
+  /// **"Chargeable Weight"**
+  String get chargeableWeight;
+
+  /// **"CBM"**
+  String get cbm;
+
+  /// **"Reset"**
+  String get reset;
+
+  /// **"Clear Search & Filters"**
+  String get clearSearchFilters;
+
+  /// **"Mark as read"**
+  String get markAsRead;
+
+  /// **"Mark as unread"**
+  String get markAsUnread;
+
+  /// **"Delete notification"**
+  String get deleteNotification;
+
+  /// **"Read all"**
+  String get readAll;
+
+  /// **"Just now"**
+  String get justNow;
+
+  /// **"{count} minutes ago"**
+  String minutesAgo(int count);
+
+  /// **"{count} hours ago"**
+  String hoursAgo(int count);
+
+  /// **"{count} days ago"**
+  String daysAgo(int count);
+
+  /// **"Last update: {time}"**
+  String lastUpdatePrefix(String time);
+
+  /// **"Awaiting update"**
+  String get awaitingUpdate;
+
+  /// **"Location update pending"**
+  String get locationUpdatePending;
+
+  /// **"Latest update"**
+  String get latestUpdate;
+
+  /// **"Completed"**
+  String get completed;
+
+  /// **"Waiting"**
+  String get waiting;
+
+  /// **"CURRENT LOCATION"**
+  String get currentLocation;
+
+  /// **"EST. DELIVERY"**
+  String get estDelivery;
+
+  /// **"Tracking Number"**
+  String get trackingNumber;
+
+  /// **"TRACKING NUMBER"**
+  String get trackingNumberUpper;
+
+  /// **"PICKUP"**
+  String get pickupUpper;
+
+  /// **"DELIVERY"**
+  String get deliveryUpper;
+
+  /// **"CARGO"**
+  String get cargoUpper;
+
+  /// **"WEIGHT"**
+  String get weightUpper;
+
+  /// **"QUANTITY"**
+  String get quantityUpper;
+
+  /// **"DIMENSIONS"**
+  String get dimensionsUpper;
+
+  /// **"Route Overview"**
+  String get routeOverview;
+
+  /// **"Shipment Progress"**
+  String get shipmentProgress;
+
+  /// **"TOTAL"**
+  String get total;
+
+  /// **"IN TRANSIT"**
+  String get inTransitUpper;
+
+  /// **"DELIVERED"**
+  String get deliveredUpper;
+
+  /// **"CONFIRMED"**
+  String get confirmedUpper;
+
+  /// **"PREPARED"**
+  String get preparedUpper;
+
+  /// **"CUSTOMS"**
+  String get customsUpper;
+
+  /// **"OUT FOR DELIVERY"**
+  String get outForDeliveryUpper;
+
+  /// **"CANCELLED"**
+  String get cancelledUpper;
+
+  /// **"PENDING"**
+  String get pendingUpper;
+
+  /// **"Application Language"**
+  String get applicationLanguage;
+
+  /// **"English"**
+  String get languageEnglish;
+
+  /// **"Arabic"**
+  String get languageArabic;
+
+  /// **"French"**
+  String get languageFrench;
+
+  /// **"Pending"**
+  String get statusPending;
+
+  /// **"Confirmed"**
+  String get statusConfirmed;
+
+  /// **"Prepared"**
+  String get statusPrepared;
+
+  /// **"In Transit"**
+  String get statusInTransit;
+
+  /// **"Customs"**
+  String get statusCustoms;
+
+  /// **"Out for Delivery"**
+  String get statusOutForDelivery;
+
+  /// **"Delivered"**
+  String get statusDelivered;
+
+  /// **"Cancelled"**
+  String get statusCancelled;
+
+  /// **"New"**
+  String get statusNew;
+
+  /// **"In Progress"**
+  String get statusInProgress;
+
+  /// **"Resolved"**
+  String get statusResolved;
+
+  /// **"Shipment Created"**
+  String get timelineCreatedTitle;
+
+  /// **"Shipment information has been registered."**
+  String get timelineCreatedDesc;
+
+  /// **"Booking Confirmed"**
+  String get timelineConfirmedTitle;
+
+  /// **"Shipment has been confirmed by our operations team."**
+  String get timelineConfirmedDesc;
+
+  /// **"Prepared"**
+  String get timelinePreparedTitle;
+
+  /// **"Shipment is prepared and ready for movement."**
+  String get timelinePreparedDesc;
+
+  /// **"In Transit"**
+  String get timelineInTransitTitle;
+
+  /// **"Shipment is moving toward the destination."**
+  String get timelineInTransitDesc;
+
+  /// **"Customs Clearance"**
+  String get timelineCustomsTitle;
+
+  /// **"Shipment is undergoing border or customs processing."**
+  String get timelineCustomsDesc;
+
+  /// **"Out for Delivery"**
+  String get timelineOutForDeliveryTitle;
+
+  /// **"Shipment is on the final delivery route."**
+  String get timelineOutForDeliveryDesc;
+
+  /// **"Delivered"**
+  String get timelineDeliveredTitle;
+
+  /// **"Shipment has been delivered successfully."**
+  String get timelineDeliveredDesc;
+
+  /// **"Shipment Cancelled"**
+  String get timelineCancelledTitle;
+
+  /// **"This shipment has been cancelled."**
+  String get timelineCancelledDesc;
+
+  /// **"Shipment confirmed by operations"**
+  String get statusDescConfirmed;
+
+  /// **"Shipment prepared for movement"**
+  String get statusDescPrepared;
+
+  /// **"Shipment moving toward destination"**
+  String get statusDescInTransit;
+
+  /// **"Shipment under customs processing"**
+  String get statusDescCustoms;
+
+  /// **"Shipment on final delivery route"**
+  String get statusDescOutForDelivery;
+
+  /// **"Shipment delivered successfully"**
+  String get statusDescDelivered;
+
+  /// **"Shipment has been cancelled"**
+  String get statusDescCancelled;
+
+  /// **"Shipment awaiting processing"**
+  String get statusDescPending;
+
+  /// **"Sea Freight"**
+  String get serviceSeaFreight;
+
+  /// **"Air Freight"**
+  String get serviceAirFreight;
+
+  /// **"Land Freight"**
+  String get serviceLandFreight;
+
+  /// **"Car Shipping"**
+  String get serviceCarShipping;
+
+  /// **"International Moving"**
+  String get serviceInternationalMoving;
+
+  /// **"Parcel Shipping"**
+  String get serviceParcelShipping;
+
+  /// **"Fast & Reliable"**
+  String get serviceSeaFreightSubtitle;
+
+  /// **"Global Coverage"**
+  String get serviceAirFreightSubtitle;
+
+  /// **"Flexible Solutions"**
+  String get serviceLandFreightSubtitle;
+
+  /// **"Safe & Secure"**
+  String get serviceCarShippingSubtitle;
+
+  /// **"Door-to-Door"**
+  String get serviceMovingSubtitle;
+
+  /// **"Easy Delivery"**
+  String get serviceParcelSubtitle;
+
+  /// **"Jan"**
+  String get monthJan;
+
+  /// **"Feb"**
+  String get monthFeb;
+
+  /// **"Mar"**
+  String get monthMar;
+
+  /// **"Apr"**
+  String get monthApr;
+
+  /// **"May"**
+  String get monthMay;
+
+  /// **"Jun"**
+  String get monthJun;
+
+  /// **"Jul"**
+  String get monthJul;
+
+  /// **"Aug"**
+  String get monthAug;
+
+  /// **"Sep"**
+  String get monthSep;
+
+  /// **"Oct"**
+  String get monthOct;
+
+  /// **"Nov"**
+  String get monthNov;
+
+  /// **"Dec"**
+  String get monthDec;
+
+  /// **"SIGN IN"**
+  String get signIn;
+
+  /// **"Welcome back"**
+  String get welcomeBack;
+
+  /// **"Sign in to manage your shipments, track deliveries and receive important updates."**
+  String get signInSubtitle;
+
+  /// **"Password"**
+  String get password;
+
+  /// **"Forgot password?"**
+  String get forgotPassword;
+
+  /// **"Create account"**
+  String get createAccount;
+
+  /// **"Email or password is incorrect"**
+  String get emailOrPasswordIncorrect;
+
+  /// **"This account has been disabled"**
+  String get accountDisabled;
+
+  /// **"Account created successfully"**
+  String get accountCreated;
+
+  /// **"Could not create account"**
+  String get couldNotCreateAccount;
+
+  /// **"Create your account"**
+  String get registerTitle;
+
+  /// **"Join TAWAM to manage shipments, quotes and deliveries from one place."**
+  String get registerSubtitle;
+
+  /// **"Confirm password"**
+  String get confirmPassword;
+
+  /// **"Passwords do not match"**
+  String get passwordsDoNotMatch;
+
+  /// **"Password must be at least 6 characters"**
+  String get passwordTooShort;
+
+  /// **"Already have an account? Sign in"**
+  String get alreadyHaveAccount;
+
+  /// **"RESET PASSWORD"**
+  String get resetPassword;
+
+  /// **"Forgot your password?"**
+  String get forgotYourPassword;
+
+  /// **"Enter your email address and we will send you a link to reset your password."**
+  String get forgotPasswordSubtitle;
+
+  /// **"Send Reset Link"**
+  String get sendResetLink;
+
+  /// **"Back to Sign In"**
+  String get backToSignIn;
+
+  /// **"Password reset link sent. Please check your email."**
+  String get resetLinkSent;
+
+  /// **"Unable to send reset link. Please try again."**
+  String get unableToSendReset;
+
+  /// **"If an account exists for this email, a reset link has been sent."**
+  String get resetLinkIfExists;
+
+  /// **"Quick Actions"**
+  String get quickActions;
+
+  /// **"Manage your shipments and requests"**
+  String get quickActionsSubtitle;
+
+  /// **"Get a Quote"**
+  String get getAQuote;
+
+  /// **"Create a Booking"**
+  String get createABooking;
+
+  /// **"Volume Calculator"**
+  String get volumeCalculator;
+
+  /// **"Shipment Tracking"**
+  String get shipmentTracking;
+
+  /// **"My Quotes"**
+  String get myQuotes;
+
+  /// **"My Bookings"**
+  String get myBookings;
+
+  /// **"Shipping Services"**
+  String get shippingServices;
+
+  /// **"Request a new shipping quotation"**
+  String get requestNewQuotation;
+
+  /// **"View your quotation history"**
+  String get viewQuotationHistory;
+
+  /// **"Create a new shipment booking"**
+  String get createNewBooking;
+
+  /// **"Manage previous bookings"**
+  String get managePreviousBookings;
+
+  /// **"Shipment Management"**
+  String get shipmentManagement;
+
+  /// **"Calculate cargo volume"**
+  String get calculateCargoVolume;
+
+  /// **"Track your shipment status"**
+  String get trackShipmentStatus;
+
+  /// **"My Shipments"**
+  String get myShipments;
+
+  /// **"View all active shipments"**
+  String get viewAllActiveShipments;
+
+  /// **"Shipping and account documents"**
+  String get shippingAndAccountDocuments;
+
+  /// **"Customer Reviews"**
+  String get customerReviews;
+
+  /// **"See what our customers say"**
+  String get seeWhatCustomersSay;
+
+  /// **"Our Website"**
+  String get ourWebsite;
+
+  /// **"Visit TAWAM AL-SHAHIN online"**
+  String get visitTawamOnline;
+
+  /// **"Account & Support"**
+  String get accountAndSupport;
+
+  /// **"Contact our logistics support team"**
+  String get contactLogisticsSupport;
+
+  /// **"My Account"**
+  String get myAccount;
+
+  /// **"Profile and account settings"**
+  String get profileAndSettings;
+
+  /// **"Log Out"**
+  String get logOut;
+
+  /// **"Are you sure you want to log out?"**
+  String get logOutConfirm;
+
+  /// **"LOG OUT"**
+  String get logOutUpper;
+
+  /// **"CANCEL"**
+  String get cancelUpper;
+
+  /// **"SOCIAL MEDIA"**
+  String get socialMedia;
+
+  /// **"Rate Request"**
+  String get rateRequest;
+
+  /// **"Get an instant quote for your shipment"**
+  String get rateRequestSubtitle;
+
+  /// **"Request Rate"**
+  String get requestRate;
+
+  /// **"Request a shipping rate for this service."**
+  String get requestRateForService;
+
+  /// **"{service} rate request will be connected next."**
+  String rateRequestWillConnect(String service);
+
+  /// **"Edit Profile"**
+  String get editProfile;
+
+  /// **"CUSTOMER PROFILE"**
+  String get customerProfile;
+
+  /// **"Customer Details"**
+  String get customerDetails;
+
+  /// **"ACCOUNT CONTROL"**
+  String get accountControl;
+
+  /// **"Account"**
+  String get account;
+
+  /// **"CUSTOMER SERVICES"**
+  String get customerServices;
+
+  /// **"Assistance"**
+  String get assistance;
+
+  /// **"Shipping files"**
+  String get shippingFiles;
+
+  /// **"Customer help"**
+  String get customerHelp;
+
+  /// **"Account & Legal"**
+  String get accountAndLegal;
+
+  /// **"Privacy, terms and account management"**
+  String get accountLegalSubtitle;
+
+  /// **"How we protect your information"**
+  String get privacySubtitle;
+
+  /// **"TAWAM application terms"**
+  String get termsSubtitle;
+
+  /// **"Delete Account"**
+  String get deleteAccount;
+
+  /// **"Permanently remove your customer account"**
+  String get deleteAccountSubtitle;
+
+  /// **"Notifications"**
+  String get notifications;
+
+  /// **"Account and service updates"**
+  String get accountServiceUpdates;
+
+  /// **"Update account security"**
+  String get updateAccountSecurity;
+
+  /// **"Securely end your current session"**
+  String get signOutSubtitle;
+
+  /// **"Unable to load profile"**
+  String get unableToLoadProfile;
+
+  /// **"Unable to load profile information."**
+  String get unableToLoadProfileInfo;
+
+  /// **"Could not update profile"**
+  String get couldNotUpdateProfile;
+
+  /// **"Could not verify your account"**
+  String get couldNotVerifyAccount;
+
+  /// **"Sign Out?"**
+  String get signOutQuestion;
+
+  /// **"You will need to sign in again to access your shipments."**
+  String get signOutConfirmBody;
+
+  /// **"Notification Center"**
+  String get notificationCenter;
+
+  /// **"Notification"**
+  String get notificationDefault;
+
+  /// **"Notification deleted"**
+  String get notificationDeleted;
+
+  /// **"No unread notifications"**
+  String get noUnreadNotifications;
+
+  /// **"All notifications marked as read"**
+  String get allMarkedAsRead;
+
+  /// **"Shipment could not be found."**
+  String get shipmentNotFoundShort;
+
+  /// **"Could not open shipment details."**
+  String get couldNotOpenShipmentDetails;
+
+  /// **"Unable to load notifications"**
+  String get unableToLoadNotifications;
+
+  /// **"We couldn't load your notifications. Please check your connection and try again."**
+  String get couldNotLoadNotifications;
+
+  /// **"No notifications yet"**
+  String get noNotificationsYet;
+
+  /// **"Live notification status"**
+  String get liveNotificationStatus;
+
+  /// **"Shipment update"**
+  String get notifShipmentInTransitTitle;
+
+  /// **"Shipment {trackingNumber} is now in transit."**
+  String notifShipmentInTransitBody(String trackingNumber);
+
+  /// **"Shipment delivered"**
+  String get notifShipmentDeliveredTitle;
+
+  /// **"Shipment {trackingNumber} has been delivered."**
+  String notifShipmentDeliveredBody(String trackingNumber);
+
+  /// **"Out for delivery"**
+  String get notifShipmentOutForDeliveryTitle;
+
+  /// **"Shipment {trackingNumber} is out for delivery."**
+  String notifShipmentOutForDeliveryBody(String trackingNumber);
+
+  /// **"Quote ready"**
+  String get notifQuoteReadyTitle;
+
+  /// **"Your quotation is ready to review."**
+  String get notifQuoteReadyBody;
+
+  /// **"Support reply"**
+  String get notifSupportReplyTitle;
+
+  /// **"You have a new reply on your support request."**
+  String get notifSupportReplyBody;
+
+  /// **"Shipment confirmed"**
+  String get notifShipmentConfirmedTitle;
+
+  /// **"Shipment {trackingNumber} has been confirmed."**
+  String notifShipmentConfirmedBody(String trackingNumber);
+
+  /// **"Customs update"**
+  String get notifShipmentCustomsTitle;
+
+  /// **"Shipment {trackingNumber} is in customs clearance."**
+  String notifShipmentCustomsBody(String trackingNumber);
+
+  /// **"Update"**
+  String get notifGenericTitle;
+
+  /// **"Unable to load shipments"**
+  String get unableToLoadShipments;
+
+  /// **"LIVE CUSTOMER SHIPMENT PORTAL"**
+  String get liveCustomerShipmentPortal;
+
+  /// **"Your Shipping Network"**
+  String get yourShippingNetwork;
+
+  /// **"Monitor every active and completed shipment from one secure place."**
+  String get monitorShipmentsSubtitle;
+
+  /// **"Search tracking number, route or cargo"**
+  String get searchTrackingRouteCargo;
+
+  /// **"Shipment Portfolio"**
+  String get shipmentPortfolio;
+
+  /// **"Select a shipment to view full details."**
+  String get selectShipmentDetails;
+
+  /// **"No matching shipments"**
+  String get noMatchingShipments;
+
+  /// **"No shipments yet"**
+  String get noShipmentsYet;
+
+  /// **"We could not find any shipments matching your current search or filter."**
+  String get noMatchingShipmentsBody;
+
+  /// **"Your shipments will appear here as soon as they are created by our operations team."**
+  String get noShipmentsYetBody;
+
+  /// **"Shipment"**
+  String get shipment;
+
+  /// **"We couldn't load your shipments. Please check your connection and try again."**
+  String get couldNotLoadShipments;
+
+  /// **"Shipment Details"**
+  String get shipmentDetails;
+
+  /// **"LIVE SHIPMENT RECORD"**
+  String get liveShipmentRecord;
+
+  /// **"Live Shipment Map"**
+  String get liveShipmentMap;
+
+  /// **"LAST KNOWN LOCATION"**
+  String get lastKnownLocation;
+
+  /// **"Updating live location..."**
+  String get updatingLiveLocation;
+
+  /// **"Location temporarily unavailable"**
+  String get locationTemporarilyUnavailable;
+
+  /// **"Complete logistics details for this shipment."**
+  String get completeLogisticsDetails;
+
+  /// **"Shipment Journey"**
+  String get shipmentJourney;
+
+  /// **"Live milestones and status history."**
+  String get liveMilestones;
+
+  /// **"Need shipment support?"**
+  String get needShipmentSupport;
+
+  /// **"Our logistics team is ready to assist you."**
+  String get logisticsTeamReady;
+
+  /// **"Shipment Update"**
+  String get shipmentUpdate;
+
+  /// **"Shipment status updated."**
+  String get shipmentStatusUpdated;
+
+  /// **"Please enter your tracking number."**
+  String get pleaseEnterTrackingNumber;
+
+  /// **"Please sign in to track your shipment."**
+  String get pleaseSignInToTrack;
+
+  /// **"Shipment not found. Please check the tracking number."**
+  String get shipmentNotFoundCheck;
+
+  /// **"This shipment is no longer available."**
+  String get shipmentNoLongerAvailable;
+
+  /// **"Live tracking connection was interrupted."**
+  String get liveTrackingInterrupted;
+
+  /// **"Could not track shipment. Please try again."**
+  String get couldNotTrackShipment;
+
+  /// **"QR code scanning will be available soon."**
+  String get qrScanningSoon;
+
+  /// **"LIVE SHIPMENT VISIBILITY"**
+  String get liveShipmentVisibility;
+
+  /// **"Track Every Move"**
+  String get trackEveryMove;
+
+  /// **"Enter your tracking number to view the latest status, location and shipment journey."**
+  String get trackEveryMoveSubtitle;
+
+  /// **"Private"**
+  String get private;
+
+  /// **"Live Updates"**
+  String get liveUpdates;
+
+  /// **"Only shipments assigned to your account can be displayed."**
+  String get onlyAssignedShipments;
+
+  /// **"Enter tracking number"**
+  String get enterTrackingNumber;
+
+  /// **"TRACKING..."**
+  String get trackingInProgress;
+
+  /// **"TRACK SHIPMENT"**
+  String get trackShipment;
+
+  /// **"Professional Shipment Visibility"**
+  String get professionalVisibility;
+
+  /// **"Your tracking view is protected and connected directly to your shipment record."**
+  String get trackingViewProtected;
+
+  /// **"Location"**
+  String get location;
+
+  /// **"Timeline"**
+  String get timeline;
+
+  /// **"Shipment journey"**
+  String get shipmentJourneyShort;
+
+  /// **"ETA details"**
+  String get etaDetails;
+
+  /// **"LIVE TRACKING"**
+  String get liveTracking;
+
+  /// **"Shipment Timeline"**
+  String get shipmentTimeline;
+
+  /// **"Latest milestones from your shipment journey."**
+  String get latestMilestones;
+
+  /// **"VIEW FULL SHIPMENT DETAILS"**
+  String get viewFullShipmentDetails;
+
+  /// **"Get a Quote"**
+  String get getAQuoteTitle;
+
+  /// **"Request Your Best Rate"**
+  String get requestYourBestRate;
+
+  /// **"Tell us about your shipment and our logistics team will prepare a tailored quotation."**
+  String get quoteHeroSubtitle;
+
+  /// **"Shipping Service"**
+  String get shippingService;
+
+  /// **"Choose the service that fits your shipment"**
+  String get chooseServiceFits;
+
+  /// **"Route"**
+  String get route;
+
+  /// **"Where is your shipment moving from and to?"**
+  String get whereShipmentMoving;
+
+  /// **"Shipment Details"**
+  String get shipmentDetailsSection;
+
+  /// **"Tell us about your cargo"**
+  String get tellUsAboutCargo;
+
+  /// **"Select your preferred pickup date"**
+  String get selectPreferredPickup;
+
+  /// **"Add any special instructions for our team"**
+  String get addSpecialInstructions;
+
+  /// **"Our team will review your request and send you the best available rate."**
+  String get teamWillReviewRate;
+
+  /// **"Preferred Pickup Date"**
+  String get preferredPickupDate;
+
+  /// **"Dimensions (optional)"**
+  String get dimensionsOptional;
+
+  /// **"Dimensions are recorded in centimeters (CM)."**
+  String get dimensionsInCm;
+
+  /// **"Special handling, customs information, vehicle details, packing notes, or anything else we should know..."**
+  String get specialHandlingHint;
+
+  /// **"Secure Request"**
+  String get secureRequest;
+
+  /// **"Best Rate"**
+  String get bestRate;
+
+  /// **"Expert Support"**
+  String get expertSupport;
+
+  /// **"SUBMIT QUOTE REQUEST"**
+  String get submitQuoteRequest;
+
+  /// **"Please complete the required shipment information."**
+  String get pleaseCompleteShipmentInfo;
+
+  /// **"Could not submit your quote request."**
+  String get couldNotSubmitQuote;
+
+  /// **"Could not submit quote request. Please try again."**
+  String get couldNotSubmitQuoteRetry;
+
+  /// **"Quote Request Submitted"**
+  String get quoteRequestSubmitted;
+
+  /// **"Your request has been sent to TAWAM AL-SHAHIN TRANSPORT."**
+  String get quoteSentToTawam;
+
+  /// **"REFERENCE"**
+  String get reference;
+
+  /// **"SELECT PICKUP DATE"**
+  String get selectPickupDate;
+
+  /// **"Create a Booking"**
+  String get createBookingTitle;
+
+  /// **"GLOBAL BOOKING DESK"**
+  String get globalBookingDesk;
+
+  /// **"Schedule Your Shipment"**
+  String get scheduleYourShipment;
+
+  /// **"Book with our logistics team and let TAWAM coordinate your shipment from pickup to delivery."**
+  String get bookingHeroSubtitle;
+
+  /// **"Select Service"**
+  String get selectService;
+
+  /// **"Choose how you would like us to move your shipment."**
+  String get chooseHowToMove;
+
+  /// **"Route & Schedule"**
+  String get routeAndSchedule;
+
+  /// **"Tell our operations team where and when to collect your cargo."**
+  String get tellOperationsWhereWhen;
+
+  /// **"Provide the cargo information needed to prepare your booking."**
+  String get provideCargoForBooking;
+
+  /// **"Contact & Instructions"**
+  String get contactAndInstructions;
+
+  /// **"Your account details are securely attached to this booking."**
+  String get accountAttachedToBooking;
+
+  /// **"Your request will be reviewed by the TAWAM operations team."**
+  String get bookingReviewedByOps;
+
+  /// **"Morning"**
+  String get morning;
+
+  /// **"Afternoon"**
+  String get afternoon;
+
+  /// **"Evening"**
+  String get evening;
+
+  /// **"Flexible"**
+  String get flexible;
+
+  /// **"Pickup Date"**
+  String get pickupDate;
+
+  /// **"Vehicle, General Cargo, Furniture..."**
+  String get vehicleGeneralCargoHint;
+
+  /// **"Pickup access, packing notes, customs information or anything our team should know..."**
+  String get pickupAccessHint;
+
+  /// **"Secure Booking"**
+  String get secureBooking;
+
+  /// **"Professional Care"**
+  String get professionalCare;
+
+  /// **"CONFIRM BOOKING"**
+  String get confirmBooking;
+
+  /// **"Please complete the required booking information."**
+  String get pleaseCompleteBooking;
+
+  /// **"Unable to submit your booking."**
+  String get unableToSubmitBooking;
+
+  /// **"Booking Request Submitted"**
+  String get bookingRequestSubmitted;
+
+  /// **"Your booking has been sent securely to TAWAM AL-SHAHIN TRANSPORT for review."**
+  String get bookingSentToTawam;
+
+  /// **"BOOKING REFERENCE"**
+  String get bookingReference;
+
+  /// **"PENDING CONFIRMATION"**
+  String get pendingConfirmation;
+
+  /// **"Document"**
+  String get document;
+
+  /// **"Document path is missing."**
+  String get documentPathMissing;
+
+  /// **"Could not open document: {error}"**
+  String couldNotOpenDocument(String error);
+
+  /// **"Could not load documents"**
+  String get couldNotLoadDocuments;
+
+  /// **"No documents yet"**
+  String get noDocumentsYet;
+
+  /// **"Your invoices, shipment documents and delivery files will appear here."**
+  String get documentsEmptyBody;
+
+  /// **"Could not load image"**
+  String get couldNotLoadImage;
+
+  /// **"Customer Support"**
+  String get customerSupport;
+
+  /// **"LOGISTICS SUPPORT CENTER"**
+  String get logisticsSupportCenter;
+
+  /// **"How Can We Help?"**
+  String get howCanWeHelp;
+
+  /// **"Professional assistance for shipments, quotations, customs and delivery requests."**
+  String get supportHeroSubtitle;
+
+  /// **"Connected"**
+  String get connected;
+
+  /// **"Protected request"**
+  String get protectedRequest;
+
+  /// **"Specialists"**
+  String get specialists;
+
+  /// **"Logistics team"**
+  String get logisticsTeam;
+
+  /// **"Tracked"**
+  String get tracked;
+
+  /// **"Case submitted"**
+  String get caseSubmitted;
+
+  /// **"Instant Assistance"**
+  String get instantAssistance;
+
+  /// **"Choose the fastest channel for your request."**
+  String get chooseFastestChannel;
+
+  /// **"WhatsApp"**
+  String get whatsapp;
+
+  /// **"Start chat"**
+  String get startChat;
+
+  /// **"Call"**
+  String get call;
+
+  /// **"Call support"**
+  String get callSupport;
+
+  /// **"Email"**
+  String get email;
+
+  /// **"Send email"**
+  String get sendEmail;
+
+  /// **"Open a Support Case"**
+  String get openSupportCase;
+
+  /// **"Send your request directly to our operations team."**
+  String get sendRequestToOps;
+
+  /// **"Frequently Asked Questions"**
+  String get faq;
+
+  /// **"Quick answers to common logistics questions."**
+  String get faqSubtitle;
+
+  /// **"Where can I find my tracking number?"**
+  String get faqTrackingQ;
+
+  /// **"Your tracking number is included in your shipment confirmation and can also be found in My Shipments."**
+  String get faqTrackingA;
+
+  /// **"Why has my shipment status not changed?"**
+  String get faqStatusQ;
+
+  /// **"Tracking updates may appear after your shipment reaches the next logistics checkpoint or after an operations update."**
+  String get faqStatusA;
+
+  /// **"How do I request a shipping quotation?"**
+  String get faqQuoteQ;
+
+  /// **"Open Get a Quote from the home page and submit your shipment details."**
+  String get faqQuoteA;
+
+  /// **"Can I update my delivery information?"**
+  String get faqDeliveryQ;
+
+  /// **"Contact support and include your tracking number together with the new delivery information."**
+  String get faqDeliveryA;
+
+  /// **"My Support Requests"**
+  String get mySupportRequests;
+
+  /// **"View your cases and latest updates"**
+  String get viewCasesAndUpdates;
+
+  /// **"Support Request"**
+  String get supportRequest;
+
+  /// **"Provide the details below."**
+  String get provideDetailsBelow;
+
+  /// **"Support category"**
+  String get supportCategory;
+
+  /// **"Tracking / shipment number — optional"**
+  String get trackingOptional;
+
+  /// **"Please describe your request"**
+  String get pleaseDescribeRequest;
+
+  /// **"Please add more details"**
+  String get pleaseAddMoreDetails;
+
+  /// **"Describe the issue or assistance you need..."**
+  String get describeIssueHint;
+
+  /// **"For shipment-related requests, include the tracking number to help our team review the case faster."**
+  String get includeTrackingHint;
+
+  /// **"SUBMITTING..."**
+  String get submitting;
+
+  /// **"SUBMIT SUPPORT REQUEST"**
+  String get submitSupportRequest;
+
+  /// **"Support Hours"**
+  String get supportHours;
+
+  /// **"Monday – Friday"**
+  String get mondayFriday;
+
+  /// **"Saturday"**
+  String get saturday;
+
+  /// **"Sunday"**
+  String get sunday;
+
+  /// **"Emergency support"**
+  String get emergencySupport;
+
+  /// **"Times shown in UAE local time."**
+  String get timesUae;
+
+  /// **"Could not open WhatsApp."**
+  String get couldNotOpenWhatsapp;
+
+  /// **"Could not open the phone app."**
+  String get couldNotOpenPhone;
+
+  /// **"Could not open the email app."**
+  String get couldNotOpenEmail;
+
+  /// **"Could not send your support request. Please try again."**
+  String get couldNotSendSupport;
+
+  /// **"Request Successfully Sent"**
+  String get requestSuccessfullySent;
+
+  /// **"Your support case has been securely submitted to the TAWAM operations team."**
+  String get supportCaseSubmitted;
+
+  /// **"REQUEST CATEGORY"**
+  String get requestCategory;
+
+  /// **"Shipment Tracking"**
+  String get catShipmentTracking;
+
+  /// **"Delivery Delay"**
+  String get catDeliveryDelay;
+
+  /// **"Request a Quote"**
+  String get catRequestQuote;
+
+  /// **"Customs Clearance"**
+  String get catCustoms;
+
+  /// **"Payment & Invoice"**
+  String get catPaymentInvoice;
+
+  /// **"Damaged Shipment"**
+  String get catDamagedShipment;
+
+  /// **"General Inquiry"**
+  String get catGeneralInquiry;
+
+  /// **"Hello TAWAM AL-SHAHIN TRANSPORT, I need assistance."**
+  String get whatsappPrefill;
+
+  /// **"TAWAM AL-SHAHIN TRANSPORT Support Request"**
+  String get supportEmailSubject;
+
+  /// **"Request Shipment"**
+  String get requestShipment;
+
+  /// **"New Shipment Request"**
+  String get newShipmentRequest;
+
+  /// **"Send your shipment details for review by our logistics team."**
+  String get sendShipmentForReview;
+
+  /// **"Example: Dubai, UAE"**
+  String get exampleDubai;
+
+  /// **"Enter pickup location"**
+  String get enterPickupLocation;
+
+  /// **"Example: Amman, Jordan"**
+  String get exampleAmman;
+
+  /// **"Enter delivery location"**
+  String get enterDeliveryLocation;
+
+  /// **"Describe the shipment"**
+  String get describeShipment;
+
+  /// **"Enter cargo details"**
+  String get enterCargoDetails;
+
+  /// **"Expected Delivery"**
+  String get expectedDelivery;
+
+  /// **"Select preferred date"**
+  String get selectPreferredDate;
+
+  /// **"Special handling, dimensions, vehicle type..."**
+  String get specialHandlingDimensions;
+
+  /// **"Your request will be reviewed by Tawam logistics. A shipment and tracking number will only be created after approval."**
+  String get requestReviewedAfterApproval;
+
+  /// **"Submit Shipment Request"**
+  String get submitShipmentRequest;
+
+  /// **"Shipment request submitted successfully."**
+  String get shipmentRequestSubmitted;
+
+  /// **"Could not submit shipment request: {error}"**
+  String couldNotSubmitShipmentRequest(String error);
+
+  /// **"Customer"**
+  String get customer;
+
+  /// **"Please enter the cargo dimensions first."**
+  String get pleaseEnterDimensionsFirst;
+
+  /// **"Cargo Dimensions"**
+  String get cargoDimensions;
+
+  /// **"Enter one package size in centimeters and the total quantity."**
+  String get enterPackageSizeQty;
+
+  /// **"Calculation Results"**
+  String get calculationResults;
+
+  /// **"Instant logistics measurements for planning your shipment."**
+  String get instantMeasurements;
+
+  /// **"REQUEST A QUOTE"**
+  String get requestAQuote;
+
+  /// **"LOGISTICS CALCULATION TOOL"**
+  String get logisticsCalculationTool;
+
+  /// **"Plan Your Cargo Smarter"**
+  String get planCargoSmarter;
+
+  /// **"Calculate CBM and volumetric weight instantly before requesting your shipping quotation."**
+  String get volumeHeroSubtitle;
+
+  /// **"Instant"**
+  String get instant;
+
+  /// **"Accurate"**
+  String get accurate;
+
+  /// **"Logistics Ready"**
+  String get logisticsReady;
+
+  /// **"Actual Total Weight"**
+  String get actualTotalWeight;
+
+  /// **"Enter the dimensions of one package. Quantity is applied automatically to the total calculation."**
+  String get enterOnePackageHint;
+
+  /// **"Enter your cargo dimensions"**
+  String get enterCargoDimensions;
+
+  /// **"Your shipping calculation will appear here instantly."**
+  String get calculationAppearsHere;
+
+  /// **"TOTAL SHIPMENT VOLUME"**
+  String get totalShipmentVolume;
+
+  /// **"Cubic volume based on the entered dimensions and quantity."**
+  String get cubicVolumeBased;
+
+  /// **"Air Vol. Weight"**
+  String get airVolWeight;
+
+  /// **"Divisor 6000"**
+  String get divisor6000;
+
+  /// **"Courier Vol. Weight"**
+  String get courierVolWeight;
+
+  /// **"Divisor 5000"**
+  String get divisor5000;
+
+  /// **"Estimated Air Chargeable Weight"**
+  String get estimatedAirChargeable;
+
+  /// **"Higher of actual total weight and air volumetric weight"**
+  String get higherOfActualAir;
+
+  /// **"RESET CALCULATOR"**
+  String get resetCalculator;
+
+  /// **"OFFICIAL RATE REQUEST"**
+  String get officialRateRequest;
+
+  /// **"Shipment Route"**
+  String get shipmentRoute;
+
+  /// **"Tell us where your cargo is moving."**
+  String get tellUsWhereMoving;
+
+  /// **"Cargo Information"**
+  String get cargoInformation;
+
+  /// **"Provide your cargo specifications."**
+  String get provideCargoSpecs;
+
+  /// **"Anything our team should know?"**
+  String get anythingTeamShouldKnow;
+
+  /// **"Your shipment information is securely submitted to our logistics team."**
+  String get infoSubmittedSecurely;
+
+  /// **"SUBMIT QUOTE"**
+  String get submitQuote;
+
+  /// **"DONE"**
+  String get doneUpper;
+
+  /// **"Air Freight Quote"**
+  String get airFreightQuote;
+
+  /// **"GLOBAL AIR CARGO"**
+  String get globalAirCargo;
+
+  /// **"Fast Cargo.\nGlobal Reach."**
+  String get fastCargoGlobalReach;
+
+  /// **"Professional air freight solutions for urgent, commercial and international cargo."**
+  String get airHeroSubtitle;
+
+  /// **"Air Freight Service"**
+  String get airFreightService;
+
+  /// **"Choose the service level for your shipment."**
+  String get chooseServiceLevel;
+
+  /// **"We calculate volumetric and chargeable weight automatically."**
+  String get weCalculateVolumetric;
+
+  /// **"Add optional logistics services if required."**
+  String get addOptionalLogistics;
+
+  /// **"Anything our air freight team should know?"**
+  String get anythingAirTeam;
+
+  /// **"Airport to Airport"**
+  String get airportToAirport;
+
+  /// **"Door to Airport"**
+  String get doorToAirport;
+
+  /// **"Airport to Door"**
+  String get airportToDoor;
+
+  /// **"Loose Cargo"**
+  String get looseCargo;
+
+  /// **"Crates"**
+  String get crates;
+
+  /// **"Airport, city or pickup location"**
+  String get airportCityPickup;
+
+  /// **"Airport, city or delivery location"**
+  String get airportCityDelivery;
+
+  /// **"Cargo Ready Date"**
+  String get cargoReadyDate;
+
+  /// **"Standard Air Freight"**
+  String get standardAirFreight;
+
+  /// **"Reliable international air cargo for regular shipments."**
+  String get standardAirDesc;
+
+  /// **"Express Air Freight"**
+  String get expressAirFreight;
+
+  /// **"Faster handling for urgent and time-sensitive cargo."**
+  String get expressAirDesc;
+
+  /// **"Priority / Time Critical"**
+  String get priorityTimeCritical;
+
+  /// **"Priority handling for highly urgent shipments."**
+  String get priorityAirDesc;
+
+  /// **"Please enter gross weight"**
+  String get pleaseEnterGrossWeight;
+
+  /// **"Enter number of pieces"**
+  String get enterNumberOfPieces;
+
+  /// **"Average Piece Dimensions"**
+  String get averagePieceDimensions;
+
+  /// **"Enter dimensions in centimeters."**
+  String get enterDimensionsCm;
+
+  /// **"AUTOMATIC AIR FREIGHT CALCULATION"**
+  String get automaticAirCalc;
+
+  /// **"Cargo volume: {volume} CBM"**
+  String cargoVolumeCbm(String volume);
+
+  /// **"Cargo classified as hazardous / DG."**
+  String get dgHint;
+
+  /// **"Request cargo insurance with the quotation."**
+  String get requestInsuranceHint;
+
+  /// **"Priority Cargo"**
+  String get priorityCargo;
+
+  /// **"Sea Freight Quote"**
+  String get seaFreightQuote;
+
+  /// **"Land Freight Quote"**
+  String get landFreightQuote;
+
+  /// **"Car Shipping Quote"**
+  String get carShippingQuote;
+
+  /// **"Moving Quote"**
+  String get movingQuote;
+
+  /// **"Parcel Quote"**
+  String get parcelQuote;
+
+  /// **"Port to Port"**
+  String get portToPort;
+
+  /// **"Door to Port"**
+  String get doorToPort;
+
+  /// **"Port to Door"**
+  String get portToDoor;
+
+  /// **"Open Carrier"**
+  String get openCarrier;
+
+  /// **"Select ready date"**
+  String get selectReadyDateShort;
+
+  /// **"Terms of Service"**
+  String get termsOfService;
+
+  /// **"Please review the terms governing your use of the TAWAM AL-SHAHIN TRANSPORT mobile application and services."**
+  String get reviewTermsSubtitle;
+
+  /// **"About Our Services"**
+  String get aboutOurServices;
+
+  /// **"Customer Accounts"**
+  String get customerAccounts;
+
+  /// **"Account Security"**
+  String get accountSecurity;
+
+  /// **"Shipment Services"**
+  String get shipmentServices;
+
+  /// **"Quotations"**
+  String get quotations;
+
+  /// **"Restricted or Prohibited Items"**
+  String get restrictedItems;
+
+  /// **"Transit & Delivery"**
+  String get transitDelivery;
+
+  /// **"Charges & Payments"**
+  String get chargesPayments;
+
+  /// **"Acceptable Use"**
+  String get acceptableUse;
+
+  /// **"Application Availability"**
+  String get applicationAvailability;
+
+  /// **"Changes to These Terms"**
+  String get changesToTerms;
+
+  /// **"Contact Us"**
+  String get contactUs;
+
+  /// **"Transportation • Logistics • Shipment Services"**
+  String get transportLogisticsServices;
+
+  /// **"Last updated: August 2026"**
+  String get lastUpdatedAugust2026;
+
+  /// **"Learn how TAWAM AL-SHAHIN TRANSPORT collects, uses and protects your information."**
+  String get privacyHeroSubtitle;
+
+  /// **"Information We Collect"**
+  String get informationWeCollect;
+
+  /// **"How We Use Information"**
+  String get howWeUseInformation;
+
+  /// **"Service Communications"**
+  String get serviceCommunications;
+
+  /// **"Data Sharing"**
+  String get dataSharing;
+
+  /// **"Data Retention"**
+  String get dataRetention;
+
+  /// **"Your Rights"**
+  String get yourRights;
+
+  /// **"Security Measures"**
+  String get securityMeasures;
+
+  /// **"Children’s Privacy"**
+  String get childrenPrivacy;
+
+  /// **"Changes to This Policy"**
+  String get changesToPolicy;
+
+  /// **"Priced"**
+  String get hasPrice;
+
+  /// **"Awaiting price"**
+  String get awaitingPrice;
+
+  /// **"Quoted"**
+  String get quoted;
+
+  /// **"Accepted"**
+  String get accepted;
+
+  /// **"Declined"**
+  String get declined;
+
+  /// **"Rejected"**
+  String get rejected;
+
+  /// **"REJECTED"**
+  String get rejectedUpper;
+
+  /// **"Quote Ready"**
+  String get quoteReady;
+
+  /// **"Under Review"**
+  String get underReview;
+
+  /// **"Your Quotations"**
+  String get yourQuotations;
+
+  /// **"Your Bookings"**
+  String get yourBookings;
+
+  /// **"Close"**
+  String get close;
+
+  /// **"CLOSE"**
+  String get closeUpper;
+
+  /// **"View Details"**
+  String get viewDetails;
+
+  /// **"VIEW DETAILS"**
+  String get viewDetailsUpper;
+
+  /// **"SHIPMENT NUMBER"**
+  String get shipmentNumber;
+
+  /// **"YOUR MESSAGE"**
+  String get yourMessage;
+
+  /// **"LATEST STATUS UPDATE"**
+  String get latestStatusUpdate;
+
+  /// **"OCEAN FREIGHT"**
+  String get oceanFreight;
+
+  /// **"Don’t have an account?"**
+  String get dontHaveAccount;
+
+  /// **"Sign In"**
+  String get signInButton;
+
+  /// **"Profile updated successfully"**
+  String get profileUpdated;
+
+  /// **"Password updated successfully"**
+  String get passwordUpdated;
+
+  /// **"Stay informed about your logistics activity"**
+  String get stayInformed;
+
+  /// **"Shipment updates, quotations and important account alerts will appear here automatically."**
+  String get notificationEmptyHint;
+
+  /// **"Vehicle Information"**
+  String get vehicleInformation;
+
+  /// **"Provide the vehicle details required for accurate transport planning."**
+  String get vehicleInfoSubtitle;
+
+  /// **"Shipping Method"**
+  String get shippingMethod;
+
+  /// **"Vehicle Protection"**
+  String get vehicleProtection;
+
+  /// **"Vehicle Type"**
+  String get vehicleType;
+
+  /// **"Number of Vehicles"**
+  String get numberOfVehicles;
+
+  /// **"Enter number of vehicles"**
+  String get enterNumberOfVehicles;
+
+  /// **"Model Year"**
+  String get modelYear;
+
+  /// **"Vehicle Condition"**
+  String get vehicleCondition;
+
+  /// **"VIN / Chassis Number"**
+  String get vinChassis;
+
+  /// **"Vehicle Value"**
+  String get vehicleValue;
+
+  /// **"Invalid value"**
+  String get invalidValue;
+
+  /// **"Currency"**
+  String get currency;
+
+  /// **"Enclosed Carrier"**
+  String get enclosedCarrier;
+
+  /// **"RoRo Shipping"**
+  String get roroShipping;
+
+  /// **"Container Shipping"**
+  String get containerShipping;
+
+  /// **"Move Profile"**
+  String get moveProfile;
+
+  /// **"Inventory Estimate"**
+  String get inventoryEstimate;
+
+  /// **"Special Items"**
+  String get specialItems;
+
+  /// **"Moving Services"**
+  String get movingServices;
+
+  /// **"Professional Packing"**
+  String get professionalPacking;
+
+  /// **"Property Type"**
+  String get propertyType;
+
+  /// **"Elevator"**
+  String get elevator;
+
+  /// **"Estimated Boxes"**
+  String get estimatedBoxes;
+
+  /// **"Large Items"**
+  String get largeItems;
+
+  /// **"Estimated Volume"**
+  String get estimatedVolume;
+
+  /// **"Unpacking Service"**
+  String get unpackingService;
+
+  /// **"Furniture Disassembly"**
+  String get furnitureDisassembly;
+
+  /// **"Temporary Storage"**
+  String get temporaryStorage;
+
+  /// **"Transport Type"**
+  String get transportType;
+
+  /// **"Cargo Requirements"**
+  String get cargoRequirements;
+
+  /// **"Full Truck Load"**
+  String get fullTruckLoad;
+
+  /// **"Partial Load"**
+  String get partialLoad;
+
+  /// **"Truck / Trailer Type"**
+  String get truckTrailerType;
+
+  /// **"Required Temperature"**
+  String get requiredTemperature;
+
+  /// **"Oversized / Out-of-Gauge Cargo"**
+  String get oversizedCargo;
+
+  /// **"Delivery Service"**
+  String get deliveryService;
+
+  /// **"Protection & Delivery"**
+  String get protectionAndDelivery;
+
+  /// **"Pickup Method"**
+  String get pickupMethod;
+
+  /// **"Number of Parcels"**
+  String get numberOfParcels;
+
+  /// **"Parcel Contents"**
+  String get parcelContents;
+
+  /// **"Please describe the parcel contents"**
+  String get pleaseDescribeParcel;
+
+  /// **"Declared Value"**
+  String get declaredValue;
+
+  /// **"Weight per Parcel"**
+  String get weightPerParcel;
+
+  /// **"Signature on Delivery"**
+  String get signatureOnDelivery;
+
+  /// **"Full Container"**
+  String get fullContainer;
+
+  /// **"Shared Cargo"**
+  String get sharedCargo;
+
+  /// **"Full Container Load"**
+  String get fullContainerLoad;
+
+  /// **"Less Container Load"**
+  String get lessContainerLoad;
+
+  /// **"Container Type"**
+  String get containerType;
+
+  /// **"Number of Containers"**
+  String get numberOfContainers;
+
+  /// **"Enter cargo volume"**
+  String get enterCargoVolume;
+
+  /// **"Route Details"**
+  String get routeDetails;
+
+  /// **"Please enter the cargo weight"**
+  String get pleaseEnterCargoWeight;
+
+  /// **"Please enter a valid weight"**
+  String get pleaseEnterValidWeight;
+
+  /// **"Please enter the number of items"**
+  String get pleaseEnterNumberOfItems;
+
+  /// **"Please enter a valid quantity"**
+  String get pleaseEnterValidQuantity;
+
+  /// **"Cargo description"**
+  String get cargoDescription;
+
+  /// **"Weight (kg)"**
+  String get weightKg;
+
+  /// **"Pickup Schedule"**
+  String get pickupSchedule;
+
+  /// **"Please select a pickup date"**
+  String get pleaseSelectAPickupDate;
+
+  /// **"Contact Information"**
+  String get contactInformation;
+
+  /// **"Tailored"**
+  String get tailored;
+
+  /// **"Supported"**
+  String get supported;
+
+  /// **"Shipment Information"**
+  String get shipmentInformation;
+
+  /// **"Data Storage"**
+  String get dataStorage;
+
+  /// **"Your Account Information"**
+  String get yourAccountInformation;
+
+  /// **"Password & Account Protection"**
+  String get passwordAccountProtection;
+
+  /// **"Accept"**
+  String get accept;
+
+  /// **"Decline"**
+  String get decline;
+
 }
 
 class _AppLocalizationsDelegate
@@ -293,7 +2310,6 @@ class _AppLocalizationsDelegate
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-  // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
@@ -304,9 +2320,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   }
 
   throw FlutterError(
-    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'AppLocalizations.delegate failed to load unsupported locale "$locale".',
   );
 }

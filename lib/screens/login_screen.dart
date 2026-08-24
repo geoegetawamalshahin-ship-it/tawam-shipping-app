@@ -3,6 +3,8 @@ import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../locale_controller.dart';
+import '../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,11 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+
+      await LocaleController.restoreFromFirestore();
 
       if (!mounted) return;
 
@@ -44,14 +50,14 @@ class _LoginScreenState extends State<LoginScreen> {
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
-      String message = 'Email or password is incorrect';
+      String message = l10n.emailOrPasswordIncorrect;
 
       if (e.code == 'invalid-email') {
-        message = 'Please enter a valid email address';
+        message = l10n.pleaseEnterValidEmail;
       } else if (e.code == 'user-disabled') {
-        message = 'This account has been disabled';
+        message = l10n.accountDisabled;
       } else if (e.code == 'too-many-requests') {
-        message = 'Too many attempts. Please try again later';
+        message = l10n.tooManyAttempts;
       }
 
       ScaffoldMessenger.of(
@@ -74,6 +80,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -112,9 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: const Color(0xFFEAF3FC),
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      child: const Text(
-                        'SIGN IN',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.signIn,
+                        style: const TextStyle(
                           color: Color(0xFF07569E),
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
@@ -125,9 +133,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 20),
 
-                    const Text(
-                      'Welcome back',
-                      style: TextStyle(
+                    Text(
+                      l10n.welcomeBack,
+                      style: const TextStyle(
                         color: Color(0xFF172033),
                         fontSize: 31,
                         fontWeight: FontWeight.w800,
@@ -137,9 +145,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 10),
 
-                    const Text(
-                      'Sign in to manage your shipments, track deliveries and receive important updates.',
-                      style: TextStyle(
+                    Text(
+                      l10n.signInSubtitle,
+                      style: const TextStyle(
                         color: Color(0xFF7B8493),
                         fontSize: 15.5,
                         height: 1.55,
@@ -148,9 +156,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 32),
 
-                    const Text(
-                      'Email address',
-                      style: TextStyle(
+                    Text(
+                      l10n.emailAddress,
+                      style: const TextStyle(
                         color: Color(0xFF202938),
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -167,11 +175,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         final email = value?.trim() ?? '';
 
                         if (email.isEmpty) {
-                          return 'Please enter your email address';
+                          return l10n.pleaseEnterEmail;
                         }
 
                         if (!email.contains('@')) {
-                          return 'Please enter a valid email address';
+                          return l10n.pleaseEnterValidEmail;
                         }
 
                         return null;
@@ -213,9 +221,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 22),
 
-                    const Text(
-                      'Password',
-                      style: TextStyle(
+                    Text(
+                      l10n.password,
+                      style: const TextStyle(
                         color: Color(0xFF202938),
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -231,17 +239,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       onFieldSubmitted: (_) => _signIn(),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return l10n.pleaseEnterPassword;
                         }
 
                         if (value.length < 6) {
-                          return 'Password must contain at least 6 characters';
+                          return l10n.passwordTooShort;
                         }
 
                         return null;
                       },
                       decoration: InputDecoration(
-                        hintText: 'Enter your password',
+                        hintText: l10n.password,
                         hintStyle: const TextStyle(color: Color(0xFFA5ABB5)),
                         prefixIcon: const Icon(
                           Icons.lock_outline_rounded,
@@ -291,12 +299,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 9),
 
                     Align(
-                      alignment: Alignment.centerRight,
+                      alignment: AlignmentDirectional.centerEnd,
                       child: TextButton(
                         onPressed: _forgotPassword,
-                        child: const Text(
-                          'Forgot password?',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.forgotPassword,
+                          style: const TextStyle(
                             color: Color(0xFF07569E),
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -320,18 +328,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Sign In',
-                              style: TextStyle(
+                              l10n.signIn,
+                              style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            SizedBox(width: 12),
-                            Icon(Icons.arrow_forward_rounded, size: 23),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.arrow_forward_rounded, size: 23),
                           ],
                         ),
                       ),
@@ -351,9 +359,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: _createAccount,
-                          child: const Text(
-                            'Create account',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.createAccount,
+                            style: const TextStyle(
                               color: Color(0xFFD72638),
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,
@@ -365,10 +373,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 12),
 
-                    const Center(
+                    Center(
                       child: Text(
-                        'Tawam Al-Shahin Shipping Services',
-                        style: TextStyle(
+                        l10n.tawamAlShahinTransport,
+                        style: const TextStyle(
                           color: Color(0xFFA0A7B2),
                           fontSize: 12.5,
                         ),

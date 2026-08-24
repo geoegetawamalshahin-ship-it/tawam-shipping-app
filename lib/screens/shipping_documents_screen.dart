@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pdfrx/pdfrx.dart';
 
+import '../l10n/app_localizations.dart';
+
 class ShippingDocumentsScreen extends StatefulWidget {
   const ShippingDocumentsScreen({super.key});
 
@@ -49,7 +51,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
         for (final rawDocument in rawDocuments) {
           if (rawDocument is Map) {
             documents.add({
-              'name': (rawDocument['name'] ?? 'Document').toString(),
+              'name': (rawDocument['name'] ?? '').toString(),
               'path': (rawDocument['path'] ?? '').toString(),
               'contentType': (rawDocument['contentType'] ?? '').toString(),
               'size': rawDocument['size'] ?? 0,
@@ -76,13 +78,14 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
   }
 
   Future<void> _openDocument(Map<String, dynamic> document) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final path = document['path']?.toString() ?? '';
-      final name = document['name']?.toString() ?? 'Document';
+      final name = document['name']?.toString() ?? '';
       final contentType = document['contentType']?.toString() ?? '';
 
       if (path.isEmpty) {
-        throw Exception('Document path is missing.');
+        throw Exception(l10n.documentPathMissing);
       }
 
       final signedUrl = await Supabase.instance.client.storage
@@ -96,7 +99,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
         MaterialPageRoute(
           builder: (_) => _DocumentViewerScreen(
             url: signedUrl,
-            name: name,
+            name: name.isEmpty ? l10n.document : name,
             contentType: contentType,
           ),
         ),
@@ -106,7 +109,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Could not open document: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.couldNotOpenDocument(e.toString()))));
     }
   }
 
@@ -146,6 +149,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: _pageBackground,
       appBar: AppBar(
@@ -155,9 +159,9 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_rounded, color: _darkNavy),
         ),
-        title: const Text(
-          'Shipping Documents',
-          style: TextStyle(
+        title: Text(
+          l10n.shippingDocuments,
+          style: const TextStyle(
             color: _darkNavy,
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -187,9 +191,9 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
                       color: Colors.redAccent,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Could not load documents',
-                      style: TextStyle(
+                    Text(
+                      l10n.couldNotLoadDocuments,
+                      style: const TextStyle(
                         color: _darkNavy,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
@@ -198,7 +202,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: _refresh,
-                      child: const Text('Try again'),
+                      child: Text(l10n.tryAgainLower),
                     ),
                   ],
                 ),
@@ -227,7 +231,8 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
               itemBuilder: (context, index) {
                 final document = documents[index];
 
-                final name = document['name'].toString();
+                final nameRaw = document['name'].toString().trim();
+                final name = nameRaw.isEmpty ? l10n.document : nameRaw;
                 final trackingNumber = document['trackingNumber'].toString();
                 final contentType = document['contentType'].toString();
 
@@ -320,25 +325,26 @@ class _EmptyDocuments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(28),
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.all(28),
       child: Column(
         children: [
-          Icon(Icons.folder_copy_outlined, color: Color(0xFF07569E), size: 70),
-          SizedBox(height: 24),
+          const Icon(Icons.folder_copy_outlined, color: Color(0xFF07569E), size: 70),
+          const SizedBox(height: 24),
           Text(
-            'No documents yet',
-            style: TextStyle(
+            l10n.noDocumentsYet,
+            style: const TextStyle(
               color: Color(0xFF10233F),
               fontSize: 20,
               fontWeight: FontWeight.w800,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
-            'Your invoices, shipment documents and delivery files will appear here.',
+            l10n.documentsEmptyBody,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(0xFF8B95A3),
               fontSize: 14,
               height: 1.5,
@@ -400,7 +406,9 @@ class _DocumentViewerScreen extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    return const Center(child: Text('Could not load image'));
+                    return Center(
+                      child: Text(AppLocalizations.of(context)!.couldNotLoadImage),
+                    );
                   },
                 ),
               ),

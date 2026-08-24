@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'get_quote_screen.dart';
 
+import '../l10n/app_localizations.dart';
+
 class VolumeCalculatorScreen extends StatefulWidget {
   const VolumeCalculatorScreen({super.key});
 
@@ -111,10 +113,11 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
 
   void _requestQuote() {
     if (!_hasCalculated) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text('Please enter the cargo dimensions first.'),
+          content: Text(l10n.pleaseEnterDimensionsFirst),
         ),
       );
       return;
@@ -136,6 +139,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: pageBg,
       body: SafeArea(
@@ -154,9 +158,8 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                     _sectionHeading(
                       number: '01',
                       icon: Icons.straighten_rounded,
-                      title: 'Cargo Dimensions',
-                      subtitle:
-                          'Enter one package size in centimeters and the total quantity.',
+                      title: l10n.cargoDimensions,
+                      subtitle: l10n.enterPackageSizeQty,
                     ),
                     const SizedBox(height: 14),
                     _buildDimensionsCard(),
@@ -164,9 +167,8 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                     _sectionHeading(
                       number: '02',
                       icon: Icons.analytics_outlined,
-                      title: 'Calculation Results',
-                      subtitle:
-                          'Instant logistics measurements for planning your shipment.',
+                      title: l10n.calculationResults,
+                      subtitle: l10n.instantMeasurements,
                     ),
                     const SizedBox(height: 14),
                     _buildResults(),
@@ -182,8 +184,8 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                           Icons.request_quote_outlined,
                           size: 20,
                         ),
-                        label: const Text(
-                          'REQUEST A QUOTE',
+                        label: Text(
+                          l10n.requestAQuote,
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
                             letterSpacing: .4,
@@ -220,6 +222,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 84,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -255,24 +258,24 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Volume Calculator',
-                  style: TextStyle(
+                  l10n.volumeCalculator,
+                  style: const TextStyle(
                     color: textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'TAWAM AL-SHAHIN TRANSPORT',
-                  style: TextStyle(
+                  l10n.tawamAlShahinTransport,
+                  style: const TextStyle(
                     color: primaryBlue,
                     fontSize: 9.3,
                     fontWeight: FontWeight.w800,
@@ -301,6 +304,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
   }
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
@@ -330,16 +334,16 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
               color: Colors.white.withValues(alpha: .055),
             ),
           ),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.calculate_outlined, color: Colors.white, size: 19),
-                  SizedBox(width: 8),
+                  const Icon(Icons.calculate_outlined, color: Colors.white, size: 19),
+                  const SizedBox(width: 8),
                   Text(
-                    'LOGISTICS CALCULATION TOOL',
-                    style: TextStyle(
+                    l10n.logisticsCalculationTool,
+                    style: const TextStyle(
                       color: Color(0xFFD5E5F4),
                       fontSize: 9.4,
                       fontWeight: FontWeight.w800,
@@ -348,10 +352,10 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'Plan Your Cargo Smarter',
-                style: TextStyle(
+                l10n.planCargoSmarter,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   height: 1.05,
@@ -359,29 +363,29 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                   letterSpacing: -.5,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Calculate CBM and volumetric weight instantly before requesting your shipping quotation.',
-                style: TextStyle(
+                l10n.volumeHeroSubtitle,
+                style: const TextStyle(
                   color: Color(0xFFD7E6F5),
-                  fontSize: 12,
+                  fontSize: 12.2,
                   height: 1.45,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 17),
+              const SizedBox(height: 16),
               Row(
                 children: [
-                  _HeroFeature(icon: Icons.speed_rounded, label: 'Instant'),
-                  SizedBox(width: 18),
+                  _HeroFeature(icon: Icons.speed_rounded, label: l10n.instant),
+                  const SizedBox(width: 16),
                   _HeroFeature(
                     icon: Icons.straighten_rounded,
-                    label: 'Accurate',
+                    label: l10n.accurate,
                   ),
-                  SizedBox(width: 18),
+                  const SizedBox(width: 16),
                   _HeroFeature(
-                    icon: Icons.public_rounded,
-                    label: 'Logistics Ready',
+                    icon: Icons.verified_outlined,
+                    label: l10n.logisticsReady,
                   ),
                 ],
               ),
@@ -456,6 +460,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
   }
 
   Widget _buildDimensionsCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -478,7 +483,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
               Expanded(
                 child: _input(
                   controller: _lengthController,
-                  label: 'Length',
+                  label: l10n.length,
                   hint: '0',
                   suffix: 'CM',
                   icon: Icons.swap_horiz_rounded,
@@ -488,7 +493,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
               Expanded(
                 child: _input(
                   controller: _widthController,
-                  label: 'Width',
+                  label: l10n.width,
                   hint: '0',
                   suffix: 'CM',
                   icon: Icons.straighten_rounded,
@@ -502,7 +507,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
               Expanded(
                 child: _input(
                   controller: _heightController,
-                  label: 'Height',
+                  label: l10n.height,
                   hint: '0',
                   suffix: 'CM',
                   icon: Icons.height_rounded,
@@ -512,7 +517,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
               Expanded(
                 child: _input(
                   controller: _quantityController,
-                  label: 'Quantity',
+                  label: l10n.quantity,
                   hint: '1',
                   icon: Icons.numbers_rounded,
                   integerOnly: true,
@@ -523,8 +528,8 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
           const SizedBox(height: 11),
           _input(
             controller: _actualWeightController,
-            label: 'Actual Total Weight',
-            hint: 'Optional',
+            label: l10n.actualTotalWeight,
+            hint: l10n.optional,
             suffix: 'KG',
             icon: Icons.monitor_weight_outlined,
           ),
@@ -537,14 +542,14 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: borderColor),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info_outline_rounded, color: primaryBlue, size: 18),
-                SizedBox(width: 8),
+                const Icon(Icons.info_outline_rounded, color: primaryBlue, size: 18),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Enter the dimensions of one package. Quantity is applied automatically to the total calculation.',
-                    style: TextStyle(
+                    l10n.enterOnePackageHint,
+                    style: const TextStyle(
                       color: textGrey,
                       fontSize: 9.8,
                       height: 1.35,
@@ -561,6 +566,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
   }
 
   Widget _buildResults() {
+    final l10n = AppLocalizations.of(context)!;
     if (!_hasCalculated) {
       return Container(
         width: double.infinity,
@@ -570,23 +576,23 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
           borderRadius: BorderRadius.circular(22),
           border: Border.all(color: borderColor),
         ),
-        child: const Column(
+        child: Column(
           children: [
-            Icon(Icons.analytics_outlined, color: primaryBlue, size: 42),
-            SizedBox(height: 12),
+            const Icon(Icons.analytics_outlined, color: primaryBlue, size: 42),
+            const SizedBox(height: 12),
             Text(
-              'Enter your cargo dimensions',
-              style: TextStyle(
+              l10n.enterCargoDimensions,
+              style: const TextStyle(
                 color: textDark,
                 fontSize: 15,
                 fontWeight: FontWeight.w900,
               ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
-              'Your shipping calculation will appear here instantly.',
+              l10n.calculationAppearsHere,
               textAlign: TextAlign.center,
-              style: TextStyle(color: textGrey, fontSize: 10.5, height: 1.4),
+              style: const TextStyle(color: textGrey, fontSize: 10.5, height: 1.4),
             ),
           ],
         ),
@@ -612,9 +618,9 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'TOTAL SHIPMENT VOLUME',
-                style: TextStyle(
+              Text(
+                l10n.totalShipmentVolume,
+                style: const TextStyle(
                   color: Color(0xFFD6E6F6),
                   fontSize: 9.2,
                   fontWeight: FontWeight.w800,
@@ -639,7 +645,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                   const Padding(
                     padding: EdgeInsets.only(bottom: 3),
                     child: Text(
-                      'CBM',
+                      l10n.cbm,
                       style: TextStyle(
                         color: Color(0xFFD6E6F6),
                         fontSize: 12,
@@ -650,9 +656,9 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Cubic volume based on the entered dimensions and quantity.',
-                style: TextStyle(
+              Text(
+                l10n.cubicVolumeBased,
+                style: const TextStyle(
                   color: Color(0xFFD6E6F6),
                   fontSize: 10,
                   height: 1.35,
@@ -667,18 +673,18 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
             Expanded(
               child: _resultCard(
                 icon: Icons.flight_rounded,
-                title: 'Air Vol. Weight',
+                title: l10n.airVolWeight,
                 value: '${_airVolWeight.toStringAsFixed(1)} KG',
-                subtitle: 'Divisor 6000',
+                subtitle: l10n.divisor6000,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: _resultCard(
                 icon: Icons.inventory_2_outlined,
-                title: 'Courier Vol. Weight',
+                title: l10n.courierVolWeight,
                 value: '${_courierVolWeight.toStringAsFixed(1)} KG',
-                subtitle: 'Divisor 5000',
+                subtitle: l10n.divisor5000,
               ),
             ),
           ],
@@ -686,9 +692,9 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
         const SizedBox(height: 10),
         _resultCard(
           icon: Icons.scale_outlined,
-          title: 'Estimated Air Chargeable Weight',
+          title: l10n.estimatedAirChargeable,
           value: '${_chargeableAirWeight.toStringAsFixed(1)} KG',
-          subtitle: 'Higher of actual total weight and air volumetric weight',
+          subtitle: l10n.higherOfActualAir,
           fullWidth: true,
         ),
       ],
@@ -782,14 +788,15 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
   }
 
   Widget _buildResetButton() {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 52,
       child: OutlinedButton.icon(
         onPressed: _reset,
         icon: const Icon(Icons.restart_alt_rounded),
-        label: const Text(
-          'RESET CALCULATOR',
+        label: Text(
+          l10n.resetCalculator,
           style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: .3),
         ),
         style: OutlinedButton.styleFrom(

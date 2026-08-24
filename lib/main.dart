@@ -44,6 +44,8 @@ Future<void> main() async {
   // تجهيز الإشعارات
   await NotificationSetup.initialize();
 
+  await LocaleController.restoreFromFirestore();
+
   runApp(const TawamShippingApp());
 }
 

@@ -8,6 +8,7 @@ import 'support_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_conditions_screen.dart';
 import '../locale_controller.dart';
+import '../l10n/app_localizations.dart';
 
 // ==========================================================
 // TAWAM AL-SHAHIN — PREMIUM CUSTOMER PROFILE
@@ -82,8 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : user.uid;
 
       setState(() {
-        _fullName =
-            data?['name']?.toString() ?? user.displayName ?? 'Tawam Customer';
+        _fullName = data?['name']?.toString() ?? user.displayName ?? '';
         _email = data?['email']?.toString() ?? user.email ?? '';
         _phone = data?['phone']?.toString() ?? '';
         _company = data?['company']?.toString() ?? 'Not provided';
@@ -96,12 +96,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _isLoading = false;
         _loadError = null;
       });
+
+      LocaleController.setLanguage(_selectedLanguage);
     } catch (_) {
       if (!mounted) return;
 
       setState(() {
         _isLoading = false;
-        _loadError = 'Unable to load profile information.';
+        _loadError = AppLocalizations.of(context)!.unableToLoadProfileInfo;
       });
     }
   }
@@ -139,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     } catch (_) {
       if (!mounted) return;
-      _showMessage('Could not load account statistics');
+      _showMessage(AppLocalizations.of(context)!.somethingWentWrong);
     }
   }
 
@@ -162,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _notificationsEnabled = !value;
       });
 
-      _showMessage('Could not save notification setting');
+      _showMessage(AppLocalizations.of(context)!.somethingWentWrong);
     }
   }
 
@@ -221,9 +223,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  String _safe(String value) {
-    if (value.trim().isEmpty) return 'Not provided';
-    return value;
+  String _displayValue(AppLocalizations l10n, String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty || trimmed == 'Not provided') {
+      return l10n.notProvided;
+    }
+    return trimmed;
+  }
+
+  String _languageLabel(AppLocalizations l10n, String language) {
+    switch (language) {
+      case 'Arabic':
+        return l10n.languageArabic;
+      case 'French':
+        return l10n.languageFrench;
+      default:
+        return l10n.languageEnglish;
+    }
   }
 
   String get _initial {
@@ -237,6 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Future<void> _editProfile() async {
+    final l10n = AppLocalizations.of(context)!;
     final formKey = GlobalKey<FormState>();
 
     final nameController = TextEditingController(text: _fullName);
@@ -302,22 +319,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Edit Customer Profile',
-                              style: TextStyle(
+                              l10n.editProfile,
+                              style: const TextStyle(
                                 color: _text,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
-                            SizedBox(height: 3),
+                            const SizedBox(height: 3),
                             Text(
-                              'Update your main account information',
-                              style: TextStyle(color: _muted, fontSize: 10.5),
+                              l10n.customerDetails,
+                              style: const TextStyle(
+                                color: _muted,
+                                fontSize: 10.5,
+                              ),
                             ),
                           ],
                         ),
@@ -335,12 +355,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     textCapitalization: TextCapitalization.words,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your full name';
+                        return l10n.pleaseEnterFullName;
                       }
                       return null;
                     },
                     decoration: _fieldDecoration(
-                      hint: 'Full name',
+                      hint: l10n.fullName,
                       icon: Icons.person_outline_rounded,
                     ),
                   ),
@@ -351,10 +371,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     enabled: false,
                     decoration:
                         _fieldDecoration(
-                          hint: 'Email address',
+                          hint: l10n.emailAddress,
                           icon: Icons.email_outlined,
                         ).copyWith(
-                          helperText: 'Email is linked to your sign-in account',
+                          helperText: l10n.signedInCustomer,
                           helperStyle: const TextStyle(
                             color: _muted,
                             fontSize: 9,
@@ -368,12 +388,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     keyboardType: TextInputType.phone,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your phone number';
+                        return l10n.pleaseEnterPhone;
                       }
                       return null;
                     },
                     decoration: _fieldDecoration(
-                      hint: 'Phone number',
+                      hint: l10n.phoneNumber,
                       icon: Icons.phone_outlined,
                     ),
                   ),
@@ -383,7 +403,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     controller: companyController,
                     textCapitalization: TextCapitalization.words,
                     decoration: _fieldDecoration(
-                      hint: 'Company name',
+                      hint: l10n.company,
                       icon: Icons.apartment_outlined,
                     ),
                   ),
@@ -394,7 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     textCapitalization: TextCapitalization.words,
                     maxLines: 2,
                     decoration: _fieldDecoration(
-                      hint: 'Default address',
+                      hint: l10n.defaultAddress,
                       icon: Icons.location_on_outlined,
                     ),
                   ),
@@ -421,9 +441,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           borderRadius: BorderRadius.circular(17),
                         ),
                       ),
-                      child: const Text(
-                        'Save Changes',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.save,
+                        style: const TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w900,
                         ),
@@ -468,7 +488,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _showMessage('Profile updated successfully');
     } catch (_) {
       if (!mounted) return;
-      _showMessage('Could not update profile');
+      _showMessage(l10n.couldNotUpdateProfile);
     }
   }
 
@@ -477,7 +497,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Future<void> _selectLanguage() async {
-    const languages = ['English', 'Arabic', 'French'];
+    final l10n = AppLocalizations.of(context)!;
 
     final selected = await showModalBottomSheet<String>(
       context: context,
@@ -503,11 +523,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 21),
-                const Align(
-                  alignment: Alignment.centerLeft,
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    'Application Language',
-                    style: TextStyle(
+                    l10n.applicationLanguage,
+                    style: const TextStyle(
                       color: _text,
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -516,7 +536,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                ...languages.map((language) {
+                ...LocaleController.languageNames.map((language) {
                   final isSelected = language == _selectedLanguage;
 
                   return Padding(
@@ -558,7 +578,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  language,
+                                  _languageLabel(l10n, language),
                                   style: const TextStyle(
                                     color: _text,
                                     fontSize: 13.5,
@@ -591,14 +611,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _selectedLanguage = selected;
     });
 
-    LocaleController.setLanguage(selected);
-
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'language': selected,
-      }, SetOptions(merge: true));
-    }
+    await LocaleController.saveLanguage(selected);
   }
 
   // ==========================================================
@@ -606,10 +619,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Future<void> _changePassword() async {
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null || user.email == null) {
-      _showMessage('Could not verify your account');
+      _showMessage(l10n.couldNotVerifyAccount);
       return;
     }
 
@@ -636,10 +650,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             child: const Icon(Icons.lock_reset_rounded, color: _blue, size: 28),
           ),
-          title: const Text(
-            'Change Password',
+          title: Text(
+            l10n.changePassword,
             textAlign: TextAlign.center,
-            style: TextStyle(color: _text, fontWeight: FontWeight.w900),
+            style: const TextStyle(color: _text, fontWeight: FontWeight.w900),
           ),
           content: Form(
             key: formKey,
@@ -650,12 +664,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextFormField(
                     obscureText: true,
                     decoration: _fieldDecoration(
-                      hint: 'Current password',
+                      hint: l10n.pleaseEnterPassword,
                       icon: Icons.lock_outline_rounded,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Enter your current password';
+                        return l10n.pleaseEnterPassword;
                       }
                       return null;
                     },
@@ -666,16 +680,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextFormField(
                     obscureText: true,
                     decoration: _fieldDecoration(
-                      hint: 'New password',
+                      hint: l10n.pleaseCreatePassword,
                       icon: Icons.password_rounded,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Enter a new password';
+                        return l10n.pleaseCreatePassword;
                       }
 
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return l10n.passwordTooShort;
                       }
 
                       return null;
@@ -687,12 +701,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextFormField(
                     obscureText: true,
                     decoration: _fieldDecoration(
-                      hint: 'Confirm password',
+                      hint: l10n.confirmPassword,
                       icon: Icons.verified_user_outlined,
                     ),
                     validator: (value) {
                       if (value != newPassword) {
-                        return 'Passwords do not match';
+                        return l10n.passwordsDoNotMatch;
                       }
                       return null;
                     },
@@ -706,7 +720,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           actions: [
             OutlinedButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -720,7 +734,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 foregroundColor: Colors.white,
                 elevation: 0,
               ),
-              child: const Text('Update'),
+              child: Text(l10n.update),
             ),
           ],
         );
@@ -743,14 +757,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
-      String message = 'Could not update password';
+      String message = l10n.somethingWentWrong;
 
       if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-        message = 'Current password is incorrect';
+        message = l10n.emailOrPasswordIncorrect;
       } else if (e.code == 'weak-password') {
-        message = 'New password is too weak';
+        message = l10n.passwordTooShort;
       } else if (e.code == 'requires-recent-login') {
-        message = 'Please sign in again and try again';
+        message = l10n.pleaseSignInAgain;
       }
 
       _showMessage(message);
@@ -762,6 +776,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Future<void> _showAccountAndLegal() async {
+    final l10n = AppLocalizations.of(context)!;
+
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -788,11 +804,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 18),
 
-                const Align(
-                  alignment: Alignment.centerLeft,
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    'Account & Legal',
-                    style: TextStyle(
+                    l10n.accountAndLegal,
+                    style: const TextStyle(
                       color: _text,
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
@@ -800,19 +816,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Align(
-                  alignment: Alignment.centerLeft,
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    'Privacy, terms and account management',
-                    style: TextStyle(color: _muted, fontSize: 10),
+                    l10n.accountLegalSubtitle,
+                    style: const TextStyle(color: _muted, fontSize: 10),
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 _sheetAction(
                   icon: Icons.privacy_tip_outlined,
-                  title: 'Privacy Policy',
-                  subtitle: 'How we protect your information',
+                  title: l10n.privacyPolicy,
+                  subtitle: l10n.privacySubtitle,
                   onTap: () {
                     Navigator.pop(sheetContext);
                     Navigator.of(context).push(
@@ -826,8 +842,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 _sheetAction(
                   icon: Icons.description_outlined,
-                  title: 'Terms & Conditions',
-                  subtitle: 'TAWAM application terms',
+                  title: l10n.termsConditions,
+                  subtitle: l10n.termsSubtitle,
                   onTap: () {
                     Navigator.pop(sheetContext);
                     Navigator.of(context).push(
@@ -841,8 +857,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 _sheetAction(
                   icon: Icons.delete_outline_rounded,
-                  title: 'Delete Account',
-                  subtitle: 'Permanently remove your customer account',
+                  title: l10n.deleteAccount,
+                  subtitle: l10n.deleteAccountSubtitle,
                   danger: true,
                   onTap: () {
                     Navigator.pop(sheetContext);
@@ -925,10 +941,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _requestAccountDeletion() async {
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null || user.email == null) {
-      _showMessage('Could not verify your account');
+      _showMessage(l10n.couldNotVerifyAccount);
       return;
     }
 
@@ -955,25 +972,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               size: 29,
             ),
           ),
-          title: const Text(
-            'Delete Account?',
+          title: Text(
+            l10n.deleteAccount,
             textAlign: TextAlign.center,
-            style: TextStyle(color: _text, fontWeight: FontWeight.w900),
+            style: const TextStyle(color: _text, fontWeight: FontWeight.w900),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Your account will be permanently deleted. Enter your password to confirm.',
+              Text(
+                l10n.deleteAccountSubtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: _muted, fontSize: 12.5, height: 1.5),
+                style: const TextStyle(
+                  color: _muted,
+                  fontSize: 12.5,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 17),
               TextField(
                 controller: passwordController,
                 obscureText: true,
                 decoration: _fieldDecoration(
-                  hint: 'Current password',
+                  hint: l10n.pleaseEnterPassword,
                   icon: Icons.lock_outline_rounded,
                 ),
               ),
@@ -983,7 +1004,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           actions: [
             OutlinedButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -995,7 +1016,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 foregroundColor: Colors.white,
                 elevation: 0,
               ),
-              child: const Text('Delete Account'),
+              child: Text(l10n.deleteAccount),
             ),
           ],
         );
@@ -1055,12 +1076,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (!mounted) return;
 
-      String message = 'Could not delete account';
+      String message = l10n.somethingWentWrong;
 
       if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-        message = 'Current password is incorrect';
+        message = l10n.emailOrPasswordIncorrect;
       } else if (e.code == 'requires-recent-login') {
-        message = 'Please sign in again and try again';
+        message = l10n.pleaseSignInAgain;
       }
 
       _showMessage(message);
@@ -1068,7 +1089,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       passwordController.dispose();
 
       if (!mounted) return;
-      _showMessage('Could not delete account');
+      _showMessage(l10n.somethingWentWrong);
     }
   }
 
@@ -1077,6 +1098,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Future<void> _confirmLogout() async {
+    final l10n = AppLocalizations.of(context)!;
+
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -1094,21 +1117,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             child: const Icon(Icons.logout_rounded, color: _blue, size: 27),
           ),
-          title: const Text(
-            'Sign Out?',
+          title: Text(
+            l10n.signOutQuestion,
             textAlign: TextAlign.center,
-            style: TextStyle(color: _text, fontWeight: FontWeight.w900),
+            style: const TextStyle(color: _text, fontWeight: FontWeight.w900),
           ),
-          content: const Text(
-            'Are you sure you want to sign out of your TAWAM customer account?',
+          content: Text(
+            l10n.signOutConfirmBody,
             textAlign: TextAlign.center,
-            style: TextStyle(color: _muted, fontSize: 12.5, height: 1.5),
+            style: const TextStyle(color: _muted, fontSize: 12.5, height: 1.5),
           ),
           actionsAlignment: MainAxisAlignment.center,
           actions: [
             OutlinedButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(dialogContext, true),
@@ -1117,7 +1140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 foregroundColor: Colors.white,
                 elevation: 0,
               ),
-              child: const Text('Sign Out'),
+              child: Text(l10n.signOut),
             ),
           ],
         );
@@ -1158,6 +1181,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _page,
       body: SafeArea(
@@ -1184,19 +1209,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Unable to load profile',
+                      Text(
+                        l10n.unableToLoadProfile,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                       const SizedBox(height: 7),
-                      const Text(
-                        'Please check your connection and try again.',
+                      Text(
+                        l10n.pleaseCheckConnectionTryAgain,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black54,
                           fontSize: 11.5,
                           height: 1.5,
@@ -1208,7 +1233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           await Future.wait([_loadProfile(), _loadStats()]);
                         },
                         icon: const Icon(Icons.refresh_rounded, size: 18),
-                        label: const Text('Try Again'),
+                        label: Text(l10n.tryAgain),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _blue,
                           foregroundColor: Colors.white,
@@ -1241,9 +1266,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     const SizedBox(height: 22),
 
-                    const _SectionTitle(
-                      eyebrow: 'CUSTOMER PROFILE',
-                      title: 'Customer Details',
+                    _SectionTitle(
+                      eyebrow: l10n.customerProfile,
+                      title: l10n.customerDetails,
                     ),
 
                     const SizedBox(height: 10),
@@ -1252,9 +1277,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     const SizedBox(height: 22),
 
-                    const _SectionTitle(
-                      eyebrow: 'ACCOUNT CONTROL',
-                      title: 'Account',
+                    _SectionTitle(
+                      eyebrow: l10n.accountControl,
+                      title: l10n.account,
                     ),
 
                     const SizedBox(height: 10),
@@ -1263,9 +1288,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     const SizedBox(height: 22),
 
-                    const _SectionTitle(
-                      eyebrow: 'CUSTOMER SERVICES',
-                      title: 'Assistance',
+                    _SectionTitle(
+                      eyebrow: l10n.customerServices,
+                      title: l10n.assistance,
                     ),
 
                     const SizedBox(height: 10),
@@ -1275,8 +1300,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Expanded(
                           child: _ActionCard(
                             icon: Icons.folder_copy_outlined,
-                            title: 'Documents',
-                            subtitle: 'Shipping files',
+                            title: l10n.documents,
+                            subtitle: l10n.shippingFiles,
                             onTap: _openDocuments,
                           ),
                         ),
@@ -1284,8 +1309,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Expanded(
                           child: _ActionCard(
                             icon: Icons.support_agent_rounded,
-                            title: 'Support',
-                            subtitle: 'Customer help',
+                            title: l10n.support,
+                            subtitle: l10n.customerHelp,
                             onTap: _openSupport,
                           ),
                         ),
@@ -1298,9 +1323,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: TextButton.icon(
                         onPressed: _showAccountAndLegal,
                         icon: const Icon(Icons.shield_outlined, size: 16),
-                        label: const Text(
-                          'Account & Legal',
-                          style: TextStyle(
+                        label: Text(
+                          l10n.accountAndLegal,
+                          style: const TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w800,
                           ),
@@ -1328,6 +1353,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -1396,22 +1423,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           children: [
                             Text(
-                              'TAWAM AL-SHAHIN TRANSPORT',
-                              style: TextStyle(
+                              l10n.tawamAlShahinTransport,
+                              style: const TextStyle(
                                 color: Color(0xFFBCD6EC),
                                 fontSize: 7,
                                 letterSpacing: 1.4,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
-                            SizedBox(height: 3),
+                            const SizedBox(height: 3),
                             Text(
-                              'Customer Account',
-                              style: TextStyle(
+                              l10n.customerAccount,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 17,
                                 fontWeight: FontWeight.w900,
@@ -1478,7 +1505,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _fullName.isEmpty ? 'Tawam Customer' : _fullName,
+                              _fullName.isEmpty
+                                  ? l10n.tawamCustomer
+                                  : _fullName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -1490,7 +1519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _email.isEmpty ? 'Customer Account' : _email,
+                              _email.isEmpty ? l10n.customerAccount : _email,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -1515,18 +1544,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ).withValues(alpha: .35),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.verified_rounded,
                                     color: Color(0xFF7CE3C6),
                                     size: 13,
                                   ),
-                                  SizedBox(width: 5),
+                                  const SizedBox(width: 5),
                                   Text(
-                                    'ACTIVE CUSTOMER',
-                                    style: TextStyle(
+                                    l10n.activeCustomer,
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 7.2,
                                       letterSpacing: .7,
@@ -1564,9 +1593,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           size: 15,
                         ),
                         const SizedBox(width: 7),
-                        const Text(
-                          'CUSTOMER ID',
-                          style: TextStyle(
+                        Text(
+                          l10n.customerId,
+                          style: const TextStyle(
                             color: Color(0xFFBED5E9),
                             fontSize: 7.2,
                             letterSpacing: 1,
@@ -1575,7 +1604,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const Spacer(),
                         Text(
-                          _customerId.isEmpty ? 'Loading...' : _customerId,
+                          _customerId.isEmpty ? l10n.loading : _customerId,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 9.7,
@@ -1593,21 +1622,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Expanded(
                         child: _Metric(
                           value: _shipmentsCount.toString(),
-                          label: 'Shipments',
+                          label: l10n.shipments,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: _Metric(
                           value: _inTransitCount.toString(),
-                          label: 'In Transit',
+                          label: l10n.inTransit,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: _Metric(
                           value: _quotesCount.toString(),
-                          label: 'Quotes',
+                          label: l10n.quotes,
                         ),
                       ),
                     ],
@@ -1626,6 +1655,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Widget _buildCustomerDetails() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
       decoration: BoxDecoration(
@@ -1644,20 +1675,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           _InfoRow(
             icon: Icons.apartment_outlined,
-            label: 'Company',
-            value: _safe(_company),
+            label: l10n.company,
+            value: _displayValue(l10n, _company),
           ),
           const SizedBox(height: 13),
           _InfoRow(
             icon: Icons.phone_outlined,
-            label: 'Phone',
-            value: _safe(_phone),
+            label: l10n.phone,
+            value: _displayValue(l10n, _phone),
           ),
           const SizedBox(height: 13),
           _InfoRow(
             icon: Icons.location_on_outlined,
-            label: 'Address',
-            value: _safe(_address),
+            label: l10n.address,
+            value: _displayValue(l10n, _address),
           ),
           const SizedBox(height: 16),
 
@@ -1667,9 +1698,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ElevatedButton.icon(
               onPressed: _editProfile,
               icon: const Icon(Icons.edit_outlined, size: 18),
-              label: const Text(
-                'Edit Profile',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12.5),
+              label: Text(
+                l10n.editProfile,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 12.5,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _navy,
@@ -1691,6 +1725,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Widget _buildAccountControls() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1710,8 +1746,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             _AccountTile(
               icon: Icons.notifications_active_outlined,
-              title: 'Notifications',
-              subtitle: 'Account and service updates',
+              title: l10n.notifications,
+              subtitle: l10n.accountServiceUpdates,
               trailing: Switch.adaptive(
                 value: _notificationsEnabled,
                 activeTrackColor: _blue,
@@ -1723,8 +1759,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             _AccountTile(
               icon: Icons.lock_reset_rounded,
-              title: 'Change Password',
-              subtitle: 'Update account security',
+              title: l10n.changePassword,
+              subtitle: l10n.updateAccountSecurity,
               onTap: _changePassword,
             ),
 
@@ -1732,8 +1768,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             _AccountTile(
               icon: Icons.language_rounded,
-              title: 'Language',
-              subtitle: _selectedLanguage,
+              title: l10n.language,
+              subtitle: _languageLabel(l10n, _selectedLanguage),
               onTap: _selectLanguage,
             ),
           ],
@@ -1743,6 +1779,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSignOut() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1781,23 +1819,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               const SizedBox(width: 12),
 
-              const Expanded(
+              Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Sign Out',
-                      style: TextStyle(
+                      l10n.signOut,
+                      style: const TextStyle(
                         color: Color(0xFF10233F),
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text(
-                      'Securely end your current session',
-                      style: TextStyle(color: Color(0xFF8A96A5), fontSize: 8.8),
+                      l10n.signOutSubtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF8A96A5),
+                        fontSize: 8.8,
+                      ),
                     ),
                   ],
                 ),
@@ -2136,20 +2177,22 @@ class _Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final l10n = AppLocalizations.of(context)!;
+
+    return Center(
       child: Column(
         children: [
           Text(
-            'TAWAM AL-SHAHIN TRANSPORT',
-            style: TextStyle(
+            l10n.tawamAlShahinTransport,
+            style: const TextStyle(
               color: Color(0xFF7E8A99),
               fontSize: 8.7,
               letterSpacing: 1.4,
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(height: 5),
-          Text(
+          const SizedBox(height: 5),
+          const Text(
             'GLOBAL LOGISTICS CUSTOMER PORTAL',
             style: TextStyle(
               color: Color(0xFFA7B0BB),
@@ -2158,8 +2201,8 @@ class _Footer extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 6),
-          Text(
+          const SizedBox(height: 6),
+          const Text(
             'Secure • Reliable • Connected',
             style: TextStyle(color: Color(0xFFB2BAC4), fontSize: 8.2),
           ),

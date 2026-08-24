@@ -24,6 +24,8 @@ import 'login_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../locale_controller.dart';
+import '../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -48,11 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // BANNERS
   // ==========================================================
 
-  final List<String> _bannerImages = const [
-    'assets/images/banner.png',
-    'assets/images/banner 2.png',
-    'assets/images/banner 3.png',
-    'assets/images/banner 4.png',
+  List<String> get _bannerImages => [
+    LocaleController.bannerAsset('banner_1.png'),
+    LocaleController.bannerAsset('banner_2.png'),
+    LocaleController.bannerAsset('banner_3.png'),
+    LocaleController.bannerAsset('banner_4.png'),
   ];
 
   late final PageController _bannerController;
@@ -64,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     _bannerController = PageController();
+    LocaleController.restoreFromFirestore();
 
     _bannerTimer = Timer.periodic(
       const Duration(seconds: 4),
@@ -94,12 +97,141 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
   }
 
+  Future<void> _selectLanguage(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final selectedLanguage = LocaleController.languageName;
+
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 44,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD9DEE5),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                const SizedBox(height: 21),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    l10n.applicationLanguage,
+                    style: const TextStyle(
+                      color: textDark,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...LocaleController.languageNames.map((language) {
+                  final isSelected = language == selectedLanguage;
+                  final label = _languageLabel(l10n, language);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Material(
+                      color: isSelected
+                          ? const Color(0xFFEAF4FF)
+                          : const Color(0xFFF7F9FC),
+                      borderRadius: BorderRadius.circular(18),
+                      child: InkWell(
+                        onTap: () => Navigator.pop(sheetContext, language),
+                        borderRadius: BorderRadius.circular(18),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 15,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFFB9D8F3)
+                                  : borderColor,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(13),
+                                ),
+                                child: const Icon(
+                                  Icons.language_rounded,
+                                  color: primaryBlue,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  label,
+                                  style: const TextStyle(
+                                    color: textDark,
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              if (isSelected)
+                                const Icon(
+                                  Icons.check_circle_rounded,
+                                  color: primaryBlue,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selected == null || !context.mounted) return;
+    await LocaleController.saveLanguage(selected);
+  }
+
+  String _languageLabel(AppLocalizations l10n, String language) {
+    switch (language) {
+      case 'Arabic':
+        return l10n.languageArabic;
+      case 'French':
+        return l10n.languageFrench;
+      default:
+        return l10n.languageEnglish;
+    }
+  }
+
   // ==========================================================
   // PAGE
   // ==========================================================
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: pageBackground,
       drawer: _buildDrawer(context),
@@ -133,24 +265,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     _buildServiceGrid(context),
 
                     const SizedBox(height: 24),
-                    const Align(
-                      alignment: Alignment.centerLeft,
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Quick Actions',
-                            style: TextStyle(
+                            l10n.quickActions,
+                            style: const TextStyle(
                               color: textDark,
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
                               letterSpacing: -0.3,
                             ),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
-                            'Manage your shipments and requests',
-                            style: TextStyle(
+                            l10n.quickActionsSubtitle,
+                            style: const TextStyle(
                               color: textGrey,
                               fontSize: 11.5,
                               fontWeight: FontWeight.w500,
@@ -401,13 +533,15 @@ class _HomeScreenState extends State<HomeScreen> {
   // ==========================================================
 
   Widget _buildSectionHeader() {
-    return const Center(
+    final l10n = AppLocalizations.of(context)!;
+
+    return Center(
       child: Column(
         children: [
           Text(
-            'Rate Request',
+            l10n.rateRequest,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: textDark,
               fontSize: 27,
               height: 1,
@@ -415,11 +549,11 @@ class _HomeScreenState extends State<HomeScreen> {
               letterSpacing: -0.6,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Get an instant quote for your shipment',
+            l10n.rateRequestSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: textGrey,
               fontSize: 13,
               height: 1.25,
@@ -436,10 +570,13 @@ class _HomeScreenState extends State<HomeScreen> {
   // ==========================================================
 
   Widget _buildServiceGrid(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final services = <_ServiceItem>[
       _ServiceItem(
-        title: 'Sea Freight',
-        subtitle: 'Fast & Reliable',
+        storedName: 'Sea Freight',
+        title: l10n.serviceSeaFreight,
+        subtitle: l10n.serviceSeaFreightSubtitle,
         image: 'assets/images/sea_freight.png',
         icon: Icons.directions_boat_filled_outlined,
         onTap: () {
@@ -450,8 +587,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       _ServiceItem(
-        title: 'Air Freight',
-        subtitle: 'Global Coverage',
+        storedName: 'Air Freight',
+        title: l10n.serviceAirFreight,
+        subtitle: l10n.serviceAirFreightSubtitle,
         image: 'assets/images/air_freight.png',
         icon: Icons.flight_rounded,
         onTap: () {
@@ -462,8 +600,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       _ServiceItem(
-        title: 'Land Freight',
-        subtitle: 'Flexible Solutions',
+        storedName: 'Land Freight',
+        title: l10n.serviceLandFreight,
+        subtitle: l10n.serviceLandFreightSubtitle,
         image: 'assets/images/land_freight.png',
         icon: Icons.local_shipping_outlined,
         onTap: () {
@@ -474,8 +613,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       _ServiceItem(
-        title: 'Car Shipping',
-        subtitle: 'Safe & Secure',
+        storedName: 'Car Shipping',
+        title: l10n.serviceCarShipping,
+        subtitle: l10n.serviceCarShippingSubtitle,
         image: 'assets/images/car_shipping.png',
         icon: Icons.directions_car_filled_outlined,
         onTap: () {
@@ -486,8 +626,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       _ServiceItem(
-        title: 'International Moving',
-        subtitle: 'Door-to-Door',
+        storedName: 'International Moving',
+        title: l10n.serviceInternationalMoving,
+        subtitle: l10n.serviceMovingSubtitle,
         image: 'assets/images/moving.png',
         icon: Icons.home_work_outlined,
         onTap: () {
@@ -500,8 +641,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       _ServiceItem(
-        title: 'Parcel Shipping',
-        subtitle: 'Easy Delivery',
+        storedName: 'Parcel Shipping',
+        title: l10n.serviceParcelShipping,
+        subtitle: l10n.serviceParcelSubtitle,
         image: 'assets/images/parcel.png',
         icon: Icons.inventory_2_outlined,
         onTap: () {
@@ -547,7 +689,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: InkWell(
         onTap:
             service.onTap ??
-            () => _showRateRequestSheet(context, service.title),
+            () => _showRateRequestSheet(context, service.storedName),
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
@@ -649,44 +791,46 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final items = [
       {
-        'title': 'Get a Quote',
+        'title': l10n.getAQuote,
         'icon': Icons.request_quote_outlined,
         'onTap': () {
           _openPage(context, const GetQuoteScreen());
         },
       },
       {
-        'title': 'Create a Booking',
+        'title': l10n.createABooking,
         'icon': Icons.calendar_month_outlined,
         'onTap': () {
           _openPage(context, const CreateBookingScreen());
         },
       },
       {
-        'title': 'Volume Calculator',
+        'title': l10n.volumeCalculator,
         'icon': Icons.calculate_outlined,
         'onTap': () {
           _openPage(context, const VolumeCalculatorScreen());
         },
       },
       {
-        'title': 'Shipment Tracking',
+        'title': l10n.shipmentTracking,
         'icon': Icons.local_shipping_outlined,
         'onTap': () {
           _openPage(context, const TrackShipmentScreen());
         },
       },
       {
-        'title': 'My Quotes',
+        'title': l10n.myQuotes,
         'icon': Icons.request_quote_outlined,
         'onTap': () {
           _openPage(context, const MyQuotesScreen());
         },
       },
       {
-        'title': 'My Bookings',
+        'title': l10n.myBookings,
         'icon': Icons.calendar_month_outlined,
         'onTap': () {
           _openPage(context, const MyBookingsScreen());
@@ -768,6 +912,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // ==========================================================
 
   Widget _buildBottomNavigation(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 78,
       padding: const EdgeInsets.fromLTRB(7, 7, 7, 8),
@@ -787,7 +933,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _navItem(
               icon: Icons.home_rounded,
-              label: 'Home',
+              label: l10n.home,
               selected: true,
               onTap: () {},
             ),
@@ -795,7 +941,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _navItem(
               icon: Icons.search_rounded,
-              label: 'Track',
+              label: l10n.track,
               onTap: () {
                 _openPage(context, const TrackShipmentScreen());
               },
@@ -804,7 +950,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _navItem(
               icon: Icons.inventory_2_outlined,
-              label: 'Shipments',
+              label: l10n.shipments,
               onTap: () {
                 _openPage(context, const ShipmentsScreen());
               },
@@ -813,7 +959,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _navItem(
               icon: Icons.support_agent_rounded,
-              label: 'Support',
+              label: l10n.support,
               onTap: () {
                 _openPage(context, const SupportScreen());
               },
@@ -822,7 +968,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _navItem(
               icon: Icons.person_outline_rounded,
-              label: 'Profile',
+              label: l10n.profile,
               onTap: () {
                 _openPage(context, const ProfileScreen());
               },
@@ -886,6 +1032,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // ==========================================================
 
   Widget _buildDrawer(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     Widget sectionTitle(String text) {
       return Padding(
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 8),
@@ -997,16 +1145,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   // TAWAM LOGO
                   Expanded(
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: AlignmentDirectional.centerStart,
                       child: Transform.scale(
                         scale: 1.65,
-                        alignment: Alignment.centerLeft,
+                        alignment: AlignmentDirectional.centerStart,
                         child: Image.asset(
                           'assets/images/tawam_logo.png',
                           width: 175,
                           height: 72,
                           fit: BoxFit.contain,
-                          alignment: Alignment.centerLeft,
+                          alignment: AlignmentDirectional.centerStart,
                         ),
                       ),
                     ),
@@ -1018,9 +1166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {
-                        // منربط تبديل اللغة فعليًا بالخطوة الجاية.
-                      },
+                      onTap: () => _selectLanguage(context),
                       borderRadius: BorderRadius.circular(25),
                       child: Container(
                         height: 42,
@@ -1030,25 +1176,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(25),
                           border: Border.all(color: const Color(0xFFD7E3F1)),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.language_rounded,
                               size: 18,
                               color: Color(0xFF0B4F9C),
                             ),
-                            SizedBox(width: 7),
+                            const SizedBox(width: 7),
                             Text(
-                              'EN',
-                              style: TextStyle(
+                              LocaleController.languageBadge,
+                              style: const TextStyle(
                                 color: Color(0xFF062B55),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            SizedBox(width: 3),
-                            Icon(
+                            const SizedBox(width: 3),
+                            const Icon(
                               Icons.keyboard_arrow_down_rounded,
                               size: 18,
                               color: Color(0xFF062B55),
@@ -1079,12 +1225,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    sectionTitle('Shipping Services'),
+                    sectionTitle(l10n.shippingServices),
 
                     premiumItem(
                       icon: Icons.request_quote_outlined,
-                      title: 'Get a Quote',
-                      subtitle: 'Request a new shipping quotation',
+                      title: l10n.getAQuote,
+                      subtitle: l10n.requestNewQuotation,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const GetQuoteScreen());
@@ -1093,8 +1239,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.receipt_long_outlined,
-                      title: 'My Quotes',
-                      subtitle: 'View your quotation history',
+                      title: l10n.myQuotes,
+                      subtitle: l10n.viewQuotationHistory,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const MyQuotesScreen());
@@ -1103,8 +1249,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.calendar_month_outlined,
-                      title: 'Create a Booking',
-                      subtitle: 'Create a new shipment booking',
+                      title: l10n.createABooking,
+                      subtitle: l10n.createNewBooking,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const CreateBookingScreen());
@@ -1113,20 +1259,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.event_note_outlined,
-                      title: 'My Bookings',
-                      subtitle: 'Manage previous bookings',
+                      title: l10n.myBookings,
+                      subtitle: l10n.managePreviousBookings,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const MyBookingsScreen());
                       },
                     ),
 
-                    sectionTitle('Shipment Management'),
+                    sectionTitle(l10n.shipmentManagement),
 
                     premiumItem(
                       icon: Icons.calculate_outlined,
-                      title: 'Volume Calculator',
-                      subtitle: 'Calculate cargo volume',
+                      title: l10n.volumeCalculator,
+                      subtitle: l10n.calculateCargoVolume,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const VolumeCalculatorScreen());
@@ -1135,8 +1281,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.location_searching_rounded,
-                      title: 'Shipment Tracking',
-                      subtitle: 'Track your shipment status',
+                      title: l10n.shipmentTracking,
+                      subtitle: l10n.trackShipmentStatus,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const TrackShipmentScreen());
@@ -1145,8 +1291,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.local_shipping_outlined,
-                      title: 'My Shipments',
-                      subtitle: 'View all active shipments',
+                      title: l10n.myShipments,
+                      subtitle: l10n.viewAllActiveShipments,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const ShipmentsScreen());
@@ -1155,8 +1301,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.description_outlined,
-                      title: 'Documents',
-                      subtitle: 'Shipping and account documents',
+                      title: l10n.documents,
+                      subtitle: l10n.shippingAndAccountDocuments,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const ShippingDocumentsScreen());
@@ -1164,8 +1310,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     premiumItem(
                       icon: Icons.reviews_outlined,
-                      title: 'Customer Reviews',
-                      subtitle: 'See what our customers say',
+                      title: l10n.customerReviews,
+                      subtitle: l10n.seeWhatCustomersSay,
                       onTap: () async {
                         Navigator.pop(context);
 
@@ -1180,8 +1326,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (!opened && context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Could not open Google reviews.'),
+                            SnackBar(
+                              content: Text(l10n.couldNotOpenReviews),
                             ),
                           );
                         }
@@ -1190,8 +1336,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.language_rounded,
-                      title: 'Our Website',
-                      subtitle: 'Visit TAWAM AL-SHAHIN online',
+                      title: l10n.ourWebsite,
+                      subtitle: l10n.visitTawamOnline,
                       onTap: () async {
                         Navigator.pop(context);
 
@@ -1204,19 +1350,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (!opened && context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Could not open our website.'),
+                            SnackBar(
+                              content: Text(l10n.couldNotOpenWebsite),
                             ),
                           );
                         }
                       },
                     ),
-                    sectionTitle('Account & Support'),
+                    sectionTitle(l10n.accountAndSupport),
 
                     premiumItem(
                       icon: Icons.support_agent_rounded,
-                      title: 'Support',
-                      subtitle: 'Contact our logistics support team',
+                      title: l10n.support,
+                      subtitle: l10n.contactLogisticsSupport,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const SupportScreen());
@@ -1225,8 +1371,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     premiumItem(
                       icon: Icons.person_outline_rounded,
-                      title: 'My Account',
-                      subtitle: 'Profile and account settings',
+                      title: l10n.myAccount,
+                      subtitle: l10n.profileAndSettings,
                       onTap: () {
                         Navigator.pop(context);
                         _openPage(context, const ProfileScreen());
@@ -1247,16 +1393,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(22),
                                   ),
-                                  title: const Text(
-                                    'Log Out',
-                                    style: TextStyle(
+                                  title: Text(
+                                    l10n.logOut,
+                                    style: const TextStyle(
                                       color: Color(0xFF101B2D),
                                       fontWeight: FontWeight.w900,
                                     ),
                                   ),
-                                  content: const Text(
-                                    'Are you sure you want to log out?',
-                                    style: TextStyle(
+                                  content: Text(
+                                    l10n.logOutConfirm,
+                                    style: const TextStyle(
                                       color: Color(0xFF7E8A9A),
                                       fontSize: 13,
                                     ),
@@ -1266,7 +1412,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       onPressed: () {
                                         Navigator.pop(dialogContext, false);
                                       },
-                                      child: const Text('CANCEL'),
+                                      child: Text(l10n.cancelUpper),
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
@@ -1278,7 +1424,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         foregroundColor: Colors.white,
                                       ),
-                                      child: const Text('LOG OUT'),
+                                      child: Text(l10n.logOutUpper),
                                     ),
                                   ],
                                 );
@@ -1310,25 +1456,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: const Color(0xFFDCE5F0),
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.logout_rounded,
                                   color: Color(0xFF0B4F9C),
                                   size: 21,
                                 ),
-                                SizedBox(width: 12),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    'Log Out',
-                                    style: TextStyle(
+                                    l10n.logOut,
+                                    style: const TextStyle(
                                       color: Color(0xFF101B2D),
                                       fontSize: 13,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),
-                                Icon(
+                                const Icon(
                                   Icons.arrow_forward_ios_rounded,
                                   color: Color(0xFF9AA6B5),
                                   size: 13,
@@ -1341,13 +1487,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 22),
 
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
                       child: Align(
-                        alignment: Alignment.centerLeft,
+                        alignment: AlignmentDirectional.centerStart,
                         child: Text(
-                          'SOCIAL MEDIA',
-                          style: TextStyle(
+                          l10n.socialMedia,
+                          style: const TextStyle(
                             color: Color(0xFF7E8A9A),
                             fontSize: 9,
                             letterSpacing: 2.2,
@@ -1419,10 +1565,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (!opened) {
             if (!mounted) return;
 
+            final l10n = AppLocalizations.of(context)!;
+
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 behavior: SnackBarBehavior.floating,
-                content: Text('Could not open this link.'),
+                content: Text(l10n.couldNotOpenLink),
               ),
             );
           }
@@ -1463,6 +1611,9 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) {
+        final l10n = AppLocalizations.of(sheetContext)!;
+        final serviceDisplayName = LocaleController.serviceLabel(l10n, service);
+
         return SafeArea(
           top: false,
           child: Padding(
@@ -1471,7 +1622,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  service,
+                  serviceDisplayName,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: textDark,
@@ -1482,10 +1633,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 9),
 
-                const Text(
-                  'Request a shipping rate for this service.',
+                Text(
+                  l10n.requestRateForService,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: textGrey, fontSize: 13, height: 1.4),
+                  style: const TextStyle(
+                    color: textGrey,
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
                 ),
 
                 const SizedBox(height: 20),
@@ -1501,7 +1656,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SnackBar(
                           behavior: SnackBarBehavior.floating,
                           content: Text(
-                            '$service rate request will be connected next.',
+                            l10n.rateRequestWillConnect(serviceDisplayName),
                           ),
                         ),
                       );
@@ -1514,9 +1669,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
-                      'Request Rate',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.requestRate,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
                       ),
@@ -1538,6 +1693,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _ServiceItem {
   const _ServiceItem({
+    required this.storedName,
     required this.title,
     required this.subtitle,
     required this.image,
@@ -1545,6 +1701,7 @@ class _ServiceItem {
     this.onTap,
   });
 
+  final String storedName;
   final String title;
   final String subtitle;
   final String image;

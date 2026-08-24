@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
@@ -11,6 +13,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBackground,
       body: SafeArea(
@@ -55,11 +59,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Privacy Policy',
+                          l10n.privacyPolicy,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 19,
                             fontWeight: FontWeight.w800,
@@ -90,10 +94,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
                   const SizedBox(height: 17),
 
-                  const Text(
-                    'Your privacy matters',
+                  Text(
+                    l10n.privacyPolicy,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
@@ -102,12 +106,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      'TAWAM AL-SHAHIN TRANSPORT is committed to handling customer information responsibly and securely.',
+                      l10n.privacyHeroSubtitle,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFFD7E8F8),
                         fontSize: 12.5,
                         height: 1.5,
@@ -157,10 +161,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
                   const SizedBox(height: 18),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '01',
                     icon: Icons.person_outline_rounded,
-                    title: 'Information We Collect',
+                    title: l10n.informationWeCollect,
                     text:
                         'When you create or use a Tawam account, we may process information that you provide to us, including:',
                     bullets: [
@@ -175,10 +179,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '02',
                     icon: Icons.local_shipping_outlined,
-                    title: 'Shipment Information',
+                    title: l10n.shipmentInformation,
                     text:
                         'When you use our transportation and logistics services, information related to your shipments may be processed to provide and manage the requested service.',
                     bullets: [
@@ -193,10 +197,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '03',
                     icon: Icons.manage_accounts_outlined,
-                    title: 'How We Use Your Information',
+                    title: l10n.howWeUseInformation,
                     text:
                         'TAWAM AL-SHAHIN TRANSPORT may use information collected through the application to:',
                     bullets: [
@@ -213,110 +217,110 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '04',
                     icon: Icons.lock_outline_rounded,
-                    title: 'Account & Authentication Security',
+                    title: l10n.accountSecurity,
                     text:
                         'Account access is protected using authentication services. Customers should keep their login credentials confidential and should not share passwords or password-reset links with other persons.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '05',
                     icon: Icons.description_outlined,
-                    title: 'Shipping Documents',
+                    title: l10n.shippingDocuments,
                     text:
                         'Invoices, transportation documents, proof-of-delivery files and other shipment-related documents may be made available through a customer account when those documents are associated with that customer or shipment.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '06',
                     icon: Icons.notifications_none_rounded,
-                    title: 'Service Communications',
+                    title: l10n.serviceCommunications,
                     text:
                         'We may use your contact information to provide service-related communications such as shipment updates, quotation information, account notices, security messages and customer-support responses.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '07',
                     icon: Icons.share_outlined,
-                    title: 'Information Sharing',
+                    title: l10n.dataSharing,
                     text:
                         'Information may be shared when reasonably necessary to provide transportation or logistics services, process a customer request, support application operations, comply with applicable legal requirements, or protect the security of our services. We do not intend customer accounts to provide public access to private shipment information.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '08',
                     icon: Icons.storage_outlined,
-                    title: 'Data Storage',
+                    title: l10n.dataStorage,
                     text:
                         'Account and application data may be stored using cloud infrastructure and service providers used by TAWAM AL-SHAHIN TRANSPORT to operate the application. Access to customer information should be limited according to account permissions and operational requirements.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '09',
                     icon: Icons.security_rounded,
-                    title: 'Data Security',
+                    title: l10n.securityMeasures,
                     text:
                         'We use technical and organizational safeguards designed to reduce unauthorized access, disclosure, alteration or misuse of customer and shipment information. No electronic system can guarantee absolute security, so customers should also protect their account credentials and devices.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '10',
                     icon: Icons.history_rounded,
-                    title: 'Data Retention',
+                    title: l10n.dataRetention,
                     text:
                         'Information may be retained for as long as reasonably necessary to provide transportation services, maintain customer and shipment records, support business operations, resolve disputes, meet contractual requirements and comply with applicable obligations.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '11',
                     icon: Icons.edit_note_rounded,
-                    title: 'Your Account Information',
+                    title: l10n.yourAccountInformation,
                     text:
                         'Customers may review and update certain account information through the Profile section of the Tawam application. Security-sensitive changes may require additional authentication or verification.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '12',
                     icon: Icons.key_rounded,
-                    title: 'Password & Account Protection',
+                    title: l10n.passwordAccountProtection,
                     text:
                         'Customers can use the available account-security features to reset or change their password. Passwords should be strong, unique and kept confidential. If you believe your account has been accessed without authorization, contact us promptly.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '13',
                     icon: Icons.support_agent_rounded,
-                    title: 'Contact & Privacy Requests',
+                    title: l10n.contactUs,
                     text:
                         'If you have questions regarding your account, shipment information, privacy or this Privacy Policy, please contact TAWAM AL-SHAHIN TRANSPORT through the Help Center available in the application.',
                   ),
 
                   const SizedBox(height: 14),
 
-                  const _PrivacySectionCard(
+                  _PrivacySectionCard(
                     number: '14',
                     icon: Icons.update_rounded,
-                    title: 'Changes to This Policy',
+                    title: l10n.changesToPolicy,
                     text:
                         'TAWAM AL-SHAHIN TRANSPORT may update this Privacy Policy when the application, our services or applicable requirements change. The latest version will be made available through the application.',
                   ),
@@ -330,20 +334,20 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       color: _darkNavy,
                       borderRadius: BorderRadius.circular(23),
                     ),
-                    child: const Column(
+                    child: Column(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.verified_user_outlined,
                           color: Colors.white,
                           size: 28,
                         ),
 
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
                         Text(
-                          'TAWAM AL-SHAHIN TRANSPORT',
+                          l10n.tawamAlShahinTransport,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
@@ -351,27 +355,27 @@ class PrivacyPolicyScreen extends StatelessWidget {
                           ),
                         ),
 
-                        SizedBox(height: 7),
+                        const SizedBox(height: 7),
 
                         Text(
-                          'Transportation • Logistics • Shipment Services',
+                          l10n.transportLogisticsServices,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFFB8C7D8),
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
 
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
 
-                        Divider(color: Color(0x25FFFFFF), height: 1),
+                        const Divider(color: Color(0x25FFFFFF), height: 1),
 
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
 
                         Text(
-                          'Last updated: August 2026',
-                          style: TextStyle(
+                          l10n.lastUpdatedAugust2026,
+                          style: const TextStyle(
                             color: Color(0xFFAEBBCC),
                             fontSize: 10.5,
                           ),

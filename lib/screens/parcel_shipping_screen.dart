@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
 
 class ParcelShippingScreen extends StatefulWidget {
@@ -278,7 +280,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     if (!mounted) return;
 
     setState(() {
-      _customerName = name.isEmpty ? 'TAWAM Customer' : name;
+      _customerName = name.isEmpty
+          ? AppLocalizations.of(context)!.tawamCustomer
+          : name;
       _customerEmail = email;
       _customerPhone = phone;
       _customerCompany = company;
@@ -293,6 +297,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBg,
       body: SafeArea(
@@ -318,9 +324,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '01',
                       icon: Icons.route_rounded,
-                      title: 'Delivery Route',
-                      subtitle:
-                          'Tell us where your parcel is being sent from and to.',
+                      title: l10n.shipmentRoute,
+                      subtitle: l10n.tellUsWhereMoving,
                     ),
 
                     const SizedBox(height: 13),
@@ -333,8 +338,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                       number: '02',
                       icon: Icons.bolt_rounded,
                       title: 'Delivery Service',
-                      subtitle:
-                          'Choose the service level that best fits your shipment.',
+                      subtitle: l10n.chooseServiceLevel,
                     ),
 
                     const SizedBox(height: 13),
@@ -346,9 +350,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '03',
                       icon: Icons.inventory_2_outlined,
-                      title: 'Parcel Information',
-                      subtitle:
-                          'Provide the package type, contents and parcel quantity.',
+                      title: l10n.cargoInformation,
+                      subtitle: l10n.provideCargoSpecs,
                     ),
 
                     const SizedBox(height: 13),
@@ -360,9 +363,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '04',
                       icon: Icons.straighten_rounded,
-                      title: 'Weight & Dimensions',
-                      subtitle:
-                          'Chargeable weight is calculated automatically.',
+                      title: l10n.dimensionsWeight,
+                      subtitle: l10n.weCalculateVolumetric,
                     ),
 
                     const SizedBox(height: 13),
@@ -388,9 +390,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '06',
                       icon: Icons.add_business_outlined,
-                      title: 'Additional Services',
-                      subtitle:
-                          'Add customs, documentation and delivery support.',
+                      title: l10n.additionalServices,
+                      subtitle: l10n.addOptionalLogistics,
                     ),
 
                     const SizedBox(height: 13),
@@ -402,8 +403,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '07',
                       icon: Icons.person_outline_rounded,
-                      title: 'Contact Details',
-                      subtitle: 'Automatically filled from your account.',
+                      title: l10n.contactDetails,
+                      subtitle: l10n.contactFilledFromAccount,
                     ),
 
                     const SizedBox(height: 13),
@@ -415,8 +416,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '08',
                       icon: Icons.notes_rounded,
-                      title: 'Special Instructions',
-                      subtitle: 'Anything our parcel team should know?',
+                      title: l10n.specialInstructions,
+                      subtitle: l10n.anythingTeamShouldKnow,
                     ),
 
                     const SizedBox(height: 13),
@@ -433,18 +434,18 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                     const SizedBox(height: 13),
 
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.lock_outline_rounded,
                           color: _textGrey,
                           size: 14,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            'Your parcel information is securely submitted to our logistics team.',
+                            l10n.infoSubmittedSecurely,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: _textGrey,
@@ -471,6 +472,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 82,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -511,24 +514,24 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           const SizedBox(width: 14),
 
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Parcel Shipping Quote',
-                  style: TextStyle(
+                  l10n.parcelQuote,
+                  style: const TextStyle(
                     color: _textDark,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -.35,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'OFFICIAL PARCEL RATE REQUEST',
-                  style: TextStyle(
+                  l10n.officialRateRequest,
+                  style: const TextStyle(
                     color: _primaryBlue,
                     fontSize: 8.3,
                     fontWeight: FontWeight.w800,
@@ -661,6 +664,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   }
 
   Widget _buildTrustBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       decoration: BoxDecoration(
@@ -668,29 +673,29 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
         borderRadius: BorderRadius.circular(19),
         border: Border.all(color: _border),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: _ParcelTrustItem(
               icon: Icons.bolt_rounded,
               title: 'EXPRESS',
-              subtitle: 'Priority Delivery',
+              subtitle: l10n.priority,
             ),
           ),
-          _ParcelDivider(),
-          Expanded(
+          const _ParcelDivider(),
+          const Expanded(
             child: _ParcelTrustItem(
               icon: Icons.public_rounded,
               title: 'INTL',
               subtitle: 'Global Parcels',
             ),
           ),
-          _ParcelDivider(),
+          const _ParcelDivider(),
           Expanded(
             child: _ParcelTrustItem(
               icon: Icons.home_work_outlined,
               title: 'D2D',
-              subtitle: 'Door to Door',
+              subtitle: l10n.doorToDoor,
             ),
           ),
         ],
@@ -778,17 +783,19 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildRouteSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         children: [
           _textField(
             controller: _originController,
-            label: 'From',
+            label: l10n.from,
             hint: 'City, pickup address or drop-off location',
             icon: Icons.trip_origin_rounded,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter origin';
+                return l10n.pleaseEnterOrigin;
               }
 
               return null;
@@ -829,12 +836,12 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           _textField(
             controller: _destinationController,
-            label: 'To',
+            label: l10n.to,
             hint: 'City or delivery address',
             icon: Icons.location_on_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter destination';
+                return l10n.pleaseEnterDestination;
               }
 
               return null;
@@ -866,6 +873,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   }
 
   Widget _dateSelector() {
+    final l10n = AppLocalizations.of(context)!;
+
     return InkWell(
       onTap: _selectReadyDate,
       borderRadius: BorderRadius.circular(15),
@@ -898,8 +907,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Parcel Ready Date',
+                  Text(
+                    l10n.cargoReadyDate,
                     style: TextStyle(
                       color: _textGrey,
                       fontSize: 9.5,
@@ -911,7 +920,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                   Text(
                     _readyDate == null
-                        ? 'Select ready date'
+                        ? l10n.selectReadyDate
                         : _formatDate(_readyDate!),
                     style: TextStyle(
                       color: _readyDate == null ? _textGrey : _textDark,
@@ -939,6 +948,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildServiceLevelSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -966,7 +977,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           _serviceOption(
             value: 'Express',
             icon: Icons.bolt_rounded,
-            title: 'Express',
+            title: l10n.express,
             subtitle: 'Fast delivery for important and time-sensitive parcels.',
           ),
 
@@ -975,7 +986,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           _serviceOption(
             value: 'Priority',
             icon: Icons.workspace_premium_outlined,
-            title: 'Priority',
+            title: l10n.priority,
             subtitle:
                 'Priority handling for urgent business or valuable shipments.',
           ),
@@ -1071,14 +1082,17 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildParcelInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         children: [
           _dropdown(
-            label: 'Package Type',
+            label: l10n.packageType,
             icon: Icons.inventory_2_outlined,
             value: _packageType,
             items: _packageTypes,
+            itemLabel: (item) => _optionLabel(l10n, item),
             onChanged: (value) {
               if (value == null) return;
 
@@ -1133,7 +1147,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 child: _textField(
                   controller: _declaredValueController,
                   label: 'Declared Value',
-                  hint: 'Optional',
+                  hint: l10n.optional,
                   icon: Icons.payments_outlined,
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -1213,6 +1227,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildDimensionsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1248,8 +1264,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           const SizedBox(height: 5),
 
-          const Text(
-            'Enter dimensions in centimeters.',
+          Text(
+            l10n.enterDimensionsCm,
             style: TextStyle(color: _textGrey, fontSize: 9),
           ),
 
@@ -1260,7 +1276,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               Expanded(
                 child: _dimensionField(
                   controller: _lengthController,
-                  label: 'Length',
+                  label: l10n.length,
                 ),
               ),
 
@@ -1269,7 +1285,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               Expanded(
                 child: _dimensionField(
                   controller: _widthController,
-                  label: 'Width',
+                  label: l10n.width,
                 ),
               ),
 
@@ -1278,7 +1294,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               Expanded(
                 child: _dimensionField(
                   controller: _heightController,
-                  label: 'Height',
+                  label: l10n.height,
                 ),
               ),
             ],
@@ -1322,7 +1338,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   children: [
                     Expanded(
                       child: _calculationItem(
-                        'Actual',
+                        l10n.actual,
                         '${_formatNumber(_totalActualWeight)} KG',
                       ),
                     ),
@@ -1335,7 +1351,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                     Expanded(
                       child: _calculationItem(
-                        'Volumetric',
+                        l10n.volumetric,
                         '${_formatNumber(_totalVolumetricWeight)} KG',
                       ),
                     ),
@@ -1366,7 +1382,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                       const Expanded(
                         child: Text(
-                          'Estimated Chargeable Weight',
+                          l10n.chargeableWeight,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 9.5,
@@ -1432,6 +1448,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildProtectionSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         children: [
@@ -1451,8 +1469,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           _optionSwitch(
             icon: Icons.shield_outlined,
-            title: 'Parcel Insurance',
-            subtitle: 'Request insurance options with the quotation.',
+            title: l10n.cargoInsurance,
+            subtitle: l10n.requestInsuranceHint,
             value: _insuranceRequested,
             onChanged: (value) {
               setState(() {
@@ -1484,13 +1502,15 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildServicesSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select services',
-            style: TextStyle(
+          Text(
+            l10n.selectServices,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -1499,9 +1519,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           const SizedBox(height: 5),
 
-          const Text(
-            'You can choose more than one.',
-            style: TextStyle(color: _textGrey, fontSize: 9.5),
+          Text(
+            l10n.youCanChooseMoreThanOne,
+            style: const TextStyle(color: _textGrey, fontSize: 9.5),
           ),
 
           const SizedBox(height: 14),
@@ -1513,7 +1533,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               final selected = _additionalServices.contains(service);
 
               return FilterChip(
-                label: Text(service),
+                label: Text(_optionLabel(l10n, service)),
                 selected: selected,
                 showCheckmark: true,
                 checkmarkColor: Colors.white,
@@ -1550,6 +1570,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildCustomerSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: _loadingProfile
           ? const Padding(
@@ -1569,9 +1591,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     color: const Color(0xFFEAF8F0),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.verified_user_outlined,
                         color: _success,
                         size: 18,
@@ -1581,7 +1603,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                       Expanded(
                         child: Text(
-                          'Contact details automatically filled from your account.',
+                          l10n.contactFilledFromAccount,
                           style: TextStyle(
                             color: _success,
                             fontSize: 9.5,
@@ -1598,7 +1620,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                 _contactRow(
                   icon: Icons.person_outline_rounded,
-                  label: 'Full Name',
+                  label: l10n.fullName,
                   value: _customerName,
                 ),
 
@@ -1606,9 +1628,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                 _contactRow(
                   icon: Icons.phone_outlined,
-                  label: 'Phone Number',
+                  label: l10n.phoneNumber,
                   value: _customerPhone.isEmpty
-                      ? 'Not added to profile'
+                      ? l10n.notProvided
                       : _customerPhone,
                 ),
 
@@ -1616,9 +1638,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                 _contactRow(
                   icon: Icons.email_outlined,
-                  label: 'Email Address',
+                  label: l10n.emailAddress,
                   value: _customerEmail.isEmpty
-                      ? 'Not added to profile'
+                      ? l10n.notProvided
                       : _customerEmail,
                 ),
 
@@ -1627,7 +1649,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                   _contactRow(
                     icon: Icons.business_outlined,
-                    label: 'Company',
+                    label: l10n.company,
                     value: _customerCompany,
                   ),
                 ],
@@ -1700,6 +1722,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildNotesSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: TextFormField(
         controller: _notesController,
@@ -1712,8 +1736,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           fontWeight: FontWeight.w600,
         ),
         decoration: InputDecoration(
-          hintText:
-              'Delivery deadline, customs notes, special handling, recipient instructions, access details...',
+          hintText: l10n.specialHandlingHint,
           hintStyle: const TextStyle(
             color: Color(0xFFA1ACB9),
             fontSize: 10,
@@ -1747,12 +1770,14 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildSummary() {
+    final l10n = AppLocalizations.of(context)!;
+
     final origin = _originController.text.trim().isEmpty
-        ? 'From'
+        ? l10n.from
         : _originController.text.trim();
 
     final destination = _destinationController.text.trim().isEmpty
-        ? 'To'
+        ? l10n.to
         : _destinationController.text.trim();
 
     return Container(
@@ -1851,9 +1876,15 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 spacing: 7,
                 runSpacing: 7,
                 children: [
-                  _summaryBadge(Icons.inventory_2_outlined, 'Parcel Shipping'),
+                  _summaryBadge(
+                    Icons.inventory_2_outlined,
+                    LocaleController.serviceLabel(l10n, 'Parcel Shipping'),
+                  ),
 
-                  _summaryBadge(Icons.bolt_rounded, _serviceLevel),
+                  _summaryBadge(
+                    Icons.bolt_rounded,
+                    _optionLabel(l10n, _serviceLevel),
+                  ),
 
                   _summaryBadge(Icons.local_shipping_outlined, _pickupMethod),
 
@@ -1887,7 +1918,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                     const Expanded(
                       child: Text(
-                        'Estimated Chargeable Weight',
+                        l10n.chargeableWeight,
                         style: TextStyle(
                           color: Color(0xFFD9E8F6),
                           fontSize: 9.5,
@@ -1979,6 +2010,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildSubmitButton() {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       width: double.infinity,
       height: 60,
@@ -2010,7 +2043,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   SizedBox(width: 10),
 
                   Text(
-                    'REQUEST OFFICIAL QUOTE',
+                    l10n.submitQuoteRequest,
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w900,
@@ -2032,9 +2065,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       _showMessage(
-        'Please complete the required parcel information.',
+        l10n.pleaseCompleteShipmentInfo,
         error: true,
       );
 
@@ -2042,13 +2077,13 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     }
 
     if (_readyDate == null) {
-      _showMessage('Please select the parcel ready date.', error: true);
+      _showMessage(l10n.pleaseSelectPickupDate, error: true);
 
       return;
     }
 
     if (_length <= 0 || _width <= 0 || _height <= 0) {
-      _showMessage('Please enter parcel dimensions.', error: true);
+      _showMessage(l10n.pleaseEnterDimensionsFirst, error: true);
 
       return;
     }
@@ -2056,7 +2091,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showMessage('Please sign in before requesting a quote.', error: true);
+      _showMessage(l10n.pleaseSignInBeforeQuote, error: true);
 
       return;
     }
@@ -2214,7 +2249,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       });
 
       _showMessage(
-        error.message ?? 'Could not submit parcel quote request.',
+        error.message ?? l10n.couldNotSubmitQuote,
         error: true,
       );
     } catch (_) {
@@ -2224,7 +2259,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
         _submitting = false;
       });
 
-      _showMessage('Something went wrong. Please try again.', error: true);
+      _showMessage(l10n.somethingWentWrong, error: true);
     }
   }
 
@@ -2237,6 +2272,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
+        final dialogL10n = AppLocalizations.of(dialogContext)!;
+
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 23),
@@ -2272,8 +2309,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                 const SizedBox(height: 17),
 
-                const Text(
-                  'Parcel Request Received',
+                Text(
+                  dialogL10n.quoteRequestSubmitted,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _textDark,
@@ -2284,8 +2321,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Your parcel shipping request has been sent securely to our logistics team.',
+                Text(
+                  dialogL10n.quoteSentToTawam,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _textGrey,
@@ -2306,9 +2343,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        'REQUEST NUMBER',
-                        style: TextStyle(
+                      Text(
+                        dialogL10n.reference,
+                        style: const TextStyle(
                           color: _textGrey,
                           fontSize: 8,
                           letterSpacing: 1,
@@ -2354,9 +2391,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'VIEW MY QUOTES',
-                      style: TextStyle(
+                    child: Text(
+                      dialogL10n.myQuotes,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
                       ),
@@ -2381,9 +2418,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'DONE',
-                      style: TextStyle(
+                    child: Text(
+                      dialogL10n.doneUpper,
+                      style: const TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w800,
                       ),
@@ -2495,6 +2532,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required String value,
     required List<String> items,
     required ValueChanged<String?> onChanged,
+    String Function(String item)? itemLabel,
   }) {
     return DropdownButtonFormField<String>(
       initialValue: value,
@@ -2509,7 +2547,10 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       decoration: _inputDecoration(label: label, hint: '', icon: icon),
       items: items
           .map(
-            (item) => DropdownMenuItem<String>(value: item, child: Text(item)),
+            (item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(itemLabel?.call(item) ?? item),
+            ),
           )
           .toList(),
       onChanged: onChanged,
@@ -2643,22 +2684,51 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   }
 
   String _formatDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    final l10n = AppLocalizations.of(context)!;
 
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+  }
+
+  // Map stored English option values to localized display labels.
+  String _optionLabel(AppLocalizations l10n, String value) {
+    switch (value) {
+      case 'Door to Door':
+        return l10n.doorToDoor;
+      case 'Port to Port':
+        return l10n.portToPort;
+      case 'Door to Port':
+        return l10n.doorToPort;
+      case 'Port to Door':
+        return l10n.portToDoor;
+      case 'Customs Clearance':
+        return l10n.customsClearance;
+      case 'Pickup':
+        return l10n.pickup;
+      case 'Delivery':
+        return l10n.delivery;
+      case 'Export Documentation':
+        return l10n.exportDocumentation;
+      case 'Packing':
+        return l10n.packing;
+      case 'Open Carrier':
+        return l10n.openCarrier;
+      case 'Standard':
+        return l10n.standard;
+      case 'Express':
+        return l10n.express;
+      case 'Priority':
+        return l10n.priority;
+      case 'Boxes':
+        return l10n.boxes;
+      case 'Pallets':
+        return l10n.pallets;
+      case 'Loose Cargo':
+        return l10n.looseCargo;
+      case 'Crates':
+        return l10n.crates;
+      default:
+        return value;
+    }
   }
 
   String _formatNumber(double value) {
