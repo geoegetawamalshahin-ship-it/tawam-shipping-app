@@ -23,6 +23,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -246,10 +247,65 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                color: deepBlue,
-                size: 27,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('notifications')
+                    .where(
+                      'userId',
+                      isEqualTo:
+                          FirebaseAuth.instance.currentUser?.uid ??
+                          '__no_user__',
+                    )
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  int unreadCount = 0;
+
+                  if (snapshot.hasData) {
+                    unreadCount = snapshot.data!.docs.where((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+
+                      return data['isRead'] != true;
+                    }).length;
+                  }
+
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      const Icon(
+                        Icons.notifications_none_rounded,
+                        color: deepBlue,
+                        size: 27,
+                      ),
+
+                      if (unreadCount > 0)
+                        Positioned(
+                          top: -9,
+                          right: -10,
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minWidth: 19,
+                              minHeight: 19,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE53935),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              unreadCount > 99 ? '99+' : unreadCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
