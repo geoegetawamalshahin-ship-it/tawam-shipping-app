@@ -4,6 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'support_screen.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 // ==========================================================
 // BRAND
@@ -42,6 +47,16 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
   _shipmentSubscription;
 
   late Map<String, dynamic> _shipment;
+  String? _liveLocation;
+  String? _liveLastUpdated;
+
+  double? _liveLatitude;
+  double? _liveLongitude;
+
+  bool _isLoadingLiveLocation = false;
+  String? _liveLocationError;
+
+  Timer? _liveLocationTimer;
   @override
   @override
   void initState() {
@@ -50,11 +65,17 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     _shipment = Map<String, dynamic>.from(widget.shipment);
 
     _startLiveListener();
+    _loadLiveLocation();
+    _liveLocationTimer = Timer.periodic(
+      const Duration(seconds: 60),
+      (_) => _loadLiveLocation(),
+    );
   }
 
   @override
   void dispose() {
     _shipmentSubscription?.cancel();
+    _liveLocationTimer?.cancel();
     super.dispose();
   }
 
@@ -87,6 +108,118 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
             // Keep showing the last known shipment data.
           },
         );
+  }
+
+  Future<void> _loadLiveLocation() async {
+    final trackingMode = (_shipment['trackingMode'] ?? '')
+        .toString()
+        .trim()
+        .toLowerCase();
+
+    // الشحنات اليدوية ما بدها GPS
+    if (trackingMode != 'gps') {
+      return;
+    }
+
+    if (_isLoadingLiveLocation) {
+      return;
+    }
+
+    final shipmentId = (_shipment['id'] ?? '').toString().trim();
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (shipmentId.isEmpty || user == null) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoadingLiveLocation = true;
+        _liveLocationError = null;
+      });
+    }
+
+    final client = HttpClient();
+
+    try {
+      final token = await user.getIdToken();
+
+      if (token == null || token.trim().isEmpty) {
+        throw Exception('Authentication token unavailable');
+      }
+
+      final request = await client.postUrl(
+        Uri.parse(
+          'https://ofbnwaivxxdrxhtsniny.supabase.co/functions/v1/live-shipment',
+        ),
+      );
+
+      request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+
+      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
+
+      request.write(jsonEncode({'shipmentId': shipmentId}));
+
+      final response = await request.close();
+
+      final responseBody = await response.transform(utf8.decoder).join();
+
+      final decoded = jsonDecode(responseBody);
+
+      if (response.statusCode == 200 &&
+          decoded is Map<String, dynamic> &&
+          decoded['success'] == true) {
+        final data = decoded['data'];
+
+        if (data is Map<String, dynamic>) {
+          if (!mounted) {
+            return;
+          }
+
+          setState(() {
+            _liveLocation = data['address']?.toString().trim();
+
+            _liveLastUpdated = data['lastUpdated']?.toString().trim();
+
+            _liveLatitude = (data['latitude'] as num?)?.toDouble();
+
+            _liveLongitude = (data['longitude'] as num?)?.toDouble();
+
+            _liveLocationError = null;
+          });
+        }
+      } else {
+        String message = 'Live location temporarily unavailable.';
+
+        if (decoded is Map<String, dynamic>) {
+          final serverMessage = decoded['message']?.toString().trim();
+
+          if (serverMessage != null && serverMessage.isNotEmpty) {
+            message = serverMessage;
+          }
+        }
+
+        if (mounted) {
+          setState(() {
+            _liveLocationError = message;
+          });
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _liveLocationError = 'Live location temporarily unavailable.';
+        });
+      }
+    } finally {
+      client.close(force: true);
+
+      if (mounted) {
+        setState(() {
+          _isLoadingLiveLocation = false;
+        });
+      }
+    }
   }
 
   // ==========================================================
@@ -122,21 +255,21 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
 
     final statusInfo = _statusInfo(status);
 
-    final currentLocation = _currentLocation(
-      status: status,
-      pickup: pickup,
-      delivery: delivery,
-    );
+    final currentLocation = _liveLocation?.trim().isNotEmpty == true
+        ? _liveLocation!.trim()
+        : _currentLocation(status: status, pickup: pickup, delivery: delivery);
 
-    final lastUpdate = _formatDateTime(
-      _firstValue(_shipment, [
-        'lastLocationUpdate',
-        'updatedAt',
-        'lastUpdatedAt',
-        'lastUpdate',
-        'createdAt',
-      ]),
-    );
+    final lastUpdate = _liveLastUpdated?.trim().isNotEmpty == true
+        ? _liveLastUpdated!.trim()
+        : _formatDateTime(
+            _firstValue(_shipment, [
+              'lastLocationUpdate',
+              'updatedAt',
+              'lastUpdatedAt',
+              'lastUpdate',
+              'createdAt',
+            ]),
+          );
 
     final estimatedDelivery = _formatDate(
       _firstValue(_shipment, ['expectedDelivery', 'estimatedDelivery']),
@@ -177,6 +310,11 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
                     lastUpdate: lastUpdate,
                     statusInfo: statusInfo,
                   ),
+
+                  if (_liveLatitude != null && _liveLongitude != null) ...[
+                    const SizedBox(height: 14),
+                    _buildLiveMapCard(),
+                  ],
 
                   const SizedBox(height: 14),
 
@@ -537,6 +675,65 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
                     ),
                   ],
                 ),
+                if (_isLoadingLiveLocation) ...[
+                  const SizedBox(height: 9),
+                  const Row(
+                    children: [
+                      SizedBox(
+                        width: 13,
+                        height: 13,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: _primaryBlue,
+                        ),
+                      ),
+                      SizedBox(width: 7),
+                      Text(
+                        'Updating live location...',
+                        style: TextStyle(
+                          color: _textGrey,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
+                if (_liveLocationError != null) ...[
+                  const SizedBox(height: 9),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline_rounded,
+                        color: _warning,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          _liveLocationError!,
+                          style: const TextStyle(
+                            color: _warning,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: _loadLiveLocation,
+                        child: const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.refresh_rounded,
+                            color: _primaryBlue,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -549,6 +746,262 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     );
   }
 
+  bool _isLiveLocationFresh() {
+    final value = _liveLastUpdated?.trim();
+
+    if (value == null || value.isEmpty) {
+      return false;
+    }
+
+    try {
+      // Locator format:
+      // 22-08-2026 22:25:19
+
+      final parts = value.split(' ');
+
+      if (parts.length != 2) {
+        return false;
+      }
+
+      final dateParts = parts[0].split('-');
+      final timeParts = parts[1].split(':');
+
+      if (dateParts.length != 3 || timeParts.length != 3) {
+        return false;
+      }
+
+      final lastUpdate = DateTime(
+        int.parse(dateParts[2]),
+        int.parse(dateParts[1]),
+        int.parse(dateParts[0]),
+        int.parse(timeParts[0]),
+        int.parse(timeParts[1]),
+        int.parse(timeParts[2]),
+      );
+
+      final difference = DateTime.now().difference(lastUpdate);
+
+      return !difference.isNegative && difference.inMinutes <= 10;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Widget _buildLiveMapCard() {
+    final point = LatLng(_liveLatitude!, _liveLongitude!);
+    final isLive = _isLiveLocationFresh();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: _deepBlue.withValues(alpha: .05),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(4, 3, 4, 11),
+            child: Row(
+              children: [
+                Icon(Icons.map_outlined, color: _primaryBlue, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  'Live Shipment Map',
+                  style: TextStyle(
+                    color: _textDark,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  width: 9,
+                  height: 9,
+                  decoration: BoxDecoration(
+                    color: isLive ? _success : _warning,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  isLive ? 'LIVE' : 'LAST KNOWN LOCATION',
+                  style: TextStyle(
+                    color: isLive ? _success : _warning,
+                    fontSize: 8,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: .5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          GestureDetector(
+            onTap: _openFullScreenMap,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(17),
+              child: SizedBox(
+                height: 245,
+                child: Stack(
+                  children: [
+                    FlutterMap(
+                      key: ValueKey('${_liveLatitude}_$_liveLongitude'),
+                      options: MapOptions(
+                        initialCenter: point,
+                        initialZoom: 13.5,
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.tawamalshahin.transport',
+                        ),
+
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: point,
+                              width: 54,
+                              height: 54,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: _primaryBlue,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 4,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _deepBlue.withValues(alpha: .25),
+                                      blurRadius: 12,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.local_shipping_rounded,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    Positioned(
+                      left: 8,
+                      bottom: 7,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: .90),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: const Text(
+                          '© OpenStreetMap contributors',
+                          style: TextStyle(
+                            color: _textGrey,
+                            fontSize: 7,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openFullScreenMap() {
+    if (_liveLatitude == null || _liveLongitude == null) {
+      return;
+    }
+
+    final point = LatLng(_liveLatitude!, _liveLongitude!);
+    final mapController = MapController();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          backgroundColor: _pageBg,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            foregroundColor: _deepBlue,
+            elevation: 0,
+            title: const Text(
+              'Live Shipment Map',
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17),
+            ),
+          ),
+          body: FlutterMap(
+            mapController: mapController,
+            options: MapOptions(initialCenter: point, initialZoom: 14),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.tawamalshahin.transport',
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: point,
+                    width: 58,
+                    height: 58,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _primaryBlue,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _deepBlue.withValues(alpha: .25),
+                            blurRadius: 14,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.local_shipping_rounded,
+                        color: Colors.white,
+                        size: 25,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              mapController.move(point, 14);
+            },
+            backgroundColor: _primaryBlue,
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.my_location_rounded),
+          ),
+        ),
+      ),
+    );
+  }
   // ==========================================================
   // ROUTE
   // ==========================================================

@@ -1,0 +1,376 @@
+---
+description: "Core architecture, coding standards, project knowledge, reusable patterns, safety rules, and persistent development rules for Tawam Shipping App."
+alwaysApply: true
+---
+
+# Tawam Shipping App — project memory
+
+Company: Tawam Al Shahin Transport.
+App: Tawam Shipping App.
+Platforms: Android, iOS.
+
+Stack:
+- Flutter
+- Dart
+- Material 3
+- Firebase Auth
+- Cloud Firestore
+- Supabase Storage
+- pdfrx
+
+Supabase bucket:
+`shipping-documents`
+
+Supported locales:
+- English `en`
+- Arabic `ar`
+- French `fr`
+
+Entry:
+`lib/main.dart`
+
+Main structure:
+
+lib/
+├── main.dart
+├── locale_controller.dart
+├── theme/app_theme.dart
+├── l10n/
+└── screens/
+
+Most application screens and logic currently live inside `lib/screens/`.
+
+Main flow:
+
+Splash → Login → Home
+
+Home is the main hub for:
+- services
+- quotes
+- bookings
+- tracking
+- shipments
+- documents
+- notifications
+- profile
+
+Existing capabilities include:
+- authentication
+- registration
+- password recovery
+- sea freight
+- air freight
+- land freight
+- car shipping
+- international moving
+- parcel shipping
+- quote requests
+- bookings
+- shipment list
+- shipment details
+- shipment timeline
+- tracking
+- shipping documents
+- notifications
+- support
+- WhatsApp
+- phone
+- email
+- profile
+- settings
+- language selection
+
+# How to work
+
+- Prefer reuse.
+- Extend existing screens, widgets, helpers, formatters, dialogs, and patterns whenever possible.
+- Modify existing files in place when appropriate.
+- Keep the current architecture simple.
+- Do not introduce extra architecture layers, services, repositories, managers, or files only for organization.
+- Do not add new dependencies unless the task cannot reasonably be completed using the current packages.
+- Preserve existing behavior unless the requested feature explicitly requires a change.
+- Never overengineer.
+- Avoid duplication.
+- Make the smallest possible change required for the current task.
+
+# Scope control
+
+- Follow the user's current request exactly.
+- If the user asks only for a plan, audit, inspection, review, explanation, or analysis, DO NOT modify any project files.
+- Only implement changes when the user explicitly asks for implementation.
+- Do not modify unrelated features.
+- Do not perform broad cleanup, refactoring, renaming, restructuring, or formatting unless explicitly requested.
+- Prefer targeted edits over project-wide replacements.
+- Do not perform global search-and-replace unless it is clearly safe and directly required by the task.
+
+# Before modifying code
+
+- Inspect the current implementation first.
+- Inspect the directly related files before making changes.
+- Never assume that a field, collection, route, translation key, helper, method, widget, class, database value, or storage structure exists.
+- Verify it in the codebase first.
+- If the task is an audit that requires project-wide inspection, such as localization auditing, inspect all relevant files needed for that audit.
+
+# Existing feature protection
+
+- Never remove or hide existing functionality unless explicitly requested.
+- Never remove or hide existing user-visible information unless explicitly requested.
+- Never delete buttons, fields, cards, screens, labels, data, or navigation paths unless the task explicitly requires it.
+- If an existing implementation already works, extend it instead of replacing it.
+- Preserve backward compatibility whenever possible.
+
+# File creation
+
+Before creating a new file:
+
+1. Search for an existing file or implementation with the same responsibility.
+2. Reuse an existing file when possible.
+3. Create a new file only if the responsibility is independent and has no suitable existing location.
+
+Do NOT create:
+- duplicate implementations
+- `*_updated.dart`
+- `*_new.dart`
+- backup source files
+- unnecessary helper files
+- unnecessary architecture files
+- README files
+- task reports
+- migration notes
+- agent notes
+- temporary documentation
+
+Forbidden unless the user explicitly asks:
+- `notes.txt`
+- `changes.txt`
+- `implementation_summary.md`
+- `feature_complete.md`
+- `migration_notes.md`
+- `todo_agent.txt`
+
+Do not modify this rule file or create additional Cursor rule files unless the user explicitly requests it.
+
+# Backend and data protection
+
+Authentication:
+Firebase Auth
+
+Database:
+Cloud Firestore
+
+File storage:
+Supabase Storage
+
+Bucket:
+`shipping-documents`
+
+Do not change these systems unless the current task explicitly requires it.
+
+Never:
+- rename Firestore collections without explicit instruction
+- delete Firestore collections
+- migrate Firestore structures automatically
+- rename existing database fields without explicit instruction
+- delete production data
+- add destructive database operations
+- change Firebase Auth behavior unless required
+- change Supabase bucket names unless required
+- change storage paths unnecessarily
+- change signed URL behavior unless required
+- change Firestore Security Rules unless explicitly requested
+- change Supabase policies unless explicitly requested
+- change Firebase configuration unless explicitly requested
+
+Preserve existing Firestore documents and compatibility with existing users.
+
+# Firestore collections currently used
+
+- `users`
+- `shipments`
+- `quote_requests`
+- `quotes`
+- `shipment_requests`
+- `support_requests`
+- `notifications`
+- `account_deletion_requests`
+
+Do not rename, remove, or restructure these collections unless the user explicitly requests it.
+
+# Shipping documents
+
+Shipment documents currently live on shipment records:
+
+`shipments/{id}`
+
+inside:
+
+`documents[]`
+
+Existing document fields include:
+- `name`
+- `path`
+- `contentType`
+- `size`
+- `uploadedAt`
+
+Example storage path:
+
+`shipments/{shipmentId}/invoice.pdf`
+
+Current document flow:
+
+Load user shipments
+→ read `documents[]`
+→ create signed URL from Supabase using `path`
+→ open PDF or image inside the app
+
+PDF viewing uses:
+`pdfrx`
+
+IMPORTANT:
+
+Do not assume that a document `type` field exists unless it is verified in the current code and data model.
+
+If document categories are added later, preserve compatibility with older document entries that do not contain a `type`.
+
+Cargo/shipping manifest documents are NOT the same as:
+
+`android/app/src/main/AndroidManifest.xml`
+
+The AndroidManifest.xml file is Android application configuration only.
+
+# Localization
+
+Use the existing localization system.
+
+Existing localization components include:
+- `AppLocalizations`
+- `LocaleController`
+- `lib/l10n/`
+
+Supported languages:
+- English `en`
+- Arabic `ar`
+- French `fr`
+
+Rules:
+
+- Never create a second localization system.
+- Reuse and extend the existing localization implementation.
+- All new user-facing static text must use localization.
+- Do not hardcode user-facing text when localization should be used.
+- Arabic must support RTL correctly.
+- English and French must remain LTR.
+- Changing the language must not hide any information.
+- All three languages must expose the same functionality and data.
+- Changing locale should not unnecessarily reload Firebase, Firestore, or Supabase data.
+- Dynamic backend data must remain unchanged.
+
+Do not translate or modify:
+- customer names
+- tracking numbers
+- shipment IDs
+- user IDs
+- phone numbers
+- emails
+- prices
+- database IDs
+- storage paths
+- raw backend values
+
+Translate only the UI labels around those values.
+
+# Status values
+
+Backend status values must remain stable.
+
+For example, if Firestore stores:
+
+`in_transit`
+
+do not change the stored value.
+
+Only translate its display label.
+
+Example:
+
+Backend:
+`in_transit`
+
+English:
+`In Transit`
+
+Arabic:
+`قيد النقل`
+
+French:
+`En transit`
+
+Never change backend enum/status values only for localization purposes.
+
+# UI and code style
+
+- Match the existing Material 3 design.
+- Reuse `AppTheme`.
+- Follow existing patterns inside `lib/screens/`.
+- Preserve current layouts unless the requested task requires a design change.
+- Do not redesign screens automatically.
+- Keep widgets inside their existing screen file unless they are already shared or are genuinely reused across multiple screens.
+- Do not create unnecessary shared components.
+
+# Platform configuration protection
+
+Do not modify Android or iOS configuration unless the task specifically requires it.
+
+Do not change without explicit need:
+- Android application ID
+- iOS bundle ID
+- Android namespace
+- signing configuration
+- keystore configuration
+- Firebase configuration files
+- Gradle configuration
+- Kotlin version
+- Info.plist
+- AndroidManifest.xml
+- deployment targets
+
+Do not automatically upgrade:
+- Flutter
+- Dart
+- Gradle
+- Kotlin
+- Firebase packages
+- Supabase packages
+- other dependencies
+
+Do not upgrade packages only because newer versions are available.
+
+# Secrets and credentials
+
+Never expose, print, log, copy, move, or reveal:
+- API keys
+- passwords
+- tokens
+- service credentials
+- signing keys
+- keystore passwords
+- private configuration
+- secrets
+
+Never place secrets directly into source code.
+
+Do not replace existing configuration values unless explicitly requested.
+
+# Validation after implementation
+
+After modifying code:
+
+- Check edited files for compile errors.
+- Check for obvious regressions.
+- Run `dart format` only on files intentionally modified.
+- Do not format the entire project unnecessarily.
+- Run `flutter analyze` when appropriate.
+- Do not fix unrelated analyzer warnings unless explicitly requested.
+- Do not claim a feature works unless it was verified through code inspection or testing.
+- If an unrelated existing error is found, report it separately instead of changing unrelated code.

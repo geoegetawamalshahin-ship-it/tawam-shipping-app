@@ -1052,8 +1052,9 @@ class _ShipmentCard extends StatelessWidget {
                 'Location update pending')
             .toString();
     final lastUpdate = _formatLastUpdate(
-      shipment['updatedAt'] ??
+      shipment['lastLocatorUpdate'] ??
           shipment['lastLocationUpdate'] ??
+          shipment['updatedAt'] ??
           shipment['lastUpdate'],
     );
     final progress = (shipment['progress'] as num?)?.toDouble() ?? .10;
