@@ -25,6 +25,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
@@ -980,7 +981,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             l10n.closeUpper,
                             style: TextStyle(fontWeight: FontWeight.w900),
                           ),

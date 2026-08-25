@@ -4,6 +4,7 @@ import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
 
+/// The translations for Arabic (`ar`).
 class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
@@ -260,7 +261,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pleaseCheckConnection => 'يرجى التحقق من اتصال الإنترنت.';
 
   @override
-  String get pleaseCheckConnectionTryAgain => 'يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
+  String get pleaseCheckConnectionTryAgain =>
+      'يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
 
   @override
   String get couldNotOpenLink => 'تعذر فتح هذا الرابط.';
@@ -329,10 +331,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pleaseSignInBeforeBooking => 'يرجى تسجيل الدخول قبل إنشاء حجز.';
 
   @override
-  String get pleaseSignInBeforeSupport => 'يرجى تسجيل الدخول قبل إرسال طلب دعم.';
+  String get pleaseSignInBeforeSupport =>
+      'يرجى تسجيل الدخول قبل إرسال طلب دعم.';
 
   @override
-  String get pleaseSignInBeforeQuoteShort => 'يرجى تسجيل الدخول قبل إرسال طلب عرض السعر';
+  String get pleaseSignInBeforeQuoteShort =>
+      'يرجى تسجيل الدخول قبل إرسال طلب عرض السعر';
 
   @override
   String get pleaseSelectPickupDate => 'يرجى اختيار تاريخ الاستلام المفضل.';
@@ -760,7 +764,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get welcomeBack => 'مرحباً بعودتك';
 
   @override
-  String get signInSubtitle => 'سجّل الدخول لإدارة شحناتك وتتبع التسليم واستلام التحديثات المهمة.';
+  String get signInSubtitle =>
+      'سجّل الدخول لإدارة شحناتك وتتبع التسليم واستلام التحديثات المهمة.';
 
   @override
   String get password => 'كلمة المرور';
@@ -772,7 +777,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get createAccount => 'إنشاء حساب';
 
   @override
-  String get emailOrPasswordIncorrect => 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+  String get emailOrPasswordIncorrect =>
+      'البريد الإلكتروني أو كلمة المرور غير صحيحة';
 
   @override
   String get accountDisabled => 'تم تعطيل هذا الحساب';
@@ -787,7 +793,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get registerTitle => 'أنشئ حسابك';
 
   @override
-  String get registerSubtitle => 'انضم إلى توأم لإدارة الشحنات والعروض والتسليم من مكان واحد.';
+  String get registerSubtitle =>
+      'انضم إلى توأم لإدارة الشحنات والعروض والتسليم من مكان واحد.';
 
   @override
   String get confirmPassword => 'تأكيد كلمة المرور';
@@ -808,7 +815,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get forgotYourPassword => 'هل نسيت كلمة المرور؟';
 
   @override
-  String get forgotPasswordSubtitle => 'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور.';
+  String get forgotPasswordSubtitle =>
+      'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور.';
 
   @override
   String get sendResetLink => 'إرسال رابط إعادة التعيين';
@@ -820,10 +828,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get resetLinkSent => 'تم إرسال رابط إعادة التعيين. يرجى فحص بريدك.';
 
   @override
-  String get unableToSendReset => 'تعذر إرسال رابط إعادة التعيين. حاول مرة أخرى.';
+  String get unableToSendReset =>
+      'تعذر إرسال رابط إعادة التعيين. حاول مرة أخرى.';
 
   @override
-  String get resetLinkIfExists => 'إذا كان هناك حساب لهذا البريد فقد تم إرسال رابط إعادة التعيين.';
+  String get resetLinkIfExists =>
+      'إذا كان هناك حساب لهذا البريد فقد تم إرسال رابط إعادة التعيين.';
 
   @override
   String get quickActions => 'إجراءات سريعة';
@@ -1011,7 +1021,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signOutQuestion => 'تسجيل الخروج؟';
 
   @override
-  String get signOutConfirmBody => 'ستحتاج لتسجيل الدخول مرة أخرى للوصول إلى شحناتك.';
+  String get signOutConfirmBody =>
+      'ستحتاج لتسجيل الدخول مرة أخرى للوصول إلى شحناتك.';
 
   @override
   String get notificationCenter => 'مركز الإشعارات';
@@ -1038,7 +1049,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unableToLoadNotifications => 'تعذر تحميل الإشعارات';
 
   @override
-  String get couldNotLoadNotifications => 'تعذر تحميل الإشعارات. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
+  String get couldNotLoadNotifications =>
+      'تعذر تحميل الإشعارات. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
 
   @override
   String get noNotificationsYet => 'لا توجد إشعارات بعد';
@@ -1111,10 +1123,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get yourShippingNetwork => 'شبكة شحنك';
 
   @override
-  String get monitorShipmentsSubtitle => 'تابع كل شحنة نشطة ومكتملة من مكان آمن واحد.';
+  String get monitorShipmentsSubtitle =>
+      'تابع كل شحنة نشطة ومكتملة من مكان آمن واحد.';
 
   @override
-  String get searchTrackingRouteCargo => 'ابحث برقم التتبع أو المسار أو البضاعة';
+  String get searchTrackingRouteCargo =>
+      'ابحث برقم التتبع أو المسار أو البضاعة';
 
   @override
   String get shipmentPortfolio => 'محفظة الشحنات';
@@ -1129,16 +1143,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noShipmentsYet => 'لا توجد شحنات بعد';
 
   @override
-  String get noMatchingShipmentsBody => 'لم نجد شحنات تطابق البحث أو الفلتر الحالي.';
+  String get noMatchingShipmentsBody =>
+      'لم نجد شحنات تطابق البحث أو الفلتر الحالي.';
 
   @override
-  String get noShipmentsYetBody => 'ستظهر شحناتك هنا فور إنشائها من فريق العمليات.';
+  String get noShipmentsYetBody =>
+      'ستظهر شحناتك هنا فور إنشائها من فريق العمليات.';
 
   @override
   String get shipment => 'شحنة';
 
   @override
-  String get couldNotLoadShipments => 'تعذر تحميل الشحنات. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
+  String get couldNotLoadShipments =>
+      'تعذر تحميل الشحنات. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
 
   @override
   String get shipmentDetails => 'تفاصيل الشحنة';
@@ -1159,7 +1176,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get locationTemporarilyUnavailable => 'الموقع غير متاح مؤقتاً';
 
   @override
-  String get completeLogisticsDetails => 'التفاصيل اللوجستية الكاملة لهذه الشحنة.';
+  String get completeLogisticsDetails =>
+      'التفاصيل اللوجستية الكاملة لهذه الشحنة.';
 
   @override
   String get shipmentJourney => 'رحلة الشحنة';
@@ -1207,7 +1225,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trackEveryMove => 'تتبع كل حركة';
 
   @override
-  String get trackEveryMoveSubtitle => 'أدخل رقم التتبع لعرض الحالة والموقع ورحلة الشحنة.';
+  String get trackEveryMoveSubtitle =>
+      'أدخل رقم التتبع لعرض الحالة والموقع ورحلة الشحنة.';
 
   @override
   String get private => 'خاص';
@@ -1231,7 +1250,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get professionalVisibility => 'رؤية شحن احترافية';
 
   @override
-  String get trackingViewProtected => 'عرض التتبع محمي ومتصل مباشرة بسجل شحنتك.';
+  String get trackingViewProtected =>
+      'عرض التتبع محمي ومتصل مباشرة بسجل شحنتك.';
 
   @override
   String get location => 'الموقع';
@@ -1264,7 +1284,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requestYourBestRate => 'اطلب أفضل سعر';
 
   @override
-  String get quoteHeroSubtitle => 'أخبرنا عن شحنتك وسيعد فريقنا عرض سعر مناسباً.';
+  String get quoteHeroSubtitle =>
+      'أخبرنا عن شحنتك وسيعد فريقنا عرض سعر مناسباً.';
 
   @override
   String get shippingService => 'خدمة الشحن';
@@ -1303,7 +1324,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dimensionsInCm => 'تُسجَّل الأبعاد بالسنتيمتر.';
 
   @override
-  String get specialHandlingHint => 'مناولة خاصة، معلومات جمركية، تفاصيل المركبة، ملاحظات التغليف...';
+  String get specialHandlingHint =>
+      'مناولة خاصة، معلومات جمركية، تفاصيل المركبة، ملاحظات التغليف...';
 
   @override
   String get secureRequest => 'طلب آمن';
@@ -1318,13 +1340,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get submitQuoteRequest => 'إرسال طلب عرض السعر';
 
   @override
-  String get pleaseCompleteShipmentInfo => 'يرجى إكمال معلومات الشحنة المطلوبة.';
+  String get pleaseCompleteShipmentInfo =>
+      'يرجى إكمال معلومات الشحنة المطلوبة.';
 
   @override
   String get couldNotSubmitQuote => 'تعذر إرسال طلب عرض السعر.';
 
   @override
-  String get couldNotSubmitQuoteRetry => 'تعذر إرسال طلب عرض السعر. حاول مرة أخرى.';
+  String get couldNotSubmitQuoteRetry =>
+      'تعذر إرسال طلب عرض السعر. حاول مرة أخرى.';
 
   @override
   String get quoteRequestSubmitted => 'تم إرسال طلب عرض السعر';
@@ -1348,7 +1372,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get scheduleYourShipment => 'جدولة شحنتك';
 
   @override
-  String get bookingHeroSubtitle => 'احجز مع فريقنا ودع توأم تنسّق شحنتك من الاستلام إلى التسليم.';
+  String get bookingHeroSubtitle =>
+      'احجز مع فريقنا ودع توأم تنسّق شحنتك من الاستلام إلى التسليم.';
 
   @override
   String get selectService => 'اختر الخدمة';
@@ -1360,16 +1385,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get routeAndSchedule => 'المسار والجدول';
 
   @override
-  String get tellOperationsWhereWhen => 'أخبر فريق العمليات أين ومتى يستلم البضاعة.';
+  String get tellOperationsWhereWhen =>
+      'أخبر فريق العمليات أين ومتى يستلم البضاعة.';
 
   @override
-  String get provideCargoForBooking => 'قدّم معلومات البضاعة اللازمة لتحضير الحجز.';
+  String get provideCargoForBooking =>
+      'قدّم معلومات البضاعة اللازمة لتحضير الحجز.';
 
   @override
   String get contactAndInstructions => 'التواصل والتعليمات';
 
   @override
-  String get accountAttachedToBooking => 'تفاصيل حسابك مرفقة بهذا الحجز بشكل آمن.';
+  String get accountAttachedToBooking =>
+      'تفاصيل حسابك مرفقة بهذا الحجز بشكل آمن.';
 
   @override
   String get bookingReviewedByOps => 'سيراجع فريق عمليات توأم طلبك.';
@@ -1393,7 +1421,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get vehicleGeneralCargoHint => 'مركبة، بضاعة عامة، أثاث...';
 
   @override
-  String get pickupAccessHint => 'وصول الاستلام، ملاحظات التغليف، المعلومات الجمركية...';
+  String get pickupAccessHint =>
+      'وصول الاستلام، ملاحظات التغليف، المعلومات الجمركية...';
 
   @override
   String get secureBooking => 'حجز آمن';
@@ -1414,7 +1443,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookingRequestSubmitted => 'تم إرسال طلب الحجز';
 
   @override
-  String get bookingSentToTawam => 'تم إرسال حجزك بأمان إلى توأم الشاهين للمراجعة.';
+  String get bookingSentToTawam =>
+      'تم إرسال حجزك بأمان إلى توأم الشاهين للمراجعة.';
 
   @override
   String get bookingReference => 'مرجع الحجز';
@@ -1440,7 +1470,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noDocumentsYet => 'لا توجد مستندات بعد';
 
   @override
-  String get documentsEmptyBody => 'ستظهر فواتيرك ومستندات الشحن وملفات التسليم هنا.';
+  String get documentsEmptyBody =>
+      'ستظهر فواتيرك ومستندات الشحن وملفات التسليم هنا.';
 
   @override
   String get couldNotLoadImage => 'تعذر تحميل الصورة';
@@ -1455,7 +1486,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get howCanWeHelp => 'كيف يمكننا مساعدتك؟';
 
   @override
-  String get supportHeroSubtitle => 'مساعدة احترافية للشحنات والعروض والجمارك وطلبات التسليم.';
+  String get supportHeroSubtitle =>
+      'مساعدة احترافية للشحنات والعروض والجمارك وطلبات التسليم.';
 
   @override
   String get connected => 'متصل';
@@ -1515,25 +1547,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get faqTrackingQ => 'أين أجد رقم التتبع؟';
 
   @override
-  String get faqTrackingA => 'رقم التتبع موجود في تأكيد الشحنة وأيضاً في شحناتي.';
+  String get faqTrackingA =>
+      'رقم التتبع موجود في تأكيد الشحنة وأيضاً في شحناتي.';
 
   @override
   String get faqStatusQ => 'لماذا لم تتغير حالة شحنتى؟';
 
   @override
-  String get faqStatusA => 'قد تظهر التحديثات بعد وصول الشحنة إلى المحطة التالية أو بعد تحديث العمليات.';
+  String get faqStatusA =>
+      'قد تظهر التحديثات بعد وصول الشحنة إلى المحطة التالية أو بعد تحديث العمليات.';
 
   @override
   String get faqQuoteQ => 'كيف أطلب عرض سعر للشحن؟';
 
   @override
-  String get faqQuoteA => 'افتح اطلب عرض سعر من الصفحة الرئيسية وأرسل تفاصيل الشحنة.';
+  String get faqQuoteA =>
+      'افتح اطلب عرض سعر من الصفحة الرئيسية وأرسل تفاصيل الشحنة.';
 
   @override
   String get faqDeliveryQ => 'هل يمكنني تحديث معلومات التسليم؟';
 
   @override
-  String get faqDeliveryA => 'تواصل مع الدعم مع رقم التتبع ومعلومات التسليم الجديدة.';
+  String get faqDeliveryA =>
+      'تواصل مع الدعم مع رقم التتبع ومعلومات التسليم الجديدة.';
 
   @override
   String get mySupportRequests => 'طلبات الدعم';
@@ -1563,7 +1599,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get describeIssueHint => 'صف المشكلة أو المساعدة التي تحتاجها...';
 
   @override
-  String get includeTrackingHint => 'لطلبات الشحن، أضف رقم التتبع لمساعدة الفريق على المراجعة أسرع.';
+  String get includeTrackingHint =>
+      'لطلبات الشحن، أضف رقم التتبع لمساعدة الفريق على المراجعة أسرع.';
 
   @override
   String get submitting => 'جارٍ الإرسال...';
@@ -1605,7 +1642,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requestSuccessfullySent => 'تم إرسال الطلب بنجاح';
 
   @override
-  String get supportCaseSubmitted => 'تم إرسال حالة الدعم بأمان إلى فريق عمليات توأم.';
+  String get supportCaseSubmitted =>
+      'تم إرسال حالة الدعم بأمان إلى فريق عمليات توأم.';
 
   @override
   String get requestCategory => 'فئة الطلب';
@@ -1644,7 +1682,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get newShipmentRequest => 'طلب شحنة جديد';
 
   @override
-  String get sendShipmentForReview => 'أرسل تفاصيل الشحنة لمراجعتها من فريقنا اللوجستي.';
+  String get sendShipmentForReview =>
+      'أرسل تفاصيل الشحنة لمراجعتها من فريقنا اللوجستي.';
 
   @override
   String get exampleDubai => 'مثال: دبي، الإمارات';
@@ -1674,7 +1713,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get specialHandlingDimensions => 'مناولة خاصة، أبعاد، نوع المركبة...';
 
   @override
-  String get requestReviewedAfterApproval => 'سيراجع فريق توأم طلبك. يُنشأ رقم الشحنة والتتبع بعد الموافقة فقط.';
+  String get requestReviewedAfterApproval =>
+      'سيراجع فريق توأم طلبك. يُنشأ رقم الشحنة والتتبع بعد الموافقة فقط.';
 
   @override
   String get submitShipmentRequest => 'إرسال طلب الشحنة';
@@ -1697,7 +1737,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cargoDimensions => 'أبعاد البضاعة';
 
   @override
-  String get enterPackageSizeQty => 'أدخل حجم الطرد الواحد بالسنتيمتر والكمية الإجمالية.';
+  String get enterPackageSizeQty =>
+      'أدخل حجم الطرد الواحد بالسنتيمتر والكمية الإجمالية.';
 
   @override
   String get calculationResults => 'نتائج الحساب';
@@ -1715,7 +1756,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get planCargoSmarter => 'خطط لبضاعتك بذكاء';
 
   @override
-  String get volumeHeroSubtitle => 'احسب المتر المكعب والوزن الحجمي فوراً قبل طلب عرض السعر.';
+  String get volumeHeroSubtitle =>
+      'احسب المتر المكعب والوزن الحجمي فوراً قبل طلب عرض السعر.';
 
   @override
   String get instant => 'فوري';
@@ -1730,7 +1772,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actualTotalWeight => 'الوزن الإجمالي الفعلي';
 
   @override
-  String get enterOnePackageHint => 'أدخل أبعاد طرد واحد. تُطبَّق الكمية تلقائياً على الحساب الإجمالي.';
+  String get enterOnePackageHint =>
+      'أدخل أبعاد طرد واحد. تُطبَّق الكمية تلقائياً على الحساب الإجمالي.';
 
   @override
   String get enterCargoDimensions => 'أدخل أبعاد بضاعتك';
@@ -1742,7 +1785,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get totalShipmentVolume => 'الحجم الإجمالي للشحنة';
 
   @override
-  String get cubicVolumeBased => 'الحجم المكعب بناءً على الأبعاد والكمية المدخلة.';
+  String get cubicVolumeBased =>
+      'الحجم المكعب بناءً على الأبعاد والكمية المدخلة.';
 
   @override
   String get airVolWeight => 'الوزن الحجمي الجوي';
@@ -1784,7 +1828,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get anythingTeamShouldKnow => 'أي شيء يجب أن يعرفه فريقنا؟';
 
   @override
-  String get infoSubmittedSecurely => 'تُرسل معلومات شحنتك بأمان إلى فريقنا اللوجستي.';
+  String get infoSubmittedSecurely =>
+      'تُرسل معلومات شحنتك بأمان إلى فريقنا اللوجستي.';
 
   @override
   String get submitQuote => 'إرسال العرض';
@@ -1802,7 +1847,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fastCargoGlobalReach => 'بضاعة سريعة.\nوصول عالمي.';
 
   @override
-  String get airHeroSubtitle => 'حلول شحن جوي احترافية للبضائع العاجلة والتجارية والدولية.';
+  String get airHeroSubtitle =>
+      'حلول شحن جوي احترافية للبضائع العاجلة والتجارية والدولية.';
 
   @override
   String get airFreightService => 'خدمة الشحن الجوي';
@@ -1924,7 +1970,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get termsOfService => 'شروط الخدمة';
 
   @override
-  String get reviewTermsSubtitle => 'يرجى مراجعة الشروط التي تحكم استخدامك لتطبيق وخدمات توأم الشاهين للنقل.';
+  String get reviewTermsSubtitle =>
+      'يرجى مراجعة الشروط التي تحكم استخدامك لتطبيق وخدمات توأم الشاهين للنقل.';
 
   @override
   String get aboutOurServices => 'حول خدماتنا';
@@ -1969,7 +2016,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lastUpdatedAugust2026 => 'آخر تحديث: أغسطس 2026';
 
   @override
-  String get privacyHeroSubtitle => 'تعرّف على كيفية جمع توأم الشاهين لمعلوماتك واستخدامها وحمايتها.';
+  String get privacyHeroSubtitle =>
+      'تعرّف على كيفية جمع توأم الشاهين لمعلوماتك واستخدامها وحمايتها.';
 
   @override
   String get informationWeCollect => 'المعلومات التي نجمعها';
@@ -2071,7 +2119,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get stayInformed => 'ابقَ على اطلاع بنشاطك اللوجستي';
 
   @override
-  String get notificationEmptyHint => 'ستظهر هنا تحديثات الشحنات والعروض والتنبيهات تلقائياً.';
+  String get notificationEmptyHint =>
+      'ستظهر هنا تحديثات الشحنات والعروض والتنبيهات تلقائياً.';
 
   @override
   String get vehicleInformation => 'معلومات المركبة';
@@ -2282,5 +2331,4 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get decline => 'رفض';
-
 }

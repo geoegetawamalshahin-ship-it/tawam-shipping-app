@@ -1337,7 +1337,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 8),
 
                     _buildSignOut(),
+                    const SizedBox(height: 10),
 
+                    _sheetAction(
+                      icon: Icons.delete_forever_outlined,
+                      title: l10n.deleteAccount,
+                      subtitle: l10n.deleteAccountSubtitle,
+                      danger: true,
+                      onTap: _requestAccountDeletion,
+                    ),
                     const SizedBox(height: 22),
 
                     const _Footer(),

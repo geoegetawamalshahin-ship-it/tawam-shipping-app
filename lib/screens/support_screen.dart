@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
-import '../locale_controller.dart';
+
 import 'my_support_requests_screen.dart';
 
 // ==========================================================
@@ -213,9 +213,7 @@ class _SupportScreenState extends State<SupportScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showMessage(
-        AppLocalizations.of(context)!.pleaseSignInBeforeSupport,
-      );
+      _showMessage(AppLocalizations.of(context)!.pleaseSignInBeforeSupport);
       return;
     }
 
@@ -318,7 +316,11 @@ class _SupportScreenState extends State<SupportScreen> {
                 Text(
                   dialogL10n.supportCaseSubmitted,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: _textGrey, fontSize: 12, height: 1.5),
+                  style: const TextStyle(
+                    color: _textGrey,
+                    fontSize: 12,
+                    height: 1.5,
+                  ),
                 ),
 
                 const SizedBox(height: 18),
@@ -571,10 +573,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
                     const SizedBox(height: 9),
 
-                    _FaqCard(
-                      question: l10n.faqQuoteQ,
-                      answer: l10n.faqQuoteA,
-                    ),
+                    _FaqCard(question: l10n.faqQuoteQ, answer: l10n.faqQuoteA),
 
                     const SizedBox(height: 9),
 
@@ -1084,10 +1083,7 @@ class _SupportScreenState extends State<SupportScreen> {
             keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.next,
             validator: (value) {
-              return _requiredValidator(
-                value,
-                l10n.pleaseEnterPhone,
-              );
+              return _requiredValidator(value, l10n.pleaseEnterPhone);
             },
             decoration: _fieldDecoration(
               hintText: l10n.phoneNumber,
@@ -1136,7 +1132,11 @@ class _SupportScreenState extends State<SupportScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline_rounded, color: _primaryBlue, size: 17),
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: _primaryBlue,
+                  size: 17,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

@@ -600,7 +600,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                       style: const TextStyle(color: _textGrey, fontSize: 8.7),
                     ),
                   ),
-                  const Text(
+                  Text(
                     l10n.viewDetailsUpper,
                     style: TextStyle(
                       color: _primaryBlue,

@@ -1881,7 +1881,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                   strokeWidth: 2.4,
                 ),
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.request_quote_outlined, size: 21),
@@ -1914,10 +1914,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     if (!_formKey.currentState!.validate()) {
-      _showMessage(
-        l10n.pleaseCompleteShipmentInfo,
-        error: true,
-      );
+      _showMessage(l10n.pleaseCompleteShipmentInfo, error: true);
       return;
     }
 
@@ -2076,10 +2073,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
         _submitting = false;
       });
 
-      _showMessage(
-        error.message ?? l10n.couldNotSubmitQuote,
-        error: true,
-      );
+      _showMessage(error.message ?? l10n.couldNotSubmitQuote, error: true);
     } catch (_) {
       if (!mounted) return;
 

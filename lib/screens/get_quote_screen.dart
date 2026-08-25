@@ -307,7 +307,11 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.request_quote_outlined, color: Colors.white, size: 32),
+              const Icon(
+                Icons.request_quote_outlined,
+                color: Colors.white,
+                size: 32,
+              ),
               const SizedBox(height: 14),
               Text(
                 l10n.requestYourBestRate,
@@ -598,7 +602,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
             ],
           ),
           const SizedBox(height: 18),
-          const Align(
+          Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
               l10n.dimensionsOptional,
@@ -635,7 +639,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
             ],
           ),
           const SizedBox(height: 9),
-          const Align(
+          Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
               l10n.dimensionsInCm,
@@ -833,10 +837,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
-      _showMessage(
-        l10n.pleaseCompleteShipmentInfo,
-        isError: true,
-      );
+      _showMessage(l10n.pleaseCompleteShipmentInfo, isError: true);
       return;
     }
 
@@ -942,10 +943,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         _submitting = false;
       });
 
-      _showMessage(
-        error.message ?? l10n.couldNotSubmitQuote,
-        isError: true,
-      );
+      _showMessage(error.message ?? l10n.couldNotSubmitQuote, isError: true);
     } catch (_) {
       if (!mounted) return;
 

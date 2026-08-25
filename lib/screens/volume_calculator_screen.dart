@@ -339,7 +339,11 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.calculate_outlined, color: Colors.white, size: 19),
+                  const Icon(
+                    Icons.calculate_outlined,
+                    color: Colors.white,
+                    size: 19,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     l10n.logisticsCalculationTool,
@@ -544,7 +548,11 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, color: primaryBlue, size: 18),
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: primaryBlue,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -592,7 +600,11 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
             Text(
               l10n.calculationAppearsHere,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: textGrey, fontSize: 10.5, height: 1.4),
+              style: const TextStyle(
+                color: textGrey,
+                fontSize: 10.5,
+                height: 1.4,
+              ),
             ),
           ],
         ),
@@ -642,7 +654,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
                     ),
                   ),
                   const SizedBox(width: 7),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(bottom: 3),
                     child: Text(
                       l10n.cbm,

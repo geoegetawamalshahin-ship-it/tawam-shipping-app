@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'l10n/app_localizations.dart';
 
 class LocaleController {
-  static const List<String> languageNames = ['English', 'Arabic', 'French'];
+  static const List<String> languageNames = ['English', 'Arabic'];
 
   static final ValueNotifier<Locale> locale = ValueNotifier<Locale>(
     const Locale('en'),
@@ -17,8 +17,7 @@ class LocaleController {
     switch (languageCode) {
       case 'ar':
         return 'Arabic';
-      case 'fr':
-        return 'French';
+
       default:
         return 'English';
     }
@@ -28,8 +27,7 @@ class LocaleController {
     switch (languageCode) {
       case 'ar':
         return 'AR';
-      case 'fr':
-        return 'FR';
+
       default:
         return 'EN';
     }
@@ -39,10 +37,6 @@ class LocaleController {
     switch (language) {
       case 'Arabic':
         locale.value = const Locale('ar');
-        break;
-
-      case 'French':
-        locale.value = const Locale('fr');
         break;
 
       default:
@@ -85,7 +79,7 @@ class LocaleController {
   // Resolve a banner image for the active locale, with English fallback.
   static String bannerAsset(String fileName) {
     final code = languageCode;
-    if (code == 'ar' || code == 'fr') {
+    if (code == 'ar') {
       return 'assets/images/banners/$code/$fileName';
     }
     return 'assets/images/banners/en/$fileName';
@@ -186,10 +180,7 @@ class LocaleController {
   }
 
   // Translate known notification events; return null to use stored title/message.
-  static String? notificationTitle(
-    AppLocalizations l10n,
-    String? event,
-  ) {
+  static String? notificationTitle(AppLocalizations l10n, String? event) {
     switch ((event ?? '').trim().toLowerCase()) {
       case 'shipment_in_transit':
         return l10n.notifShipmentInTransitTitle;

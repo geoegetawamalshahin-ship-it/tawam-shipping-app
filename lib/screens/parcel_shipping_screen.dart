@@ -1380,7 +1380,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                       const SizedBox(width: 9),
 
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           l10n.chargeableWeight,
                           style: TextStyle(
@@ -1916,7 +1916,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                     const SizedBox(width: 9),
 
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         l10n.chargeableWeight,
                         style: TextStyle(
@@ -2035,7 +2035,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   strokeWidth: 2.4,
                 ),
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.request_quote_outlined, size: 21),
@@ -2068,10 +2068,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     if (!_formKey.currentState!.validate()) {
-      _showMessage(
-        l10n.pleaseCompleteShipmentInfo,
-        error: true,
-      );
+      _showMessage(l10n.pleaseCompleteShipmentInfo, error: true);
 
       return;
     }
@@ -2248,10 +2245,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
         _submitting = false;
       });
 
-      _showMessage(
-        error.message ?? l10n.couldNotSubmitQuote,
-        error: true,
-      );
+      _showMessage(error.message ?? l10n.couldNotSubmitQuote, error: true);
     } catch (_) {
       if (!mounted) return;
 

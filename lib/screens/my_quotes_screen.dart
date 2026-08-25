@@ -440,6 +440,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   Widget _buildQuoteCard(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
     final l10n = AppLocalizations.of(context)!;
     final data = doc.data();
+    final status = _text(data['status']).trim().toLowerCase();
     final serviceRaw = _fallback(data['serviceType'], '');
     final service = _serviceDisplay(l10n, serviceRaw);
     final quoteNumber = _fallback(data['quoteNumber'], l10n.quotations);
@@ -510,7 +511,11 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                       ],
                     ),
                   ),
-                  _statusBadge(hasPrice: hasPrice, decision: decision),
+                  _statusBadge(
+                    hasPrice: hasPrice,
+                    decision: decision,
+                    status: status,
+                  ),
                 ],
               ),
               const SizedBox(height: 15),
@@ -566,10 +571,10 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                               ),
                             ],
                           )
-                        : const Column(
+                        : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'RATE STATUS',
                                 style: TextStyle(
                                   color: textGrey,
@@ -578,10 +583,14 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
-                                'Under Review',
-                                style: TextStyle(
+                                _quoteStatusText(
+                                  hasPrice: hasPrice,
+                                  decision: decision,
+                                  status: status,
+                                ),
+                                style: const TextStyle(
                                   color: textDark,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w800,
@@ -643,29 +652,31 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
     );
   }
 
-  Widget _statusBadge({required bool hasPrice, required String decision}) {
+  Widget _statusBadge({
+    required bool hasPrice,
+    required String decision,
+    required String status,
+  }) {
     Color bg;
     Color fg;
-    String text;
+    final text = _quoteStatusText(
+      hasPrice: hasPrice,
+      decision: decision,
+      status: status,
+    );
 
-    final l10n = AppLocalizations.of(context)!;
-
-    if (decision == 'accepted') {
+    if (decision == 'accepted' || status == 'completed') {
       bg = const Color(0xFFEAF8F0);
       fg = const Color(0xFF16765C);
-      text = l10n.accepted;
-    } else if (decision == 'declined') {
+    } else if (decision == 'declined' || status == 'cancelled') {
       bg = const Color(0xFFFFECEC);
       fg = const Color(0xFFD72638);
-      text = l10n.declined;
-    } else if (hasPrice) {
+    } else if (status == 'in_progress' || status == 'quoted' || hasPrice) {
       bg = softBlue;
       fg = primaryBlue;
-      text = l10n.quoteReady;
     } else {
       bg = const Color(0xFFFFF6E5);
       fg = const Color(0xFFB26A00);
-      text = l10n.underReview;
     }
 
     return Container(
@@ -679,6 +690,32 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
         style: TextStyle(color: fg, fontSize: 9, fontWeight: FontWeight.w800),
       ),
     );
+  }
+
+  String _quoteStatusText({
+    required bool hasPrice,
+    required String decision,
+    required String status,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (decision == 'accepted') return l10n.accepted;
+    if (decision == 'declined') return l10n.declined;
+
+    switch (status) {
+      case 'in_progress':
+        return 'In Progress';
+      case 'quoted':
+        return l10n.quoteReady;
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      case 'new':
+        return l10n.underReview;
+      default:
+        return hasPrice ? l10n.quoteReady : l10n.underReview;
+    }
   }
 
   void _showQuoteDetails(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
@@ -791,7 +828,10 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           Row(
             children: [
               Expanded(
-                child: _headerRoute(l10n.from, _fallback(data['from'], l10n.origin)),
+                child: _headerRoute(
+                  l10n.from,
+                  _fallback(data['from'], l10n.origin),
+                ),
               ),
               const Icon(
                 Icons.arrow_forward_rounded,
@@ -1258,7 +1298,11 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
             Text(
               l10n.pleaseCheckConnectionTryAgain,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: textGrey, fontSize: 11.5, height: 1.5),
+              style: const TextStyle(
+                color: textGrey,
+                fontSize: 11.5,
+                height: 1.5,
+              ),
             ),
             const SizedBox(height: 18),
             ElevatedButton.icon(
