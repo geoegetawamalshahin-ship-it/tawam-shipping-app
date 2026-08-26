@@ -3259,6 +3259,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get termsContactBody => 'إذا كانت لديك أسئلة حول هذه الشروط والأحكام أو حول خدمة نقل، يرجى التواصل مع توأم الشاهين للنقل عبر مركز المساعدة في التطبيق.';
 
   @override
+  String get packageBox => 'صندوق';
+
+  @override
+  String get packageTube => 'أنبوب';
+
+  @override
+  String get periodAm => 'ص';
+
+  @override
+  String get periodPm => 'م';
+
+  @override
+  String get temperatureControlled => 'شحن بدرجة حرارة مضبوطة';
+
+  @override
+  String get select => 'اختيار';
+
+  @override
   String plusNMore(int count) {
     return '+$count المزيد';
   }
@@ -3281,6 +3299,26 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String totalVolumeCarrierNote(String volume) {
     return 'الحجم الإجمالي: $volume م³ • قد تختلف معادلة الناقل النهائية.';
+  }
+
+  @override
+  String truckSingular(int count) {
+    return '$count شاحنة';
+  }
+
+  @override
+  String truckPlural(int count) {
+    return '$count شاحنات';
+  }
+
+  @override
+  String packageSingular(int count) {
+    return '$count طرد';
+  }
+
+  @override
+  String packagePlural(int count) {
+    return '$count طرود';
   }
 
 

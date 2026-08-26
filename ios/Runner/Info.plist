@@ -72,5 +72,11 @@
 		<string>This lets you take a new profile photo.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>This lets you choose a profile photo from your library.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>This lets you save or update your profile photo.</string>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>remote-notification</string>
+		</array>
 	</dict>
 </plist>

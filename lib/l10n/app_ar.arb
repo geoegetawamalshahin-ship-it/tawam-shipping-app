@@ -1165,6 +1165,12 @@
   "termsApplicationAvailabilityBody": "نسعى لتوفير وصول موثوق إلى التطبيق، لكن التوفر قد يتأثر أحياناً بالصيانة أو التحديثات أو حالة الشبكة أو خدمات الجهات الخارجية أو المشكلات التقنية.",
   "termsChangesBody": "قد تقوم توأم الشاهين للنقل بتحديث هذه الشروط والأحكام عند تغيّر ميزات التطبيق أو الخدمات أو المتطلبات المعمول بها. قد تُتاح أحدث نسخة عبر التطبيق.",
   "termsContactBody": "إذا كانت لديك أسئلة حول هذه الشروط والأحكام أو حول خدمة نقل، يرجى التواصل مع توأم الشاهين للنقل عبر مركز المساعدة في التطبيق.",
+  "packageBox": "صندوق",
+  "packageTube": "أنبوب",
+  "periodAm": "ص",
+  "periodPm": "م",
+  "temperatureControlled": "شحن بدرجة حرارة مضبوطة",
+  "select": "اختيار",
   "plusNMore": "+{count} المزيد",
   "@plusNMore": {
     "placeholders": {
@@ -1202,6 +1208,38 @@
     "placeholders": {
       "volume": {
         "type": "String"
+      }
+    }
+  },
+  "truckSingular": "{count} شاحنة",
+  "@truckSingular": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "truckPlural": "{count} شاحنات",
+  "@truckPlural": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageSingular": "{count} طرد",
+  "@packageSingular": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packagePlural": "{count} طرود",
+  "@packagePlural": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   }

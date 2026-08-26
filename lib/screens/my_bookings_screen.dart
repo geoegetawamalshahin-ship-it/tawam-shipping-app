@@ -677,7 +677,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               const SizedBox(width: 5),
               Expanded(
                 child: Text(
-                  LocaleController.optionLabel(l10n, cargo),
+                  LocaleController.displayOption(
+                    l10n,
+                    cargo,
+                    emptyLabel: l10n.notProvided,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -928,7 +932,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                         children: [
                           _detailLine(
                             l10n.cargoType,
-                            LocaleController.optionLabel(l10n, cargo),
+                            LocaleController.displayOption(
+                              l10n,
+                              cargo,
+                              emptyLabel: l10n.notProvided,
+                            ),
                           ),
                           _detailLine(l10n.weight, '$weight KG'),
                           _detailLine(l10n.quantity, quantity),

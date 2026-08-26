@@ -460,7 +460,11 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   Widget _buildRequestCard(BuildContext context, Map<String, dynamic> request) {
     final l10n = AppLocalizations.of(context)!;
-    final category = (request['category'] ?? l10n.supportRequest).toString();
+    final category = LocaleController.displayOption(
+      l10n,
+      (request['category'] ?? '').toString(),
+      emptyLabel: l10n.supportRequest,
+    );
     final shipmentNumber = (request['shipmentNumber'] ?? '').toString().trim();
     final message = (request['message'] ?? '').toString();
     final rawStatus = (request['status'] ?? 'new').toString();
@@ -627,7 +631,11 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   void _showRequestDetails(BuildContext context, Map<String, dynamic> request) {
     final l10n = AppLocalizations.of(context)!;
-    final category = (request['category'] ?? l10n.supportRequest).toString();
+    final category = LocaleController.displayOption(
+      l10n,
+      (request['category'] ?? '').toString(),
+      emptyLabel: l10n.supportRequest,
+    );
     final shipmentNumber = (request['shipmentNumber'] ?? '').toString().trim();
     final message = (request['message'] ?? '').toString();
     final rawStatus = (request['status'] ?? 'new').toString();
@@ -977,7 +985,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
     final minute = date.minute.toString().padLeft(2, '0');
 
-    final amPm = date.hour >= 12 ? 'PM' : 'AM';
+    final amPm = LocaleController.timePeriod(l10n, date.hour);
 
     return '${date.day} '
         '${LocaleController.monthAbbrev(l10n, date.month)} '

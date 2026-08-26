@@ -3261,6 +3261,24 @@ abstract class AppLocalizations {
   /// **"If you have questions regarding these Terms & Conditions or a transportation service, please contact TAWAM AL-SHAHIN TRANSPORT through the Help Center in the application."**
   String get termsContactBody;
 
+  /// **"Box"**
+  String get packageBox;
+
+  /// **"Tube"**
+  String get packageTube;
+
+  /// **"AM"**
+  String get periodAm;
+
+  /// **"PM"**
+  String get periodPm;
+
+  /// **"Temperature Controlled"**
+  String get temperatureControlled;
+
+  /// **"Select"**
+  String get select;
+
   /// **"+{count} more"**
   String plusNMore(int count);
 
@@ -3275,6 +3293,18 @@ abstract class AppLocalizations {
 
   /// **"Total volume: {volume} CBM • Final carrier formula may vary."**
   String totalVolumeCarrierNote(String volume);
+
+  /// **"{count} Truck"**
+  String truckSingular(int count);
+
+  /// **"{count} Trucks"**
+  String truckPlural(int count);
+
+  /// **"{count} Package"**
+  String packageSingular(int count);
+
+  /// **"{count} Packages"**
+  String packagePlural(int count);
 
 
 }

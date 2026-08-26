@@ -942,7 +942,7 @@ class _ShipmentCard extends StatelessWidget {
         : date.hour;
 
     final minute = date.minute.toString().padLeft(2, '0');
-    final period = date.hour >= 12 ? 'PM' : 'AM';
+    final period = LocaleController.timePeriod(l10n, date.hour);
 
     return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year} • '
         '$hour12:$minute $period';
@@ -980,7 +980,11 @@ class _ShipmentCard extends StatelessWidget {
       l10n,
     );
     final typeRaw = (shipment['type'] ?? '').toString().trim();
-    final type = typeRaw.isEmpty ? l10n.shipment : typeRaw;
+    final type = LocaleController.displayOption(
+      l10n,
+      typeRaw,
+      emptyLabel: l10n.shipment,
+    );
     final rawStatus = (shipment['rawStatus'] ?? 'pending').toString();
     final stage = _shipmentStatusDescription(l10n, rawStatus);
     final currentLocationRaw =

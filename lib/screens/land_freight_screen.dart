@@ -1858,17 +1858,24 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                   if (_loadType == 'FTL')
                     _summaryBadge(
                       Icons.local_shipping_outlined,
-                      '$quantity Truck${quantity == 1 ? '' : 's'}',
+                      quantity == 1
+                          ? l10n.truckSingular(quantity)
+                          : l10n.truckPlural(quantity),
                     ),
 
                   if (_loadType == 'LTL')
                     _summaryBadge(
                       Icons.inventory_outlined,
-                      '$quantity Package${quantity == 1 ? '' : 's'}',
+                      quantity == 1
+                          ? l10n.packageSingular(quantity)
+                          : l10n.packagePlural(quantity),
                     ),
 
                   if (_truckType != 'Recommend for Me')
-                    _summaryBadge(Icons.fire_truck_outlined, _truckType),
+                    _summaryBadge(
+                      Icons.fire_truck_outlined,
+                      _optionLabel(l10n, _truckType),
+                    ),
                 ],
               ),
 
@@ -1892,7 +1899,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
                     Expanded(
                       child: Text(
-                        'Gross Weight: ${_displayWeight()}',
+                        '${l10n.grossWeight}: ${_displayWeight()}',
                         style: const TextStyle(
                           color: Color(0xFFD9E8F6),
                           fontSize: 9.5,
@@ -1936,7 +1943,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
                       Expanded(
                         child: Text(
-                          'Temperature Controlled • ${_temperatureController.text.trim()} °C',
+                          '${l10n.temperatureControlled} • ${_temperatureController.text.trim()} °C',
                           style: const TextStyle(
                             color: Color(0xFFD9E8F6),
                             fontSize: 9.5,

@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'login_screen.dart';
 import 'shipping_documents_screen.dart';
@@ -89,6 +92,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? user.uid.substring(0, 8)
           : user.uid;
 
+      final photoBytes = _bytesFromProfilePhoto(data?['profilePhoto']);
+      final storedPath = data?['profilePhotoPath']?.toString();
+      final downloadedBytes =
+          photoBytes ?? await _downloadProfilePhoto(storedPath);
+
+      if (!mounted) return;
+
       setState(() {
         _fullName = data?['name']?.toString() ?? user.displayName ?? '';
         _email = data?['email']?.toString() ?? user.email ?? '';
@@ -100,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         _customerId =
             data?['customerId']?.toString() ?? 'TW-${shortUid.toUpperCase()}';
-        _profilePhotoBytes = _bytesFromProfilePhoto(data?['profilePhoto']);
+        _profilePhotoBytes = downloadedBytes;
         _isLoading = false;
         _loadError = null;
       });
@@ -165,6 +175,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'notificationsEnabled': value,
       }, SetOptions(merge: true));
+
+      if (value) {
+        await _enablePushToken(user.uid);
+      } else {
+        await _disablePushToken(user.uid);
+      }
     } catch (_) {
       if (!mounted) return;
 
@@ -299,9 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       didPreview = true;
 
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'profilePhoto': Blob(bytes),
-      }, SetOptions(merge: true));
+      await _persistProfilePhoto(user.uid, bytes);
 
       if (!mounted) return;
 
@@ -355,9 +369,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'profilePhoto': FieldValue.delete(),
-      }, SetOptions(merge: true));
+      await _deleteStoredProfilePhoto(user.uid);
 
       if (!mounted) return;
 
@@ -376,6 +388,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       _showMessage(l10n.couldNotUpdatePhoto);
     }
+  }
+
+  // Save the photo in Firestore, or in the existing documents bucket if the
+  // document would become too large.
+  Future<void> _persistProfilePhoto(String uid, Uint8List bytes) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'profilePhoto': Blob(bytes),
+        'profilePhotoPath': FieldValue.delete(),
+      }, SetOptions(merge: true));
+      return;
+    } catch (_) {
+      // Fall through to storage when the Firestore write is rejected.
+    }
+
+    const bucket = 'shipping-documents';
+    final path = 'users/$uid/profile.jpg';
+
+    await Supabase.instance.client.storage
+        .from(bucket)
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: const FileOptions(upsert: true),
+        );
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'profilePhoto': FieldValue.delete(),
+      'profilePhotoPath': path,
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> _deleteStoredProfilePhoto(String uid) async {
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'profilePhoto': FieldValue.delete(),
+      'profilePhotoPath': FieldValue.delete(),
+    }, SetOptions(merge: true));
+
+    try {
+      await Supabase.instance.client.storage.from('shipping-documents').remove([
+        'users/$uid/profile.jpg',
+      ]);
+    } catch (_) {
+      // Ignore missing storage objects.
+    }
+  }
+
+  Future<Uint8List?> _downloadProfilePhoto(String? path) async {
+    if (path == null || path.isEmpty) return null;
+
+    try {
+      return await Supabase.instance.client.storage
+          .from('shipping-documents')
+          .download(path);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _enablePushToken(String uid) async {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token == null || token.isEmpty) return;
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'fcmToken': token,
+      'fcmTokens': FieldValue.arrayUnion([token]),
+      'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> _disablePushToken(String uid) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    final storedToken = doc.data()?['fcmToken']?.toString();
+
+    try {
+      await FirebaseMessaging.instance.deleteToken();
+    } catch (_) {
+      // Continue clearing the stored token even if deleteToken fails.
+    }
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'fcmToken': FieldValue.delete(),
+      if (storedToken != null && storedToken.isNotEmpty)
+        'fcmTokens': FieldValue.arrayRemove([storedToken]),
+      'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   // ==========================================================
@@ -463,6 +564,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (value is Blob) return value.bytes;
     if (value is Uint8List) return value;
     if (value is List<int>) return Uint8List.fromList(value);
+    if (value is String && value.isNotEmpty) {
+      try {
+        return Uint8List.fromList(base64Decode(value));
+      } catch (_) {
+        return null;
+      }
+    }
     return null;
   }
 

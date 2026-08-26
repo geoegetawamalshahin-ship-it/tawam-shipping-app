@@ -994,12 +994,11 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           const SizedBox(height: 15),
           _detailRow(
             l10n.cargoType,
-            _text(data['cargoType']).trim().isEmpty
-                ? l10n.notProvided
-                : LocaleController.optionLabel(
-                    l10n,
-                    _text(data['cargoType']).trim(),
-                  ),
+            LocaleController.displayOption(
+              l10n,
+              _text(data['cargoType']),
+              emptyLabel: l10n.notProvided,
+            ),
           ),
           _detailRow(l10n.weight, '${_fallback(data['weightKg'], '—')} KG'),
           _detailRow(l10n.quantity, _fallback(data['quantity'], '—')),
@@ -1007,7 +1006,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           _detailRow(l10n.pickupDate, _formatDate(data['pickupDate'])),
           _detailRow(l10n.requestedOn, _formatDate(data['createdAt'])),
           _detailRow(
-            'Notes',
+            l10n.additionalNotes,
             _text(data['notes']).trim().isEmpty
                 ? l10n.noAdditionalNotes
                 : _text(data['notes']),

@@ -72,10 +72,16 @@ class _HomeScreenState extends State<HomeScreen> {
       const Duration(seconds: 4),
       (_) => _nextBanner(),
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      NotificationRouter.consumePending(context);
+    });
   }
 
   @override
   void dispose() {
+    NotificationRouter.homeReady = false;
     _bannerTimer?.cancel();
     _bannerController.dispose();
     super.dispose();

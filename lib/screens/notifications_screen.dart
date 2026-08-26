@@ -26,6 +26,170 @@ const Color _accentRed = Color(0xFFD83B4E);
 const Color _quotePurple = Color(0xFF7457D7);
 const Color _supportOrange = Color(0xFFD98624);
 
+// Routes FCM and in-app notification taps to the matching screen.
+class NotificationRouter {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  static Map<String, String>? _pendingPayload;
+  static bool _autoOpenPending = false;
+  static bool homeReady = false;
+
+  static Map<String, String> payloadFromMessage({
+    required Map<String, dynamic> data,
+    String? title,
+    String? body,
+  }) {
+    return {
+      'type': (data['type'] ?? '').toString(),
+      'referenceId': (data['referenceId'] ?? '').toString(),
+      'event': (data['event'] ?? '').toString(),
+      'title': (title ?? data['title'] ?? '').toString(),
+      'body': (body ?? data['message'] ?? data['body'] ?? '').toString(),
+      'trackingNumber': (data['trackingNumber'] ?? '').toString(),
+    };
+  }
+
+  static void remember(Map<String, String> payload, {bool autoOpen = false}) {
+    _pendingPayload = payload;
+    _autoOpenPending = autoOpen;
+  }
+
+  static Future<void> consumePending(BuildContext context) async {
+    homeReady = true;
+    final payload = _pendingPayload;
+    final shouldOpen = _autoOpenPending;
+    _pendingPayload = null;
+    _autoOpenPending = false;
+    if (payload == null) return;
+
+    if (shouldOpen) {
+      await openFromPayload(context, payload);
+      return;
+    }
+
+    showForegroundBanner(context, payload);
+  }
+
+  static void showForegroundBanner(
+    BuildContext context,
+    Map<String, String> payload,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+
+    final event = payload['event'];
+    final params = <String, dynamic>{
+      'trackingNumber': payload['trackingNumber'] ?? '',
+    };
+    final title =
+        LocaleController.notificationTitle(l10n, event) ??
+        (payload['title']?.isNotEmpty == true
+            ? payload['title']!
+            : l10n.notificationDefault);
+    final body =
+        LocaleController.notificationBody(l10n, event, params) ??
+        (payload['body'] ?? '');
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          body.isEmpty ? title : '$title\n$body',
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 6),
+        action: SnackBarAction(
+          label: l10n.viewDetails,
+          onPressed: () {
+            if (!context.mounted) return;
+            openFromPayload(context, payload);
+          },
+        ),
+      ),
+    );
+  }
+
+  static Future<void> openFromPayload(
+    BuildContext context,
+    Map<String, String> payload,
+  ) async {
+    final type = (payload['type'] ?? '').trim().toLowerCase();
+    final referenceId = (payload['referenceId'] ?? '').trim();
+    final l10n = AppLocalizations.of(context);
+
+    if (type == 'support') {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => MySupportRequestsScreen(
+            initialRequestId: referenceId.isEmpty ? null : referenceId,
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (type == 'quote') {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => MyQuotesScreen(
+            initialQuoteId: referenceId.isEmpty ? null : referenceId,
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (type == 'shipment' && referenceId.isNotEmpty) {
+      try {
+        final document = await FirebaseFirestore.instance
+            .collection('shipments')
+            .doc(referenceId)
+            .get();
+
+        if (!context.mounted) return;
+
+        if (!document.exists || document.data() == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n?.shipmentNotFoundShort ?? ''),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          return;
+        }
+
+        final shipment = <String, dynamic>{
+          ...document.data()!,
+          'id': document.id,
+        };
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ShipmentDetailsScreen(shipment: shipment),
+          ),
+        );
+      } catch (_) {
+        if (!context.mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n?.couldNotOpenShipmentDetails ?? ''),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+    );
+  }
+}
+
 // ==========================================================
 // NOTIFICATIONS SCREEN
 // ==========================================================
@@ -455,79 +619,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       .toString()
                       .trim();
 
-                  // SUPPORT
-                  if (type == 'support') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MySupportRequestsScreen(
-                          initialRequestId: referenceId.isEmpty
-                              ? null
-                              : referenceId,
-                        ),
-                      ),
-                    );
-                    return;
-                  }
-
-                  // SHIPMENT
-                  if (type == 'shipment' && referenceId.isNotEmpty) {
-                    try {
-                      final document = await FirebaseFirestore.instance
-                          .collection('shipments')
-                          .doc(referenceId)
-                          .get();
-
-                      if (!mounted) return;
-
-                      if (!document.exists || document.data() == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.shipmentNotFoundShort),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                        return;
-                      }
-
-                      final shipment = <String, dynamic>{
-                        ...document.data()!,
-                        'id': document.id,
-                      };
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              ShipmentDetailsScreen(shipment: shipment),
-                        ),
-                      );
-                    } catch (e) {
-                      if (!mounted) return;
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.couldNotOpenShipmentDetails),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  }
-
-                  // QUOTE
-                  if (type == 'quote') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MyQuotesScreen(
-                          initialQuoteId: referenceId.isEmpty
-                              ? null
-                              : referenceId,
-                        ),
-                      ),
-                    );
-                    return;
-                  }
+                  await NotificationRouter.openFromPayload(context, {
+                    'type': type,
+                    'referenceId': referenceId,
+                  });
                 },
 
                 onMenuSelected: (value) {

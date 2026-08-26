@@ -3259,6 +3259,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get termsContactBody => 'If you have questions regarding these Terms & Conditions or a transportation service, please contact TAWAM AL-SHAHIN TRANSPORT through the Help Center in the application.';
 
   @override
+  String get packageBox => 'Box';
+
+  @override
+  String get packageTube => 'Tube';
+
+  @override
+  String get periodAm => 'AM';
+
+  @override
+  String get periodPm => 'PM';
+
+  @override
+  String get temperatureControlled => 'Temperature Controlled';
+
+  @override
+  String get select => 'Select';
+
+  @override
   String plusNMore(int count) {
     return '+$count more';
   }
@@ -3281,6 +3299,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String totalVolumeCarrierNote(String volume) {
     return 'Total volume: $volume CBM • Final carrier formula may vary.';
+  }
+
+  @override
+  String truckSingular(int count) {
+    return '$count Truck';
+  }
+
+  @override
+  String truckPlural(int count) {
+    return '$count Trucks';
+  }
+
+  @override
+  String packageSingular(int count) {
+    return '$count Package';
+  }
+
+  @override
+  String packagePlural(int count) {
+    return '$count Packages';
   }
 
 

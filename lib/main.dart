@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 import 'screens/splash_screen.dart';
+import 'screens/notifications_screen.dart';
 import 'theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'locale_controller.dart';
@@ -115,11 +116,7 @@ class NotificationSetup {
     // --------------------------------------------------------
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('FOREGROUND NOTIFICATION');
-
-      debugPrint('Title: ${message.notification?.title}');
-
-      debugPrint('Body: ${message.notification?.body}');
+      _handleForegroundMessage(message);
     });
 
     // --------------------------------------------------------
@@ -127,7 +124,7 @@ class NotificationSetup {
     // --------------------------------------------------------
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('NOTIFICATION OPENED: ${message.messageId}');
+      _openOrRemember(message);
     });
 
     // --------------------------------------------------------
@@ -137,11 +134,40 @@ class NotificationSetup {
     final initialMessage = await _messaging.getInitialMessage();
 
     if (initialMessage != null) {
-      debugPrint(
-        'APP OPENED FROM TERMINATED NOTIFICATION: '
-        '${initialMessage.messageId}',
-      );
+      NotificationRouter.remember(_payloadFrom(initialMessage), autoOpen: true);
     }
+  }
+
+  static Map<String, String> _payloadFrom(RemoteMessage message) {
+    return NotificationRouter.payloadFromMessage(
+      data: message.data,
+      title: message.notification?.title,
+      body: message.notification?.body,
+    );
+  }
+
+  static void _openOrRemember(RemoteMessage message) {
+    final payload = _payloadFrom(message);
+    final context = NotificationRouter.navigatorKey.currentContext;
+
+    if (NotificationRouter.homeReady && context != null && context.mounted) {
+      NotificationRouter.openFromPayload(context, payload);
+      return;
+    }
+
+    NotificationRouter.remember(payload, autoOpen: true);
+  }
+
+  static void _handleForegroundMessage(RemoteMessage message) {
+    final payload = _payloadFrom(message);
+    final context = NotificationRouter.navigatorKey.currentContext;
+
+    if (!NotificationRouter.homeReady || context == null || !context.mounted) {
+      NotificationRouter.remember(payload);
+      return;
+    }
+
+    NotificationRouter.showForegroundBanner(context, payload);
   }
 
   // ==========================================================
@@ -149,6 +175,25 @@ class NotificationSetup {
   // ==========================================================
 
   static Future<void> _saveCurrentToken() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      debugPrint('No logged-in user. Token not saved yet.');
+      return;
+    }
+
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (userDoc.data()?['notificationsEnabled'] == false) {
+        debugPrint('Notifications disabled. Token not saved.');
+        return;
+      }
+    } catch (e) {
+      debugPrint('Could not read notification preference: $e');
+    }
+
     try {
       final token = await _messaging.getToken();
 
@@ -177,6 +222,19 @@ class NotificationSetup {
       debugPrint('No logged-in user. Token not saved yet.');
 
       return;
+    }
+
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (userDoc.data()?['notificationsEnabled'] == false) {
+        debugPrint('Notifications disabled. Token not saved.');
+        return;
+      }
+    } catch (e) {
+      debugPrint('Could not read notification preference: $e');
     }
 
     if (_lastSavedToken == token) {
@@ -217,6 +275,8 @@ class TawamShippingApp extends StatelessWidget {
       builder: (context, locale, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
+
+          navigatorKey: NotificationRouter.navigatorKey,
 
           theme: AppTheme.lightTheme,
 

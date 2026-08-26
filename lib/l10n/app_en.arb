@@ -1165,6 +1165,12 @@
   "termsApplicationAvailabilityBody": "We aim to provide reliable access to the application, but availability may occasionally be affected by maintenance, updates, network conditions, third-party services or technical issues.",
   "termsChangesBody": "TAWAM AL-SHAHIN TRANSPORT may update these Terms & Conditions when application features, services or applicable requirements change. The latest version may be made available through the application.",
   "termsContactBody": "If you have questions regarding these Terms & Conditions or a transportation service, please contact TAWAM AL-SHAHIN TRANSPORT through the Help Center in the application.",
+  "packageBox": "Box",
+  "packageTube": "Tube",
+  "periodAm": "AM",
+  "periodPm": "PM",
+  "temperatureControlled": "Temperature Controlled",
+  "select": "Select",
   "plusNMore": "+{count} more",
   "@plusNMore": {
     "placeholders": {
@@ -1202,6 +1208,38 @@
     "placeholders": {
       "volume": {
         "type": "String"
+      }
+    }
+  },
+  "truckSingular": "{count} Truck",
+  "@truckSingular": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "truckPlural": "{count} Trucks",
+  "@truckPlural": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageSingular": "{count} Package",
+  "@packageSingular": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packagePlural": "{count} Packages",
+  "@packagePlural": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   }

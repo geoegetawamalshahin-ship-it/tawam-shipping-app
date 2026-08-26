@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
+import '../locale_controller.dart';
 
 import 'my_support_requests_screen.dart';
 
@@ -59,24 +60,7 @@ class _SupportScreenState extends State<SupportScreen> {
   bool _isSubmitting = false;
 
   String _categoryLabel(AppLocalizations l10n, String value) {
-    switch (value) {
-      case 'Shipment Tracking':
-        return l10n.catShipmentTracking;
-      case 'Delivery Delay':
-        return l10n.catDeliveryDelay;
-      case 'Request a Quote':
-        return l10n.catRequestQuote;
-      case 'Customs Clearance':
-        return l10n.catCustoms;
-      case 'Payment & Invoice':
-        return l10n.catPaymentInvoice;
-      case 'Damaged Shipment':
-        return l10n.catDamagedShipment;
-      case 'General Inquiry':
-        return l10n.catGeneralInquiry;
-      default:
-        return value;
-    }
+    return LocaleController.optionLabel(l10n, value);
   }
 
   // ==========================================================

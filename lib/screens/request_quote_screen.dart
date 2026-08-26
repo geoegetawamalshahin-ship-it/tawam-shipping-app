@@ -100,7 +100,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
       lastDate: DateTime(today.year + 2),
       helpText: l10n.selectPreferredPickupDate,
       cancelText: l10n.cancel,
-      confirmText: 'Select',
+      confirmText: l10n.select,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(

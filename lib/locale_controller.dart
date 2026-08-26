@@ -228,9 +228,27 @@ class LocaleController {
     }
   }
 
+  // Localized AM/PM marker for a 24-hour clock value.
+  static String timePeriod(AppLocalizations l10n, int hour) {
+    return hour >= 12 ? l10n.periodPm : l10n.periodAm;
+  }
+
+  // Show a stored option as a localized word, with a fallback when empty.
+  static String displayOption(
+    AppLocalizations l10n,
+    String? value, {
+    String? emptyLabel,
+  }) {
+    final raw = (value ?? '').trim();
+    if (raw.isEmpty) {
+      return emptyLabel ?? l10n.notSpecified;
+    }
+    return optionLabel(l10n, raw);
+  }
+
   // Display label for stored English option values. Unknown values stay as-is.
   static String optionLabel(AppLocalizations l10n, String value) {
-    switch (value) {
+    switch (value.trim()) {
       case 'Door to Door':
         return l10n.doorToDoor;
       case 'Port to Port':
@@ -454,8 +472,53 @@ class LocaleController {
         return l10n.householdGoodsPersonalEffects;
       case 'Office Relocation':
         return l10n.officeRelocation;
+      case 'Box':
+        return l10n.packageBox;
+      case 'Tube':
+        return l10n.packageTube;
+      case 'Professional Packing':
+        return l10n.professionalPacking;
+      case 'Furniture Disassembly':
+        return l10n.furnitureDisassembly;
+      case 'Temporary Storage':
+        return l10n.temporaryStorage;
+      case 'Shipment Tracking':
+        return l10n.catShipmentTracking;
+      case 'Delivery Delay':
+        return l10n.catDeliveryDelay;
+      case 'Request a Quote':
+        return l10n.catRequestQuote;
+      case 'Payment & Invoice':
+        return l10n.catPaymentInvoice;
+      case 'Damaged Shipment':
+        return l10n.catDamagedShipment;
+      case 'General Inquiry':
+        return l10n.catGeneralInquiry;
       default:
-        return value;
+        return _optionLabelFallback(l10n, value);
     }
+  }
+
+  // Translate known status codes; otherwise keep the original stored text.
+  static String _optionLabelFallback(AppLocalizations l10n, String value) {
+    final raw = value.trim();
+    if (raw.isEmpty) return raw;
+
+    final status = normalizeStatus(raw);
+    const knownStatuses = {
+      'pending',
+      'confirmed',
+      'prepared',
+      'in_transit',
+      'customs_clearance',
+      'out_for_delivery',
+      'delivered',
+      'cancelled',
+    };
+    if (knownStatuses.contains(status)) {
+      return statusLabel(l10n, raw);
+    }
+
+    return raw;
   }
 }

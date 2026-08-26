@@ -690,11 +690,16 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       'destination',
     ], fallback: l10n.notSpecified);
 
-    final cargo = _stringValue(shipment, [
+    final cargoRaw = _stringValue(shipment, [
       'cargo',
       'cargoType',
       'type',
-    ], fallback: l10n.shipment);
+    ], fallback: '');
+    final cargo = LocaleController.displayOption(
+      l10n,
+      cargoRaw,
+      emptyLabel: l10n.shipment,
+    );
 
     final status = LocaleController.normalizeStatus(
       _stringValue(shipment, ['status'], fallback: 'pending'),
@@ -1514,7 +1519,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
     final minute = date.minute.toString().padLeft(2, '0');
 
-    final amPm = date.hour >= 12 ? 'PM' : 'AM';
+    final amPm = LocaleController.timePeriod(l10n, date.hour);
 
     return '${date.day} '
         '${LocaleController.monthAbbrev(l10n, date.month)} '
@@ -1560,7 +1565,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       return LocaleController.statusLabel(l10n, raw);
     }
 
-    return raw;
+    return LocaleController.optionLabel(l10n, raw);
   }
 
   IconData _timelineIcon(String value) {
