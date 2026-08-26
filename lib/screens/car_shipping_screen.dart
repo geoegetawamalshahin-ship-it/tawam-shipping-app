@@ -272,9 +272,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                     _sectionTitle(
                       number: '02',
                       icon: Icons.directions_car_filled_outlined,
-                      title: 'Vehicle Information',
-                      subtitle:
-                          'Provide the vehicle details required for accurate transport planning.',
+                      title: l10n.vehicleInformation,
+                      subtitle: l10n.vehicleInfoSubtitle,
                     ),
 
                     const SizedBox(height: 13),
@@ -286,7 +285,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                     _sectionTitle(
                       number: '03',
                       icon: Icons.local_shipping_outlined,
-                      title: 'Shipping Method',
+                      title: l10n.shippingMethod,
                       subtitle: l10n.chooseHowToMove,
                     ),
 
@@ -299,9 +298,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                     _sectionTitle(
                       number: '04',
                       icon: Icons.verified_user_outlined,
-                      title: 'Vehicle Protection',
-                      subtitle:
-                          'Add insurance or priority handling to your quotation request.',
+                      title: l10n.vehicleProtection,
+                      subtitle: l10n.addInsuranceOrPriority,
                     ),
 
                     const SizedBox(height: 13),
@@ -488,6 +486,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
   // =========================================================
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 235,
       clipBehavior: Clip.antiAlias,
@@ -521,8 +521,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
             ),
           ),
 
-          Positioned(
-            left: 18,
+          PositionedDirectional(
+            start: 18,
             top: 17,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
@@ -530,18 +530,18 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                 color: Colors.white.withValues(alpha: .94),
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.verified_user_outlined,
                     color: _primaryBlue,
                     size: 14,
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
-                    'SECURE VEHICLE LOGISTICS',
-                    style: TextStyle(
+                    l10n.secureVehicleLogistics,
+                    style: const TextStyle(
                       color: _deepBlue,
                       fontSize: 8,
                       fontWeight: FontWeight.w900,
@@ -553,16 +553,16 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
             ),
           ),
 
-          const Positioned(
-            left: 19,
-            right: 19,
+          PositionedDirectional(
+            start: 19,
+            end: 19,
             bottom: 19,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your Vehicle.\nHandled Professionally.',
-                  style: TextStyle(
+                  l10n.carHeroTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 25,
                     height: 1.05,
@@ -570,10 +570,10 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                     letterSpacing: -.55,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'Premium regional and international vehicle transport with flexible shipping options.',
-                  style: TextStyle(
+                  l10n.carHeroSubtitle,
+                  style: const TextStyle(
                     color: Color(0xFFE2EDF8),
                     fontSize: 10.5,
                     height: 1.45,
@@ -589,6 +589,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
   }
 
   Widget _buildTrustBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       decoration: BoxDecoration(
@@ -596,29 +598,29 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
         borderRadius: BorderRadius.circular(19),
         border: Border.all(color: _border),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: _CarTrustItem(
               icon: Icons.local_shipping_outlined,
-              title: 'ROAD',
-              subtitle: 'Carrier Transport',
+              title: l10n.badgeRoad,
+              subtitle: l10n.carrierTransport,
             ),
           ),
-          _CarDivider(),
+          const _CarDivider(),
           Expanded(
             child: _CarTrustItem(
               icon: Icons.directions_boat_outlined,
               title: 'RoRo',
-              subtitle: 'Port Shipping',
+              subtitle: l10n.portShipping,
             ),
           ),
-          _CarDivider(),
+          const _CarDivider(),
           Expanded(
             child: _CarTrustItem(
               icon: Icons.inventory_2_outlined,
-              title: 'CONTAINER',
-              subtitle: 'Protected Shipping',
+              title: l10n.containerUpper,
+              subtitle: l10n.protectedShipping,
             ),
           ),
         ],
@@ -714,7 +716,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           _textField(
             controller: _originController,
             label: l10n.pickupLocation,
-            hint: 'City, address, showroom or port',
+            hint: l10n.cityShowroomPort,
             icon: Icons.trip_origin_rounded,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -759,7 +761,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           _textField(
             controller: _destinationController,
             label: l10n.deliveryLocation,
-            hint: 'City, address, warehouse or port',
+            hint: l10n.cityWarehousePort,
             icon: Icons.location_on_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -870,14 +872,17 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
   // =========================================================
 
   Widget _buildVehicleSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         children: [
           _dropdown(
-            label: 'Vehicle Type',
+            label: l10n.vehicleType,
             icon: Icons.directions_car_filled_outlined,
             value: _vehicleType,
             items: _vehicleTypes,
+            itemLabel: (item) => _optionLabel(l10n, item),
             onChanged: (value) {
               if (value == null) return;
 
@@ -891,7 +896,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
 
           _textField(
             controller: _vehicleCountController,
-            label: 'Number of Vehicles',
+            label: l10n.numberOfVehicles,
             hint: '1',
             icon: Icons.numbers_rounded,
             keyboardType: TextInputType.number,
@@ -899,7 +904,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
               final count = int.tryParse(value?.trim() ?? '');
 
               if (count == null || count <= 0) {
-                return 'Enter number of vehicles';
+                return l10n.enterNumberOfVehicles;
               }
 
               return null;
@@ -913,12 +918,12 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
               Expanded(
                 child: _textField(
                   controller: _makeController,
-                  label: 'Make',
+                  label: l10n.vehicleMake,
                   hint: 'Toyota',
                   icon: Icons.badge_outlined,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Enter make';
+                      return l10n.enterMake;
                     }
 
                     return null;
@@ -931,12 +936,12 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
               Expanded(
                 child: _textField(
                   controller: _modelController,
-                  label: 'Model',
+                  label: l10n.vehicleModel,
                   hint: 'Land Cruiser',
                   icon: Icons.directions_car_outlined,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Enter model';
+                      return l10n.enterModel;
                     }
 
                     return null;
@@ -950,7 +955,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
 
           _textField(
             controller: _yearController,
-            label: 'Model Year',
+            label: l10n.modelYear,
             hint: '2024',
             icon: Icons.calendar_today_outlined,
             keyboardType: TextInputType.number,
@@ -959,7 +964,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
               final maxYear = DateTime.now().year + 1;
 
               if (year == null || year < 1900 || year > maxYear) {
-                return 'Enter a valid model year';
+                return l10n.enterValidModelYear;
               }
 
               return null;
@@ -969,10 +974,11 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           const SizedBox(height: 14),
 
           _dropdown(
-            label: 'Vehicle Condition',
+            label: l10n.vehicleCondition,
             icon: Icons.car_repair_outlined,
             value: _vehicleCondition,
             items: _vehicleConditions,
+            itemLabel: (item) => _optionLabel(l10n, item),
             onChanged: (value) {
               if (value == null) return;
 
@@ -992,20 +998,20 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: const Color(0xFFF2D9AC)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.info_outline_rounded,
                     color: Color(0xFFB26A00),
                     size: 18,
                   ),
 
-                  SizedBox(width: 9),
+                  const SizedBox(width: 9),
 
                   Expanded(
                     child: Text(
-                      'Special loading equipment may be required for non-running or damaged vehicles.',
-                      style: TextStyle(
+                      l10n.specialLoadingMayBeRequired,
+                      style: const TextStyle(
                         color: Color(0xFF8A5800),
                         fontSize: 9.2,
                         height: 1.35,
@@ -1022,8 +1028,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
 
           _textField(
             controller: _vinController,
-            label: 'VIN / Chassis Number',
-            hint: 'Optional',
+            label: l10n.vinChassis,
+            hint: l10n.optional,
             icon: Icons.pin_outlined,
           ),
 
@@ -1036,8 +1042,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                 flex: 3,
                 child: _textField(
                   controller: _vehicleValueController,
-                  label: 'Vehicle Value',
-                  hint: 'Optional',
+                  label: l10n.vehicleValue,
+                  hint: l10n.optional,
                   icon: Icons.payments_outlined,
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -1050,7 +1056,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                     final amount = double.tryParse(value.trim());
 
                     if (amount == null || amount <= 0) {
-                      return 'Invalid value';
+                      return l10n.invalidValue;
                     }
 
                     return null;
@@ -1066,7 +1072,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                   initialValue: _valueCurrency,
                   isExpanded: true,
                   decoration: InputDecoration(
-                    labelText: 'Currency',
+                    labelText: l10n.currency,
                     filled: true,
                     fillColor: _softGrey,
                     contentPadding: const EdgeInsets.symmetric(
@@ -1117,18 +1123,18 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                 color: _softBlue,
                 borderRadius: BorderRadius.circular(13),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.info_outline_rounded,
                     color: _primaryBlue,
                     size: 16,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'If the vehicles are different models or conditions, add the remaining vehicle details under Special Instructions.',
-                      style: TextStyle(
+                      l10n.differentVehiclesHint,
+                      style: const TextStyle(
                         color: _primaryBlue,
                         fontSize: 9,
                         height: 1.35,
@@ -1156,9 +1162,9 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Transport Method',
-            style: TextStyle(
+          Text(
+            l10n.transportMethod,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -1167,9 +1173,9 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
 
           const SizedBox(height: 5),
 
-          const Text(
-            'Choose the option that best fits your route and vehicle.',
-            style: TextStyle(color: _textGrey, fontSize: 9.5),
+          Text(
+            l10n.chooseBestRouteVehicle,
+            style: const TextStyle(color: _textGrey, fontSize: 9.5),
           ),
 
           const SizedBox(height: 14),
@@ -1178,7 +1184,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
             value: 'Open Carrier',
             icon: Icons.local_shipping_outlined,
             title: l10n.openCarrier,
-            subtitle: 'Cost-effective road transport for standard vehicles.',
+            subtitle: l10n.openCarrierDesc,
           ),
 
           const SizedBox(height: 10),
@@ -1186,9 +1192,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           _methodOption(
             value: 'Enclosed Carrier',
             icon: Icons.inventory_2_outlined,
-            title: 'Enclosed Carrier',
-            subtitle:
-                'Enhanced protection for luxury, classic or high-value vehicles.',
+            title: l10n.enclosedCarrier,
+            subtitle: l10n.enclosedCarrierDesc,
           ),
 
           const SizedBox(height: 10),
@@ -1196,8 +1201,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           _methodOption(
             value: 'RoRo',
             icon: Icons.directions_boat_outlined,
-            title: 'RoRo Shipping',
-            subtitle: 'Roll-on / roll-off international port shipping.',
+            title: l10n.roroShipping,
+            subtitle: l10n.roroDesc,
           ),
 
           const SizedBox(height: 10),
@@ -1205,8 +1210,8 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           _methodOption(
             value: 'Container',
             icon: Icons.view_in_ar_outlined,
-            title: 'Container Shipping',
-            subtitle: 'Containerized international vehicle transportation.',
+            title: l10n.containerShipping,
+            subtitle: l10n.containerShippingDesc,
           ),
         ],
       ),
@@ -1325,8 +1330,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           _optionSwitch(
             icon: Icons.workspace_premium_outlined,
             title: l10n.priority,
-            subtitle:
-                'Request priority coordination for a time-sensitive vehicle movement.',
+            subtitle: l10n.requestPriorityVehicle,
             value: _priorityHandling,
             onChanged: (value) {
               setState(() {
@@ -1501,7 +1505,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
 
                   _contactRow(
                     icon: Icons.public_outlined,
-                    label: 'Country',
+                    label: l10n.country,
                     value: _customerCountry,
                   ),
                 ],
@@ -1622,7 +1626,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
         ? l10n.destination
         : _destinationController.text.trim();
 
-    final vehicleLabel = _vehicleLabel;
+    final vehicleLabel = _vehicleLabel(l10n);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -1652,19 +1656,19 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.fact_check_outlined,
                     color: Colors.white,
                     size: 19,
                   ),
 
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
 
                   Text(
-                    'REQUEST SUMMARY',
-                    style: TextStyle(
+                    l10n.requestSummary,
+                    style: const TextStyle(
                       color: Color(0xFFCFE1F3),
                       fontSize: 8.5,
                       letterSpacing: 1,
@@ -1795,18 +1799,18 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                     color: Colors.white.withValues(alpha: .08),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.construction_rounded,
                         color: Color(0xFF7EC0FF),
                         size: 18,
                       ),
-                      SizedBox(width: 9),
+                      const SizedBox(width: 9),
                       Expanded(
                         child: Text(
-                          'Special loading requirement flagged automatically.',
-                          style: TextStyle(
+                          l10n.specialLoadingFlagged,
+                          style: const TextStyle(
                             color: Color(0xFFD9E8F6),
                             fontSize: 9.5,
                             fontWeight: FontWeight.w600,
@@ -2458,7 +2462,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
     return value;
   }
 
-  String get _vehicleLabel {
+  String _vehicleLabel(AppLocalizations l10n) {
     final make = _makeController.text.trim();
     final model = _modelController.text.trim();
     final year = _yearController.text.trim();
@@ -2470,13 +2474,14 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
     ];
 
     if (parts.isEmpty) {
-      return _vehicleType;
+      return _optionLabel(l10n, _vehicleType);
     }
 
-    return '${parts.join(' ')} • $_vehicleType';
+    return '${parts.join(' ')} • ${_optionLabel(l10n, _vehicleType)}';
   }
 
   Future<void> _selectReadyDate() async {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
 
     final result = await showDatePicker(
@@ -2484,7 +2489,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
       initialDate: _readyDate ?? now,
       firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(now.year + 2),
-      helpText: 'SELECT VEHICLE READY DATE',
+      helpText: l10n.selectVehicleReadyDate,
     );
 
     if (result == null || !mounted) return;
@@ -2502,45 +2507,9 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
 
   // Map stored English option values to localized display labels.
   String _optionLabel(AppLocalizations l10n, String value) {
-    switch (value) {
-      case 'Door to Door':
-        return l10n.doorToDoor;
-      case 'Port to Port':
-        return l10n.portToPort;
-      case 'Door to Port':
-        return l10n.doorToPort;
-      case 'Port to Door':
-        return l10n.portToDoor;
-      case 'Customs Clearance':
-        return l10n.customsClearance;
-      case 'Pickup':
-        return l10n.pickup;
-      case 'Delivery':
-        return l10n.delivery;
-      case 'Export Documentation':
-        return l10n.exportDocumentation;
-      case 'Packing':
-        return l10n.packing;
-      case 'Open Carrier':
-        return l10n.openCarrier;
-      case 'Standard':
-        return l10n.standard;
-      case 'Express':
-        return l10n.express;
-      case 'Priority':
-        return l10n.priority;
-      case 'Boxes':
-        return l10n.boxes;
-      case 'Pallets':
-        return l10n.pallets;
-      case 'Loose Cargo':
-        return l10n.looseCargo;
-      case 'Crates':
-        return l10n.crates;
-      default:
-        return value;
-    }
+    return LocaleController.optionLabel(l10n, value);
   }
+
 
   String _two(int value) {
     return value.toString().padLeft(2, '0');

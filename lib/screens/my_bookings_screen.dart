@@ -36,11 +36,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             _buildHeader(context),
 
             if (user == null)
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Text(
-                    'Please sign in to view your bookings.',
-                    style: TextStyle(
+                    l10n.pleaseSignInToViewBookings,
+                    style: const TextStyle(
                       color: textGrey,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -161,9 +161,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
                           const SizedBox(height: 5),
 
-                          const Text(
-                            'Track every booking request and its latest status.',
-                            style: TextStyle(
+                          Text(
+                            l10n.trackEveryBooking,
+                            style: const TextStyle(
                               color: textGrey,
                               fontSize: 11.5,
                               fontWeight: FontWeight.w500,
@@ -280,6 +280,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   // =========================================================
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 21, 20, 20),
@@ -310,20 +311,20 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             ),
           ),
 
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.verified_user_outlined,
                     color: Colors.white,
                     size: 18,
                   ),
-                  SizedBox(width: 7),
+                  const SizedBox(width: 7),
                   Text(
-                    'SECURE CUSTOMER PORTAL',
-                    style: TextStyle(
+                    l10n.secureCustomerPortal,
+                    style: const TextStyle(
                       color: Color(0xFFD6E6F6),
                       fontSize: 9,
                       letterSpacing: .9,
@@ -333,11 +334,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 ],
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               Text(
-                'Your Shipping Bookings',
-                style: TextStyle(
+                l10n.yourShippingBookings,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 23,
                   fontWeight: FontWeight.w900,
@@ -345,11 +346,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 ),
               ),
 
-              SizedBox(height: 7),
+              const SizedBox(height: 7),
 
               Text(
-                'Follow your booking requests from submission to final confirmation.',
-                style: TextStyle(
+                l10n.followBookingRequests,
+                style: const TextStyle(
                   color: Color(0xFFD6E6F6),
                   fontSize: 11.5,
                   height: 1.45,
@@ -450,7 +451,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       ['all', l10n.all],
       ['pending', l10n.statusPending],
       ['approved', l10n.statusConfirmed],
-      ['rejected', 'Rejected'],
+      ['rejected', l10n.rejected],
     ];
 
     return SingleChildScrollView(
@@ -676,7 +677,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               const SizedBox(width: 5),
               Expanded(
                 child: Text(
-                  cargo,
+                  LocaleController.optionLabel(l10n, cargo),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -699,9 +700,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 _showBookingDetails(context, data);
               },
               icon: const Icon(Icons.visibility_outlined, size: 18),
-              label: const Text(
-                'VIEW BOOKING DETAILS',
-                style: TextStyle(
+              label: Text(
+                l10n.viewBookingDetails,
+                style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: .3,
@@ -925,16 +926,19 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                       _detailCard(
                         title: l10n.shipmentDetails,
                         children: [
-                          _detailLine(l10n.cargoType, cargo),
+                          _detailLine(
+                            l10n.cargoType,
+                            LocaleController.optionLabel(l10n, cargo),
+                          ),
                           _detailLine(l10n.weight, '$weight KG'),
                           _detailLine(l10n.quantity, quantity),
                           _detailLine(
-                            'Dimensions',
+                            l10n.dimensions,
                             '$length × $width × $height CM',
                           ),
                           _detailLine(l10n.pickupDate, pickupDate),
                           _detailLine(
-                            'Preferred Time',
+                            l10n.preferredTime,
                             _preferredTimeLabel(l10n, preferredTime),
                           ),
                           _detailLine(
@@ -951,13 +955,13 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                         title: l10n.specialInstructions,
                         children: [
                           _detailLine(
-                            'Customer Notes',
+                            l10n.customerNotes,
                             notes,
                             showDivider: adminNote != '-',
                           ),
                           if (adminNote != '-')
                             _detailLine(
-                              'Message From Our Team',
+                              l10n.messageFromOurTeam,
                               adminNote,
                               showDivider: false,
                             ),
@@ -1068,6 +1072,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   // =========================================================
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
@@ -1076,23 +1081,23 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: borderColor),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Icon(Icons.event_note_outlined, color: primaryBlue, size: 45),
-          SizedBox(height: 13),
+          const Icon(Icons.event_note_outlined, color: primaryBlue, size: 45),
+          const SizedBox(height: 13),
           Text(
-            'No bookings found',
-            style: TextStyle(
+            l10n.noBookingsFound,
+            style: const TextStyle(
               color: textDark,
               fontSize: 16,
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
-            'Your booking requests will appear here.',
+            l10n.bookingsEmptyBody,
             textAlign: TextAlign.center,
-            style: TextStyle(color: textGrey, fontSize: 11),
+            style: const TextStyle(color: textGrey, fontSize: 11),
           ),
         ],
       ),
@@ -1129,10 +1134,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             ),
             const SizedBox(height: 16),
 
-            const Text(
-              'Unable to load bookings',
+            Text(
+              l10n.unableToLoadBookings,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: textDark,
                 fontSize: 17,
                 fontWeight: FontWeight.w900,

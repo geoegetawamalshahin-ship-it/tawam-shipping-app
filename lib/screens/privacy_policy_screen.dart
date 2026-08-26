@@ -135,19 +135,19 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: const Color(0xFFD5E8F8)),
                     ),
-                    child: const Row(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.info_outline_rounded,
                           color: _primaryBlue,
                           size: 22,
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'This Privacy Policy explains how TAWAM AL-SHAHIN TRANSPORT handles information when customers use the Tawam mobile application and related transportation services.',
-                            style: TextStyle(
+                            l10n.privacyIntro,
+                            style: const TextStyle(
                               color: _darkNavy,
                               fontSize: 12.5,
                               height: 1.55,
@@ -165,15 +165,14 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     number: '01',
                     icon: Icons.person_outline_rounded,
                     title: l10n.informationWeCollect,
-                    text:
-                        'When you create or use a Tawam account, we may process information that you provide to us, including:',
+                    text: l10n.privacyAccountIntro,
                     bullets: [
-                      'Full name',
-                      'Email address',
-                      'Phone number',
-                      'Company information, when provided',
-                      'Delivery or account address, when provided',
-                      'Account and customer identification information',
+                      l10n.fullName,
+                      l10n.emailAddress,
+                      l10n.privacyPhoneNumber,
+                      l10n.privacyCompanyWhenProvided,
+                      l10n.privacyAddressWhenProvided,
+                      l10n.privacyAccountIdInfo,
                     ],
                   ),
 
@@ -183,15 +182,14 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     number: '02',
                     icon: Icons.local_shipping_outlined,
                     title: l10n.shipmentInformation,
-                    text:
-                        'When you use our transportation and logistics services, information related to your shipments may be processed to provide and manage the requested service.',
+                    text: l10n.privacyShipmentIntro,
                     bullets: [
-                      'Shipment and tracking numbers',
-                      'Origin and destination information',
-                      'Shipment status and delivery updates',
-                      'Transportation service details',
-                      'Shipment-related documents',
-                      'Information submitted with quotation requests',
+                      l10n.privacyTrackingNumbers,
+                      l10n.privacyOriginDestination,
+                      l10n.privacyStatusUpdates,
+                      l10n.privacyServiceDetails,
+                      l10n.privacyRelatedDocuments,
+                      l10n.privacyQuoteInfo,
                     ],
                   ),
 
@@ -201,17 +199,16 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     number: '03',
                     icon: Icons.manage_accounts_outlined,
                     title: l10n.howWeUseInformation,
-                    text:
-                        'TAWAM AL-SHAHIN TRANSPORT may use information collected through the application to:',
+                    text: l10n.privacyUseIntro,
                     bullets: [
-                      'Create and manage customer accounts',
-                      'Authenticate users and protect account access',
-                      'Process transportation and shipment requests',
-                      'Provide shipment tracking and status updates',
-                      'Manage quotation requests',
-                      'Provide invoices and shipment documents',
-                      'Respond to customer support requests',
-                      'Maintain and improve application functionality',
+                      l10n.privacyUseAccounts,
+                      l10n.privacyUseAuth,
+                      l10n.privacyUseRequests,
+                      l10n.privacyUseTracking,
+                      l10n.privacyUseQuotes,
+                      l10n.privacyUseInvoices,
+                      l10n.privacyUseSupport,
+                      l10n.privacyUseImprove,
                     ],
                   ),
 
@@ -222,7 +219,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.lock_outline_rounded,
                     title: l10n.accountSecurity,
                     text:
-                        'Account access is protected using authentication services. Customers should keep their login credentials confidential and should not share passwords or password-reset links with other persons.',
+                        l10n.privacyAccountSecurityBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -232,7 +229,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.description_outlined,
                     title: l10n.shippingDocuments,
                     text:
-                        'Invoices, transportation documents, proof-of-delivery files and other shipment-related documents may be made available through a customer account when those documents are associated with that customer or shipment.',
+                        l10n.privacyShippingDocumentsBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -242,7 +239,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.notifications_none_rounded,
                     title: l10n.serviceCommunications,
                     text:
-                        'We may use your contact information to provide service-related communications such as shipment updates, quotation information, account notices, security messages and customer-support responses.',
+                        l10n.privacyServiceCommunicationsBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -252,7 +249,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.share_outlined,
                     title: l10n.dataSharing,
                     text:
-                        'Information may be shared when reasonably necessary to provide transportation or logistics services, process a customer request, support application operations, comply with applicable legal requirements, or protect the security of our services. We do not intend customer accounts to provide public access to private shipment information.',
+                        l10n.privacyDataSharingBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -262,7 +259,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.storage_outlined,
                     title: l10n.dataStorage,
                     text:
-                        'Account and application data may be stored using cloud infrastructure and service providers used by TAWAM AL-SHAHIN TRANSPORT to operate the application. Access to customer information should be limited according to account permissions and operational requirements.',
+                        l10n.privacyDataStorageBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -272,7 +269,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.security_rounded,
                     title: l10n.securityMeasures,
                     text:
-                        'We use technical and organizational safeguards designed to reduce unauthorized access, disclosure, alteration or misuse of customer and shipment information. No electronic system can guarantee absolute security, so customers should also protect their account credentials and devices.',
+                        l10n.privacySecurityMeasuresBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -282,7 +279,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.history_rounded,
                     title: l10n.dataRetention,
                     text:
-                        'Information may be retained for as long as reasonably necessary to provide transportation services, maintain customer and shipment records, support business operations, resolve disputes, meet contractual requirements and comply with applicable obligations.',
+                        l10n.privacyDataRetentionBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -292,7 +289,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.edit_note_rounded,
                     title: l10n.yourAccountInformation,
                     text:
-                        'Customers may review and update certain account information through the Profile section of the Tawam application. Security-sensitive changes may require additional authentication or verification.',
+                        l10n.privacyYourAccountInfoBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -302,7 +299,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.key_rounded,
                     title: l10n.passwordAccountProtection,
                     text:
-                        'Customers can use the available account-security features to reset or change their password. Passwords should be strong, unique and kept confidential. If you believe your account has been accessed without authorization, contact us promptly.',
+                        l10n.privacyPasswordProtectionBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -312,7 +309,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.support_agent_rounded,
                     title: l10n.contactUs,
                     text:
-                        'If you have questions regarding your account, shipment information, privacy or this Privacy Policy, please contact TAWAM AL-SHAHIN TRANSPORT through the Help Center available in the application.',
+                        l10n.privacyContactBody,
                   ),
 
                   const SizedBox(height: 14),
@@ -322,7 +319,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     icon: Icons.update_rounded,
                     title: l10n.changesToPolicy,
                     text:
-                        'TAWAM AL-SHAHIN TRANSPORT may update this Privacy Policy when the application, our services or applicable requirements change. The latest version will be made available through the application.',
+                        l10n.privacyChangesBody,
                   ),
 
                   const SizedBox(height: 24),
@@ -386,10 +383,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
                   const SizedBox(height: 18),
 
-                  const Center(
+                  Center(
                     child: Text(
-                      'Privacy • Security • Trust',
-                      style: TextStyle(
+                      l10n.privacySecurityTrust,
+                      style: const TextStyle(
                         color: _mutedText,
                         fontSize: 10.5,
                         fontWeight: FontWeight.w700,

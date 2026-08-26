@@ -285,9 +285,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '02',
                       icon: Icons.home_work_outlined,
-                      title: 'Move Profile',
-                      subtitle:
-                          'Help us understand the size and type of your relocation.',
+                      title: l10n.moveProfile,
+                      subtitle: l10n.moveProfileHelp,
                     ),
 
                     const SizedBox(height: 13),
@@ -299,9 +298,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '03',
                       icon: Icons.inventory_2_outlined,
-                      title: 'Inventory Estimate',
-                      subtitle:
-                          'Provide a simple estimate. Final volume can be confirmed by our team.',
+                      title: l10n.inventoryEstimate,
+                      subtitle: l10n.inventoryEstimateHelp,
                     ),
 
                     const SizedBox(height: 13),
@@ -313,9 +311,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '04',
                       icon: Icons.chair_outlined,
-                      title: 'Special Items',
-                      subtitle:
-                          'Select items that may require special packing or handling.',
+                      title: l10n.specialItems,
+                      subtitle: l10n.selectSpecialPackingItems,
                     ),
 
                     const SizedBox(height: 13),
@@ -327,9 +324,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     _sectionTitle(
                       number: '05',
                       icon: Icons.design_services_outlined,
-                      title: 'Moving Services',
-                      subtitle:
-                          'Build the moving package that fits your relocation.',
+                      title: l10n.movingServices,
+                      subtitle: l10n.buildMovingPackage,
                     ),
 
                     const SizedBox(height: 13),
@@ -516,6 +512,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 235,
       clipBehavior: Clip.antiAlias,
@@ -549,8 +547,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
             ),
           ),
 
-          Positioned(
-            left: 18,
+          PositionedDirectional(
+            start: 18,
             top: 17,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
@@ -558,14 +556,14 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                 color: Colors.white.withValues(alpha: .94),
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.public_rounded, color: _primaryBlue, size: 14),
-                  SizedBox(width: 6),
+                  const Icon(Icons.public_rounded, color: _primaryBlue, size: 14),
+                  const SizedBox(width: 6),
                   Text(
-                    'GLOBAL RELOCATION',
-                    style: TextStyle(
+                    l10n.globalRelocation,
+                    style: const TextStyle(
                       color: _deepBlue,
                       fontSize: 8,
                       fontWeight: FontWeight.w900,
@@ -577,16 +575,16 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
             ),
           ),
 
-          const Positioned(
-            left: 19,
-            right: 19,
+          PositionedDirectional(
+            start: 19,
+            end: 19,
             bottom: 19,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Move Worldwide.\nFeel At Home.',
-                  style: TextStyle(
+                  l10n.movingHeroTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 26,
                     height: 1.05,
@@ -594,10 +592,10 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     letterSpacing: -.55,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'Premium relocation planning for homes, offices and personal effects — from collection to final delivery.',
-                  style: TextStyle(
+                  l10n.movingHeroSubtitle,
+                  style: const TextStyle(
                     color: Color(0xFFE2EDF8),
                     fontSize: 10.5,
                     height: 1.45,
@@ -624,18 +622,18 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       ),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: _MovingTrustItem(
               icon: Icons.inventory_2_outlined,
-              title: 'PACK',
-              subtitle: 'Professional Packing',
+              title: l10n.badgePack,
+              subtitle: l10n.professionalPacking,
             ),
           ),
           const _MovingDivider(),
           Expanded(
             child: _MovingTrustItem(
               icon: Icons.public_rounded,
-              title: 'GLOBAL',
+              title: l10n.badgeGlobal,
               subtitle: l10n.serviceInternationalMoving,
             ),
           ),
@@ -740,7 +738,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           _textField(
             controller: _originController,
             label: l10n.origin,
-            hint: 'City, building or current address',
+            hint: l10n.cityBuildingCurrent,
             icon: Icons.home_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -786,7 +784,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           _textField(
             controller: _destinationController,
             label: l10n.destination,
-            hint: 'City, building or destination address',
+            hint: l10n.cityBuildingDestination,
             icon: Icons.location_on_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -898,13 +896,15 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildMoveProfileSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Move Type',
-            style: TextStyle(
+          Text(
+            l10n.moveType,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -919,8 +919,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                 child: _moveTypeButton(
                   value: 'Home Move',
                   icon: Icons.home_rounded,
-                  title: 'Home',
-                  subtitle: 'Household move',
+                  title: l10n.homeMoveShort,
+                  subtitle: l10n.householdMove,
                 ),
               ),
 
@@ -930,8 +930,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                 child: _moveTypeButton(
                   value: 'Office Move',
                   icon: Icons.business_rounded,
-                  title: 'Office',
-                  subtitle: 'Business move',
+                  title: l10n.office,
+                  subtitle: l10n.businessMove,
                 ),
               ),
 
@@ -941,8 +941,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                 child: _moveTypeButton(
                   value: 'Personal Effects',
                   icon: Icons.inventory_2_rounded,
-                  title: 'Personal',
-                  subtitle: 'Personal effects',
+                  title: l10n.personalShort,
+                  subtitle: l10n.personalEffectsLower,
                 ),
               ),
             ],
@@ -951,10 +951,11 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           const SizedBox(height: 18),
 
           _dropdown(
-            label: 'Property Type',
+            label: l10n.propertyType,
             icon: Icons.apartment_rounded,
             value: _propertyType,
             items: _propertyTypes,
+            itemLabel: (item) => _optionLabel(l10n, item),
             onChanged: (value) {
               if (value == null) return;
 
@@ -969,8 +970,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           _textField(
             controller: _roomsController,
             label: _moveType == 'Office Move'
-                ? 'Rooms / Work Areas'
-                : 'Bedrooms / Rooms',
+                ? l10n.roomsWorkAreas
+                : l10n.bedroomsRooms,
             hint: '2',
             icon: Icons.bed_outlined,
             keyboardType: TextInputType.number,
@@ -978,7 +979,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               final count = int.tryParse(value?.trim() ?? '');
 
               if (count == null || count <= 0) {
-                return 'Enter number of rooms';
+                return l10n.enterNumberOfRooms;
               }
 
               return null;
@@ -987,9 +988,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           const SizedBox(height: 18),
 
-          const Text(
-            'Origin Access',
-            style: TextStyle(
+          Text(
+            l10n.originAccess,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
@@ -1004,7 +1005,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               Expanded(
                 child: _textField(
                   controller: _originFloorController,
-                  label: 'Floor',
+                  label: l10n.floor,
                   hint: '0',
                   icon: Icons.layers_outlined,
                   keyboardType: TextInputType.number,
@@ -1015,7 +1016,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
               Expanded(
                 child: _compactToggle(
-                  title: 'Elevator',
+                  title: l10n.elevator,
                   value: _originElevator,
                   onChanged: (value) {
                     setState(() {
@@ -1029,9 +1030,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           const SizedBox(height: 18),
 
-          const Text(
-            'Destination Access',
-            style: TextStyle(
+          Text(
+            l10n.destinationAccess,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
@@ -1046,7 +1047,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               Expanded(
                 child: _textField(
                   controller: _destinationFloorController,
-                  label: 'Floor',
+                  label: l10n.floor,
                   hint: '0',
                   icon: Icons.layers_outlined,
                   keyboardType: TextInputType.number,
@@ -1057,7 +1058,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
               Expanded(
                 child: _compactToggle(
-                  title: 'Elevator',
+                  title: l10n.elevator,
                   value: _destinationElevator,
                   onChanged: (value) {
                     setState(() {
@@ -1196,6 +1197,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildInventorySection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1205,7 +1208,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               Expanded(
                 child: _textField(
                   controller: _boxesController,
-                  label: 'Estimated Boxes',
+                  label: l10n.estimatedBoxes,
                   hint: '10',
                   icon: Icons.inventory_outlined,
                   keyboardType: TextInputType.number,
@@ -1218,7 +1221,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               Expanded(
                 child: _textField(
                   controller: _largeItemsController,
-                  label: 'Large Items',
+                  label: l10n.largeItems,
                   hint: '5',
                   icon: Icons.chair_outlined,
                   keyboardType: TextInputType.number,
@@ -1232,8 +1235,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           _textField(
             controller: _volumeController,
-            label: 'Estimated Volume',
-            hint: 'Optional — our team can confirm it',
+            label: l10n.estimatedVolume,
+            hint: l10n.optionalTeamCanConfirm,
             suffix: 'CBM',
             icon: Icons.view_in_ar_rounded,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -1245,7 +1248,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               final volume = double.tryParse(value.trim());
 
               if (volume == null || volume <= 0) {
-                return 'Enter a valid volume';
+                return l10n.enterValidVolume;
               }
 
               return null;
@@ -1272,7 +1275,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                 Expanded(
                   child: Text(
-                    _planningNote,
+                    _planningNote(l10n),
                     style: const TextStyle(
                       color: _primaryBlue,
                       fontSize: 9.2,
@@ -1294,13 +1297,15 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Widget _buildSpecialItemsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Items requiring extra care',
-            style: TextStyle(
+          Text(
+            l10n.itemsRequiringExtraCare,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -1309,9 +1314,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           const SizedBox(height: 5),
 
-          const Text(
-            'Select all that apply.',
-            style: TextStyle(color: _textGrey, fontSize: 9.5),
+          Text(
+            l10n.selectAllThatApply,
+            style: const TextStyle(color: _textGrey, fontSize: 9.5),
           ),
 
           const SizedBox(height: 14),
@@ -1323,7 +1328,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               final selected = _specialItems.contains(item);
 
               return FilterChip(
-                label: Text(item),
+                label: Text(_optionLabel(l10n, item)),
                 selected: selected,
                 showCheckmark: true,
                 checkmarkColor: Colors.white,
@@ -1368,7 +1373,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           _optionSwitch(
             icon: Icons.inventory_2_outlined,
             title: l10n.packing,
-            subtitle: 'Our moving team packs household or office items.',
+            subtitle: l10n.movingTeamPacksItems,
             value: _packingRequired,
             onChanged: (value) {
               setState(() {
@@ -1381,8 +1386,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           _optionSwitch(
             icon: Icons.unarchive_outlined,
-            title: 'Unpacking Service',
-            subtitle: 'Request unpacking support at destination.',
+            title: l10n.unpackingService,
+            subtitle: l10n.requestUnpacking,
             value: _unpackingRequired,
             onChanged: (value) {
               setState(() {
@@ -1395,9 +1400,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           _optionSwitch(
             icon: Icons.handyman_outlined,
-            title: 'Furniture Disassembly',
-            subtitle:
-                'Dismantling support for large furniture before transport.',
+            title: l10n.furnitureDisassembly,
+            subtitle: l10n.dismantlingSupport,
             value: _furnitureDisassembly,
             onChanged: (value) {
               setState(() {
@@ -1410,8 +1414,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
           _optionSwitch(
             icon: Icons.warehouse_outlined,
-            title: 'Temporary Storage',
-            subtitle: 'Request storage options before final delivery.',
+            title: l10n.temporaryStorage,
+            subtitle: l10n.requestStorageBeforeDelivery,
             value: _storageRequired,
             onChanged: (value) {
               setState(() {
@@ -1596,7 +1600,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                   _contactRow(
                     icon: Icons.public_outlined,
-                    label: 'Country',
+                    label: l10n.country,
                     value: _customerCountry,
                   ),
                 ],
@@ -1745,19 +1749,19 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.fact_check_outlined,
                     color: Colors.white,
                     size: 19,
                   ),
 
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
 
                   Text(
-                    'MOVE SUMMARY',
-                    style: TextStyle(
+                    l10n.moveSummary,
+                    style: const TextStyle(
                       color: Color(0xFFCFE1F3),
                       fontSize: 8.5,
                       letterSpacing: 1,
@@ -1820,13 +1824,21 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     LocaleController.serviceLabel(l10n, 'International Moving'),
                   ),
 
-                  _summaryBadge(Icons.home_work_outlined, _moveType),
+                  _summaryBadge(
+                    Icons.home_work_outlined,
+                    _optionLabel(l10n, _moveType),
+                  ),
 
-                  _summaryBadge(Icons.apartment_rounded, _propertyType),
+                  _summaryBadge(
+                    Icons.apartment_rounded,
+                    _optionLabel(l10n, _propertyType),
+                  ),
 
                   _summaryBadge(
                     Icons.bed_outlined,
-                    '$_roomsCount Room${_roomsCount == 1 ? '' : 's'}',
+                    _roomsCount == 1
+                        ? l10n.roomSingular(_roomsCount)
+                        : l10n.roomPlural(_roomsCount),
                   ),
 
                   _summaryBadge(
@@ -1856,7 +1868,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
                     Expanded(
                       child: Text(
-                        _serviceSummaryText,
+                        _serviceSummaryText(l10n),
                         style: const TextStyle(
                           color: Color(0xFFD9E8F6),
                           fontSize: 9.4,
@@ -1900,8 +1912,8 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
                     Expanded(
                       child: Text(
                         _estimatedVolume > 0
-                            ? 'Final survey can confirm volume, access and packing requirements.'
-                            : 'Our relocation team can confirm final volume and access requirements before issuing the rate.',
+                            ? l10n.finalSurveyCanConfirm
+                            : l10n.relocationTeamConfirmVolume,
                         style: const TextStyle(
                           color: Color(0xFFD9E8F6),
                           fontSize: 9.2,
@@ -2600,20 +2612,20 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     return double.tryParse(_volumeController.text.trim()) ?? 0;
   }
 
-  String get _planningNote {
+  String _planningNote(AppLocalizations l10n) {
     if (_estimatedVolume > 0) {
-      return 'Estimated volume entered: ${_formatNumber(_estimatedVolume)} CBM. Our team can confirm the final volume before the rate is issued.';
+      return l10n.estimatedVolumeEntered(_formatNumber(_estimatedVolume));
     }
 
     if (_roomsCount >= 4 || _boxCount >= 40 || _largeItemsCount >= 15) {
-      return 'Large move profile detected. A pre-move survey may help confirm volume, access and packing requirements.';
+      return l10n.largeMoveProfile;
     }
 
     if (_roomsCount >= 2 || _boxCount >= 15 || _largeItemsCount >= 7) {
-      return 'Medium move profile. Final CBM can be confirmed by our relocation team before quotation.';
+      return l10n.mediumMoveProfile;
     }
 
-    return 'Compact move profile. You can leave CBM blank if you do not know it — our team can confirm it.';
+    return l10n.compactMoveProfile;
   }
 
   List<String> get _combinedServices {
@@ -2629,31 +2641,35 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     return services;
   }
 
-  String get _serviceSummaryText {
+  String _serviceSummaryText(AppLocalizations l10n) {
     final services = _combinedServices;
 
     if (services.isEmpty) {
-      return 'Standard relocation coordination';
+      return l10n.standardRelocationCoordination;
     }
 
-    if (services.length <= 2) {
-      return services.join(' • ');
+    final labels = services.map((service) => _optionLabel(l10n, service)).toList();
+
+    if (labels.length <= 2) {
+      return labels.join(' • ');
     }
 
-    return '${services.take(2).join(' • ')} +${services.length - 2} more';
+    return '${labels.take(2).join(' • ')} ${l10n.plusNMore(labels.length - 2)}';
   }
 
   String? _nonNegativeIntegerValidator(String? value) {
+    final l10n = AppLocalizations.of(context)!;
     final number = int.tryParse(value?.trim() ?? '');
 
     if (number == null || number < 0) {
-      return 'Enter 0 or more';
+      return l10n.enterZeroOrMore;
     }
 
     return null;
   }
 
   Future<void> _selectMovingDate() async {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
 
     final result = await showDatePicker(
@@ -2661,7 +2677,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       initialDate: _movingDate ?? now,
       firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(now.year + 2),
-      helpText: 'SELECT MOVING DATE',
+      helpText: l10n.selectMovingDate,
     );
 
     if (result == null || !mounted) return;
@@ -2679,45 +2695,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
   // Map stored English option values to localized display labels.
   String _optionLabel(AppLocalizations l10n, String value) {
-    switch (value) {
-      case 'Door to Door':
-        return l10n.doorToDoor;
-      case 'Port to Port':
-        return l10n.portToPort;
-      case 'Door to Port':
-        return l10n.doorToPort;
-      case 'Port to Door':
-        return l10n.portToDoor;
-      case 'Customs Clearance':
-        return l10n.customsClearance;
-      case 'Pickup':
-        return l10n.pickup;
-      case 'Delivery':
-        return l10n.delivery;
-      case 'Export Documentation':
-        return l10n.exportDocumentation;
-      case 'Packing':
-        return l10n.packing;
-      case 'Open Carrier':
-        return l10n.openCarrier;
-      case 'Standard':
-        return l10n.standard;
-      case 'Express':
-        return l10n.express;
-      case 'Priority':
-        return l10n.priority;
-      case 'Boxes':
-        return l10n.boxes;
-      case 'Pallets':
-        return l10n.pallets;
-      case 'Loose Cargo':
-        return l10n.looseCargo;
-      case 'Crates':
-        return l10n.crates;
-      default:
-        return value;
-    }
+    return LocaleController.optionLabel(l10n, value);
   }
+
 
   String _formatNumber(double value) {
     if (value == value.roundToDouble()) {

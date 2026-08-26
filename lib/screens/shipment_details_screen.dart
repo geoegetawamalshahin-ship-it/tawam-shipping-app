@@ -333,7 +333,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
                   const SizedBox(height: 18),
 
                   _sectionTitle(
-                    title: 'Shipment Information',
+                    title: l10n.shipmentInformation,
                     subtitle: l10n.completeLogisticsDetails,
                     icon: Icons.inventory_2_outlined,
                   ),
@@ -2088,6 +2088,7 @@ class _TimelineRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final circleColor = active
         ? activeColor
         : completed
@@ -2170,7 +2171,7 @@ class _TimelineRow extends StatelessWidget {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
-                            'CURRENT',
+                            l10n.currentBadge,
                             style: TextStyle(
                               color: activeColor,
                               fontSize: 7.5,

@@ -413,9 +413,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
 
                       if (unreadCount > 0)
-                        Positioned(
+                        PositionedDirectional(
                           top: -9,
-                          right: -10,
+                          end: -10,
                           child: Container(
                             constraints: const BoxConstraints(
                               minWidth: 19,

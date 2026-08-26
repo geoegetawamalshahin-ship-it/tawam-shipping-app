@@ -500,8 +500,8 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
             ),
           ),
 
-          Positioned(
-            left: 18,
+          PositionedDirectional(
+            start: 18,
             top: 17,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
@@ -528,16 +528,16 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
             ),
           ),
 
-          const Positioned(
-            left: 19,
-            right: 19,
+          PositionedDirectional(
+            start: 19,
+            end: 19,
             bottom: 19,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Move Your Cargo\nAcross The World',
-                  style: TextStyle(
+                  l10n.seaHeroTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 25,
                     height: 1.05,
@@ -545,10 +545,10 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                     letterSpacing: -.55,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'Submit your sea freight requirements and receive a tailored quotation from our logistics team.',
-                  style: TextStyle(
+                  l10n.seaHeroSubmitSubtitle,
+                  style: const TextStyle(
                     color: Color(0xFFE2EDF8),
                     fontSize: 10.5,
                     height: 1.45,
@@ -579,19 +579,19 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       ),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: _TrustItem(
               icon: Icons.inventory_2_outlined,
               title: 'FCL',
-              subtitle: 'Full Container',
+              subtitle: _optionLabel(l10n, 'Full Container'),
             ),
           ),
           const _VerticalDivider(),
-          const Expanded(
+          Expanded(
             child: _TrustItem(
               icon: Icons.widgets_outlined,
               title: 'LCL',
-              subtitle: 'Shared Cargo',
+              subtitle: _optionLabel(l10n, 'Shared Cargo'),
             ),
           ),
           const _VerticalDivider(),
@@ -691,7 +691,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
           _textField(
             controller: _originController,
             label: l10n.origin,
-            hint: 'Port, city or pickup location',
+            hint: l10n.portCityPickup,
             icon: Icons.trip_origin_rounded,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -734,7 +734,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
           _textField(
             controller: _destinationController,
             label: l10n.destination,
-            hint: 'Port, city or delivery location',
+            hint: l10n.portCityDelivery,
             icon: Icons.location_on_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -843,13 +843,15 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   // =========================================================
 
   Widget _buildShipmentTypeSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Shipment Load',
-            style: TextStyle(
+          Text(
+            l10n.shipmentLoad,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -864,7 +866,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                 child: _shipmentTypeButton(
                   value: 'FCL',
                   title: 'FCL',
-                  subtitle: 'Full Container Load',
+                  subtitle: _optionLabel(l10n, 'Full Container Load'),
                   icon: Icons.inventory_2_outlined,
                 ),
               ),
@@ -875,7 +877,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                 child: _shipmentTypeButton(
                   value: 'LCL',
                   title: 'LCL',
-                  subtitle: 'Less Container Load',
+                  subtitle: _optionLabel(l10n, 'Less Container Load'),
                   icon: Icons.widgets_outlined,
                 ),
               ),
@@ -974,11 +976,13 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   }
 
   Widget _buildFclFields() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       key: const ValueKey('FCL'),
       children: [
         _dropdown(
-          label: 'Container Type',
+          label: l10n.containerType,
           icon: Icons.view_in_ar_outlined,
           value: _containerType,
           items: _containerTypes,
@@ -995,7 +999,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
 
         _textField(
           controller: _quantityController,
-          label: 'Number of Containers',
+          label: l10n.numberOfContainers,
           hint: '1',
           icon: Icons.numbers_rounded,
           keyboardType: TextInputType.number,
@@ -1014,7 +1018,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       children: [
         _textField(
           controller: _quantityController,
-          label: 'Number of Packages / Pallets',
+          label: l10n.numberOfPackagesPallets,
           hint: '1',
           icon: Icons.inventory_outlined,
           keyboardType: TextInputType.number,
@@ -1023,9 +1027,9 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
 
         const SizedBox(height: 16),
 
-        const Text(
-          'Package Dimensions',
-          style: TextStyle(
+        Text(
+          l10n.packageDimensions,
+          style: const TextStyle(
             color: _textDark,
             fontSize: 11.5,
             fontWeight: FontWeight.w800,
@@ -1093,7 +1097,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
           _textField(
             controller: _cargoController,
             label: l10n.cargoType,
-            hint: 'e.g. Machinery, Furniture, General Cargo',
+            hint: l10n.hintCargoSea,
             icon: Icons.category_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -1129,7 +1133,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
             controller: _volumeController,
             label: l10n.cbm,
             hint: _shipmentType == 'LCL'
-                ? 'Calculated automatically'
+                ? l10n.calculatedAutomatically
                 : l10n.optional,
             suffix: 'CBM',
             icon: Icons.view_in_ar_rounded,
@@ -1142,7 +1146,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
               final volume = double.tryParse(value?.trim() ?? '');
 
               if (volume == null || volume <= 0) {
-                return 'Enter cargo volume';
+                return l10n.enterCargoVolume;
               }
 
               return null;
@@ -1377,7 +1381,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
 
                   _contactRow(
                     icon: Icons.public_outlined,
-                    label: 'Country',
+                    label: l10n.country,
                     value: _customerCountry,
                   ),
                 ],
@@ -1528,17 +1532,17 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.fact_check_outlined,
                     color: Colors.white,
                     size: 20,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'REQUEST SUMMARY',
-                    style: TextStyle(
+                    l10n.requestSummary,
+                    style: const TextStyle(
                       color: Color(0xFFCFE1F3),
                       fontSize: 8.5,
                       letterSpacing: 1,
@@ -1634,18 +1638,18 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                     color: Colors.white.withValues(alpha: .10),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.support_agent_rounded,
                       color: Color(0xFF7EC0FF),
                       size: 19,
                     ),
-                    SizedBox(width: 9),
+                    const SizedBox(width: 9),
                     Expanded(
                       child: Text(
-                        'Your request will be reviewed by our logistics team before an official rate is issued.',
-                        style: TextStyle(
+                        l10n.reviewedBeforeOfficialRate,
+                        style: const TextStyle(
                           color: Color(0xFFD9E8F6),
                           fontSize: 9.5,
                           height: 1.4,
@@ -2383,25 +2387,9 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
 
   // Map stored English option values to localized display labels.
   String _optionLabel(AppLocalizations l10n, String value) {
-    switch (value) {
-      case 'Door to Door':
-        return l10n.doorToDoor;
-      case 'Port to Port':
-        return l10n.portToPort;
-      case 'Door to Port':
-        return l10n.doorToPort;
-      case 'Port to Door':
-        return l10n.portToDoor;
-      case 'Customs Clearance':
-        return l10n.customsClearance;
-      case 'Pickup':
-        return l10n.pickup;
-      case 'Delivery':
-        return l10n.delivery;
-      default:
-        return value;
-    }
+    return LocaleController.optionLabel(l10n, value);
   }
+
 
   String _two(int value) {
     return value.toString().padLeft(2, '0');

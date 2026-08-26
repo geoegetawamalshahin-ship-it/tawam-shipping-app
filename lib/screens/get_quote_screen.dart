@@ -551,7 +551,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
           _textField(
             controller: _cargoController,
             label: l10n.cargoType,
-            hint: 'e.g. General Cargo, Steel, Furniture',
+            hint: l10n.hintCargoQuote,
             icon: Icons.category_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {

@@ -227,4 +227,235 @@ class LocaleController {
         return null;
     }
   }
+
+  // Display label for stored English option values. Unknown values stay as-is.
+  static String optionLabel(AppLocalizations l10n, String value) {
+    switch (value) {
+      case 'Door to Door':
+        return l10n.doorToDoor;
+      case 'Port to Port':
+        return l10n.portToPort;
+      case 'Door to Port':
+        return l10n.doorToPort;
+      case 'Port to Door':
+        return l10n.portToDoor;
+      case 'Airport to Airport':
+        return l10n.airportToAirport;
+      case 'Door to Airport':
+        return l10n.doorToAirport;
+      case 'Airport to Door':
+        return l10n.airportToDoor;
+      case 'Depot to Depot':
+        return l10n.depotToDepot;
+      case 'Door to Depot':
+        return l10n.doorToDepot;
+      case 'Depot to Door':
+        return l10n.depotToDoor;
+      case 'Recommend for Me':
+        return l10n.recommendForMe;
+      case 'Customs Clearance':
+        return l10n.customsClearance;
+      case 'Pickup':
+        return l10n.pickup;
+      case 'Delivery':
+        return l10n.delivery;
+      case 'Export Documentation':
+        return l10n.exportDocumentation;
+      case 'Packing':
+        return l10n.packing;
+      case 'Loose Cargo':
+        return l10n.looseCargo;
+      case 'Boxes':
+        return l10n.boxes;
+      case 'Pallets':
+        return l10n.pallets;
+      case 'Full Container':
+        return l10n.fullContainer;
+      case 'Shared Cargo':
+        return l10n.sharedCargo;
+      case 'Full Container Load':
+        return l10n.fullContainerLoad;
+      case 'Less Container Load':
+        return l10n.lessContainerLoad;
+      case 'Flat Rack':
+        return l10n.flatRack;
+      case 'Packing List Review':
+        return l10n.packingListReview;
+      case 'Open Carrier':
+        return l10n.openCarrier;
+      case 'Enclosed Carrier':
+        return l10n.enclosedCarrier;
+      case 'RoRo Shipping':
+        return l10n.roroShipping;
+      case 'Container Shipping':
+        return l10n.containerShipping;
+      case 'Sedan':
+        return l10n.sedan;
+      case 'SUV':
+        return l10n.suv;
+      case 'Van':
+        return l10n.van;
+      case 'Motorcycle':
+        return l10n.motorcycle;
+      case 'Luxury / Classic':
+        return l10n.luxuryClassic;
+      case 'Commercial Vehicle':
+        return l10n.commercialVehicle;
+      case 'Running':
+        return l10n.running;
+      case 'Non-Running':
+        return l10n.nonRunning;
+      case 'Damaged / Accident':
+        return l10n.damagedAccident;
+      case 'Vehicle Inspection':
+        return l10n.vehicleInspection;
+      case 'Full Truck Load':
+        return l10n.fullTruckLoad;
+      case 'Partial Load':
+        return l10n.partialLoad;
+      case 'Less Than Truck Load':
+        return l10n.lessThanTruckLoad;
+      case 'Curtain Side':
+        return l10n.curtainSide;
+      case 'Box Truck':
+        return l10n.boxTruck;
+      case 'Border Documentation':
+        return l10n.borderDocumentation;
+      case 'Loading / Unloading':
+        return l10n.loadingUnloading;
+      case 'Home Move':
+        return l10n.homeMove;
+      case 'Apartment':
+        return l10n.apartment;
+      case 'Villa':
+        return l10n.villa;
+      case 'Townhouse':
+        return l10n.townhouse;
+      case 'Studio':
+        return l10n.studio;
+      case 'Office':
+        return l10n.office;
+      case 'Warehouse':
+        return l10n.warehouse;
+      case 'Office Move':
+        return l10n.officeMove;
+      case 'Personal Effects':
+      case 'Personal effects':
+        return l10n.personalEffects;
+      case 'Piano':
+        return l10n.piano;
+      case 'Safe':
+        return l10n.safe;
+      case 'Artwork':
+        return l10n.artwork;
+      case 'Large Appliances':
+        return l10n.largeAppliances;
+      case 'Fragile Items':
+        return l10n.fragileItems;
+      case 'High-Value Items':
+        return l10n.highValueItems;
+      case 'Packing Materials':
+        return l10n.packingMaterials;
+      case 'Furniture Reassembly':
+        return l10n.furnitureReassembly;
+      case 'Debris Removal':
+        return l10n.debrisRemoval;
+      case 'Elevator':
+        return l10n.elevator;
+      case 'Unpacking':
+        return l10n.unpacking;
+      case 'Moving Insurance':
+        return l10n.movingInsurance;
+      case 'Door Pickup':
+        return l10n.doorPickup;
+      case 'Envelope / Document':
+        return l10n.envelopeDocument;
+      case 'Padded Bag':
+        return l10n.paddedBag;
+      case 'Proof of Delivery':
+        return l10n.proofOfDelivery;
+      case 'Economy':
+        return l10n.economy;
+      case 'Fragile':
+        return l10n.fragile;
+      case 'General Cargo':
+        return l10n.cargoGeneral;
+      case 'Heavy Equipment':
+        return l10n.cargoHeavyEquipment;
+      case 'Furniture':
+        return l10n.cargoFurniture;
+      case 'Electronics':
+        return l10n.cargoElectronics;
+      case 'Food Products':
+        return l10n.cargoFoodProducts;
+      case 'Medical Supplies':
+        return l10n.cargoMedicalSupplies;
+      case 'Road Freight':
+        return l10n.roadFreight;
+      case 'Sea Freight':
+        return l10n.serviceSeaFreight;
+      case 'Air Freight':
+        return l10n.serviceAirFreight;
+      case 'Land Freight':
+        return l10n.serviceLandFreight;
+      case 'Car Shipping':
+        return l10n.serviceCarShipping;
+      case 'International Moving':
+        return l10n.serviceInternationalMoving;
+      case 'Parcel Shipping':
+        return l10n.serviceParcelShipping;
+      case 'Morning':
+        return l10n.morning;
+      case 'Afternoon':
+        return l10n.afternoon;
+      case 'Evening':
+        return l10n.evening;
+      case 'Flexible':
+        return l10n.flexible;
+      case 'Standard':
+        return l10n.standard;
+      case 'Express':
+        return l10n.express;
+      case 'Priority':
+        return l10n.priority;
+      case 'Crates':
+        return l10n.crates;
+      case 'Bags':
+        return l10n.bags;
+      case 'Drop-off':
+        return l10n.dropOff;
+      case 'Reefer':
+        return l10n.reefer;
+      case 'Flatbed':
+        return l10n.flatbed;
+      case 'Lowbed':
+        return l10n.lowbed;
+      case 'Open Top':
+        return l10n.openTop;
+      case '20FT Standard':
+        return l10n.ft20Standard;
+      case '40FT Standard':
+        return l10n.ft40Standard;
+      case '40FT HC':
+        return l10n.ft40Hc;
+      case '20FT Reefer':
+        return l10n.ft20Reefer;
+      case '40FT Reefer':
+        return l10n.ft40Reefer;
+      case 'Container':
+        return l10n.container;
+      case 'RoRo':
+        return l10n.roroShipping;
+      case 'Other':
+        return l10n.otherOption;
+      case 'Vehicles':
+        return l10n.vehicles;
+      case 'Household Goods & Personal Effects':
+        return l10n.householdGoodsPersonalEffects;
+      case 'Office Relocation':
+        return l10n.officeRelocation;
+      default:
+        return value;
+    }
+  }
 }

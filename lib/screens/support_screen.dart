@@ -860,8 +860,8 @@ class _SupportScreenState extends State<SupportScreen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+              begin: AlignmentDirectional.centerStart,
+              end: AlignmentDirectional.centerEnd,
               colors: [Color(0xFF062B55), Color(0xFF0B4F9C)],
             ),
             borderRadius: BorderRadius.circular(20),

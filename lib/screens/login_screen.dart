@@ -350,9 +350,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Don’t have an account?',
-                          style: TextStyle(
+                        Text(
+                          l10n.dontHaveAccount,
+                          style: const TextStyle(
                             color: Color(0xFF7B8493),
                             fontSize: 14.5,
                           ),

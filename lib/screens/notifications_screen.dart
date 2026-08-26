@@ -862,9 +862,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                 const SizedBox(height: 6),
 
-                const Text(
-                  'Shipment updates, quotations and important account alerts.',
-                  style: TextStyle(
+                Text(
+                  l10n.notificationHeaderSubtitle,
+                  style: const TextStyle(
                     color: Color(0xFFD6E7F7),
                     fontSize: 11.5,
                     height: 1.5,
@@ -1149,14 +1149,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               color: const Color(0xFFF4F8FC),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.sync_rounded, size: 16, color: Color(0xFF0B5FB3)),
-                SizedBox(width: 7),
+                const Icon(
+                  Icons.sync_rounded,
+                  size: 16,
+                  color: Color(0xFF0B5FB3),
+                ),
+                const SizedBox(width: 7),
                 Text(
-                  'Updates appear automatically',
-                  style: TextStyle(
+                  l10n.updatesAppearAutomatically,
+                  style: const TextStyle(
                     color: Color(0xFF0B5FB3),
                     fontSize: 11,
                     fontWeight: FontWeight.w700,

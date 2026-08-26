@@ -572,8 +572,8 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
             ),
           ),
 
-          Positioned(
-            left: 18,
+          PositionedDirectional(
+            start: 18,
             top: 17,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
@@ -600,9 +600,9 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
             ),
           ),
 
-          Positioned(
-            left: 19,
-            right: 19,
+          PositionedDirectional(
+            start: 19,
+            end: 19,
             bottom: 19,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1058,7 +1058,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
           _textField(
             controller: _cargoController,
             label: l10n.cargoType,
-            hint: 'e.g. Electronics, Machinery, General Cargo',
+            hint: l10n.hintCargoAir,
             icon: Icons.category_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -1519,7 +1519,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
                   const _AirContactDivider(),
                   _contactRow(
                     Icons.public_outlined,
-                    'Country',
+                    l10n.country,
                     _customerCountry,
                   ),
                 ],
@@ -1637,15 +1637,15 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.fact_check_outlined, color: Colors.white, size: 19),
+              const Icon(Icons.fact_check_outlined, color: Colors.white, size: 19),
 
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
 
               Text(
-                'REQUEST SUMMARY',
-                style: TextStyle(
+                l10n.requestSummary,
+                style: const TextStyle(
                   color: Color(0xFFCFE1F3),
                   fontSize: 8.5,
                   letterSpacing: 1,
@@ -2366,43 +2366,9 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
 
   // Map stored English option values to localized display labels.
   String _optionLabel(AppLocalizations l10n, String value) {
-    switch (value) {
-      case 'Door to Door':
-        return l10n.doorToDoor;
-      case 'Airport to Airport':
-        return l10n.airportToAirport;
-      case 'Door to Airport':
-        return l10n.doorToAirport;
-      case 'Airport to Door':
-        return l10n.airportToDoor;
-      case 'Customs Clearance':
-        return l10n.customsClearance;
-      case 'Pickup':
-        return l10n.pickup;
-      case 'Delivery':
-        return l10n.delivery;
-      case 'Export Documentation':
-        return l10n.exportDocumentation;
-      case 'Packing':
-        return l10n.packing;
-      case 'Boxes':
-        return l10n.boxes;
-      case 'Pallets':
-        return l10n.pallets;
-      case 'Loose Cargo':
-        return l10n.looseCargo;
-      case 'Crates':
-        return l10n.crates;
-      case 'Standard':
-        return l10n.standard;
-      case 'Express':
-        return l10n.express;
-      case 'Priority':
-        return l10n.priority;
-      default:
-        return value;
-    }
+    return LocaleController.optionLabel(l10n, value);
   }
+
 
   String _formatNumber(double value) {
     if (value <= 0) return '0';

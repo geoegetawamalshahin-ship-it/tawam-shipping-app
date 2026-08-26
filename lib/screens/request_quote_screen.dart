@@ -86,15 +86,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   String _shippingModeLabel(AppLocalizations l10n, String mode) {
-    switch (mode) {
-      case 'Air Freight':
-      case 'Sea Freight':
-        return LocaleController.serviceLabel(l10n, mode);
-      case 'Express':
-        return l10n.express;
-      default:
-        return mode;
-    }
+    return LocaleController.optionLabel(l10n, mode);
   }
 
   Future<void> _choosePickupDate() async {
@@ -106,7 +98,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
       initialDate: _pickupDate ?? today.add(const Duration(days: 1)),
       firstDate: today,
       lastDate: DateTime(today.year + 2),
-      helpText: 'Select preferred pickup date',
+      helpText: l10n.selectPreferredPickupDate,
       cancelText: l10n.cancel,
       confirmText: 'Select',
       builder: (context, child) {
@@ -262,10 +254,10 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
                 const SizedBox(height: 10),
 
-                const Text(
-                  'Your shipping request has been prepared successfully. Our logistics team will review the details and contact you.',
+                Text(
+                  l10n.quotePreparedSuccess,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: _mutedText,
                     fontSize: 13.5,
                     height: 1.55,
@@ -449,8 +441,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
               _SectionCard(
                 icon: Icons.route_rounded,
                 title: l10n.routeDetails,
-                subtitle:
-                    'Tell us where your shipment will be collected and delivered.',
+                subtitle: l10n.tellUsCollectedDelivered,
                 child: Column(
                   children: [
                     TextFormField(
@@ -508,8 +499,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
               _SectionCard(
                 icon: Icons.local_shipping_outlined,
                 title: l10n.shippingService,
-                subtitle:
-                    'Choose the transportation service that fits your shipment.',
+                subtitle: l10n.chooseTransportService,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final itemWidth = (constraints.maxWidth - 12) / 2;
@@ -542,8 +532,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
               _SectionCard(
                 icon: Icons.inventory_2_outlined,
                 title: l10n.cargoInformation,
-                subtitle:
-                    'Provide the cargo details so we can prepare an accurate quote.',
+                subtitle: l10n.provideCargoForQuote,
                 child: Column(
                   children: [
                     DropdownButtonFormField<String>(
@@ -561,7 +550,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                         return DropdownMenuItem<String>(
                           value: cargoType,
                           child: Text(
-                            cargoType,
+                            LocaleController.optionLabel(l10n, cargoType),
                             style: const TextStyle(
                               color: _darkNavy,
                               fontSize: 13.5,
@@ -587,7 +576,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       validator: (value) {
                         return _requiredValidator(
                           value,
-                          'Please describe your cargo',
+                          l10n.pleaseDescribeCargo,
                         );
                       },
                       decoration: _fieldDecoration(
@@ -641,14 +630,14 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
               _SectionCard(
                 icon: Icons.calendar_month_outlined,
                 title: l10n.pickupSchedule,
-                subtitle: 'Choose your preferred date for cargo collection.',
+                subtitle: l10n.choosePreferredCollectionDate,
                 child: TextFormField(
                   controller: _dateController,
                   readOnly: true,
                   onTap: _choosePickupDate,
                   validator: (value) {
                     if (_pickupDate == null) {
-                      return 'Please select a pickup date';
+                      return l10n.pleaseSelectPickupDate;
                     }
 
                     return null;
@@ -669,8 +658,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
               _SectionCard(
                 icon: Icons.person_outline_rounded,
                 title: l10n.contactInformation,
-                subtitle:
-                    'Enter the details our logistics team can use to contact you.',
+                subtitle: l10n.enterContactForLogistics,
                 child: Column(
                   children: [
                     TextFormField(
@@ -728,16 +716,14 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
               _SectionCard(
                 icon: Icons.edit_note_rounded,
                 title: l10n.additionalNotes,
-                subtitle:
-                    'Add any instructions or special requirements for your shipment.',
+                subtitle: l10n.addInstructionsOrRequirements,
                 child: TextFormField(
                   controller: _notesController,
                   minLines: 4,
                   maxLines: 7,
                   textInputAction: TextInputAction.newline,
                   decoration: _fieldDecoration(
-                    hintText:
-                        'Special handling, cargo dimensions, customs notes...',
+                    hintText: l10n.specialHandlingHintShort,
                     icon: Icons.notes_rounded,
                   ),
                 ),
@@ -752,19 +738,19 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFD5E8F8)),
                 ),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.verified_user_outlined,
                       color: _primaryBlue,
                       size: 22,
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Your shipment information will be reviewed securely by the Tawam logistics team before the final quotation is prepared.',
-                        style: TextStyle(
+                        l10n.reviewedBeforeFinalQuote,
+                        style: const TextStyle(
                           color: Color(0xFF587089),
                           fontSize: 12.5,
                           height: 1.5,
@@ -913,9 +899,9 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
           const SizedBox(height: 8),
 
-          const Text(
-            'Share your shipment details and receive a tailored transportation quotation.',
-            style: TextStyle(
+          Text(
+            l10n.shareDetailsTailoredQuote,
+            style: const TextStyle(
               color: Color(0xFFD9E9F8),
               fontSize: 14,
               height: 1.5,

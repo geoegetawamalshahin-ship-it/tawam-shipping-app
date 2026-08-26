@@ -770,6 +770,7 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
   }
 
   Widget _buildProfessionalNote() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -778,15 +779,19 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
         borderRadius: BorderRadius.circular(17),
         border: Border.all(color: const Color(0xFFF0DDAA)),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline_rounded, color: Color(0xFFA66C00), size: 19),
-          SizedBox(width: 9),
+          const Icon(
+            Icons.info_outline_rounded,
+            color: Color(0xFFA66C00),
+            size: 19,
+          ),
+          const SizedBox(width: 9),
           Expanded(
             child: Text(
-              'Volumetric-weight rules can vary by carrier, service and route. Final chargeable weight is confirmed by TAWAM AL-SHAHIN TRANSPORT.',
-              style: TextStyle(
+              l10n.volumetricRulesDisclaimer,
+              style: const TextStyle(
                 color: Color(0xFF795718),
                 fontSize: 9.7,
                 height: 1.4,

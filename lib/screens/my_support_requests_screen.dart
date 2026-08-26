@@ -295,13 +295,13 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  _LiveDot(),
-                  SizedBox(width: 7),
+                  const _LiveDot(),
+                  const SizedBox(width: 7),
                   Text(
-                    'LIVE SUPPORT PORTAL',
-                    style: TextStyle(
+                    l10n.liveSupportPortal,
+                    style: const TextStyle(
                       color: Color(0xFFD2E3F3),
                       fontSize: 8.5,
                       fontWeight: FontWeight.w800,
@@ -311,9 +311,9 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Your Support Cases',
-                style: TextStyle(
+              Text(
+                l10n.yourSupportCases,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   height: 1.05,
@@ -322,9 +322,9 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                 ),
               ),
               const SizedBox(height: 7),
-              const Text(
-                'Follow every request and its latest status from one secure place.',
-                style: TextStyle(
+              Text(
+                l10n.followEveryRequest,
+                style: const TextStyle(
                   color: Color(0xFFD7E6F5),
                   fontSize: 10.8,
                   height: 1.4,
@@ -416,24 +416,25 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   Widget _buildSectionHeader(int count) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Support History',
-                style: TextStyle(
+                l10n.supportHistory,
+                style: const TextStyle(
                   color: _textDark,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
               ),
-              SizedBox(height: 3),
+              const SizedBox(height: 3),
               Text(
-                'Tap any case to view complete details.',
-                style: TextStyle(color: _textGrey, fontSize: 9.5),
+                l10n.tapAnyCase,
+                style: const TextStyle(color: _textGrey, fontSize: 9.5),
               ),
             ],
           ),
@@ -524,7 +525,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                         const SizedBox(height: 4),
                         Text(
                           shipmentNumber.isEmpty
-                              ? 'General support case'
+                              ? l10n.generalSupportCase
                               : '${l10n.shipment}: $shipmentNumber',
                           style: const TextStyle(
                             color: _textGrey,
@@ -574,7 +575,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(
-                  message.isEmpty ? 'No message provided.' : message,
+                  message.isEmpty ? l10n.noMessageProvided : message,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -739,7 +740,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                 _DetailBox(
                   icon: Icons.chat_bubble_outline_rounded,
                   label: l10n.yourMessage,
-                  value: message.isEmpty ? 'No message provided.' : message,
+                  value: message.isEmpty ? l10n.noMessageProvided : message,
                 ),
                 const SizedBox(height: 10),
                 _DetailBox(
@@ -767,17 +768,17 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.admin_panel_settings_outlined,
                             color: _primaryBlue,
                             size: 19,
                           ),
-                          SizedBox(width: 7),
+                          const SizedBox(width: 7),
                           Text(
-                            'TAWAM SUPPORT RESPONSE',
-                            style: TextStyle(
+                            l10n.tawamSupportResponse,
+                            style: const TextStyle(
                               color: _primaryBlue,
                               fontSize: 8.5,
                               fontWeight: FontWeight.w900,
@@ -789,7 +790,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
                       const SizedBox(height: 9),
                       Text(
                         adminReply.isEmpty
-                            ? 'Our support team has not added a response yet.'
+                            ? l10n.noSupportResponseYet
                             : adminReply,
                         style: const TextStyle(
                           color: _textDark,
@@ -834,6 +835,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   Widget _buildEmpty() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 42),
       decoration: BoxDecoration(
@@ -841,27 +843,31 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: _border),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Icon(
+          const Icon(
             Icons.support_agent_outlined,
             color: Color(0xFF9BA6B4),
             size: 45,
           ),
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
           Text(
-            'No support requests found',
-            style: TextStyle(
+            l10n.noSupportRequestsFound,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 16,
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
-            'Your support requests and their latest status will appear here.',
+            l10n.supportRequestsEmptyBody,
             textAlign: TextAlign.center,
-            style: TextStyle(color: _textGrey, fontSize: 10.5, height: 1.4),
+            style: const TextStyle(
+              color: _textGrey,
+              fontSize: 10.5,
+              height: 1.4,
+            ),
           ),
         ],
       ),
@@ -869,23 +875,25 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   }
 
   Widget _buildError() {
-    return const Center(
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Text(
-          'Could not load support requests.',
-          style: TextStyle(color: _textDark, fontWeight: FontWeight.w700),
+          l10n.couldNotLoadSupportRequests,
+          style: const TextStyle(color: _textDark, fontWeight: FontWeight.w700),
         ),
       ),
     );
   }
 
   Widget _buildSignedOut() {
-    return const Center(
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
       child: Text(
-        'Please sign in to view your support requests.',
+        l10n.pleaseSignInToViewSupport,
         textAlign: TextAlign.center,
-        style: TextStyle(color: _textDark, fontWeight: FontWeight.w700),
+        style: const TextStyle(color: _textDark, fontWeight: FontWeight.w700),
       ),
     );
   }

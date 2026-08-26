@@ -337,7 +337,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '02',
                       icon: Icons.bolt_rounded,
-                      title: 'Delivery Service',
+                      title: l10n.deliveryService,
                       subtitle: l10n.chooseServiceLevel,
                     ),
 
@@ -376,9 +376,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     _sectionTitle(
                       number: '05',
                       icon: Icons.shield_outlined,
-                      title: 'Protection & Delivery',
-                      subtitle:
-                          'Add insurance, fragile handling or signature confirmation.',
+                      title: l10n.protectionAndDelivery,
+                      subtitle: l10n.addInsuranceFragileSignature,
                     ),
 
                     const SizedBox(height: 13),
@@ -565,6 +564,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 235,
       clipBehavior: Clip.antiAlias,
@@ -598,8 +599,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
             ),
           ),
 
-          Positioned(
-            left: 18,
+          PositionedDirectional(
+            start: 18,
             top: 17,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
@@ -607,14 +608,14 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 color: Colors.white.withValues(alpha: .94),
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.bolt_rounded, color: _primaryBlue, size: 14),
-                  SizedBox(width: 6),
+                  const Icon(Icons.bolt_rounded, color: _primaryBlue, size: 14),
+                  const SizedBox(width: 6),
                   Text(
-                    'EXPRESS PARCEL LOGISTICS',
-                    style: TextStyle(
+                    l10n.expressParcelLogistics,
+                    style: const TextStyle(
                       color: _deepBlue,
                       fontSize: 8,
                       fontWeight: FontWeight.w900,
@@ -626,16 +627,16 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
             ),
           ),
 
-          const Positioned(
-            left: 19,
-            right: 19,
+          PositionedDirectional(
+            start: 19,
+            end: 19,
             bottom: 19,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Send Faster.\nDeliver Smarter.',
-                  style: TextStyle(
+                  l10n.parcelHeroTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 26,
                     height: 1.05,
@@ -644,11 +645,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   ),
                 ),
 
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
 
                 Text(
-                  'Professional domestic and international parcel solutions for personal and business shipments.',
-                  style: TextStyle(
+                  l10n.parcelHeroSubtitle,
+                  style: const TextStyle(
                     color: Color(0xFFE2EDF8),
                     fontSize: 10.5,
                     height: 1.45,
@@ -678,16 +679,16 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           Expanded(
             child: _ParcelTrustItem(
               icon: Icons.bolt_rounded,
-              title: 'EXPRESS',
+              title: l10n.badgeExpress,
               subtitle: l10n.priority,
             ),
           ),
           const _ParcelDivider(),
-          const Expanded(
+          Expanded(
             child: _ParcelTrustItem(
               icon: Icons.public_rounded,
-              title: 'INTL',
-              subtitle: 'Global Parcels',
+              title: l10n.badgeIntl,
+              subtitle: l10n.globalParcels,
             ),
           ),
           const _ParcelDivider(),
@@ -791,7 +792,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           _textField(
             controller: _originController,
             label: l10n.from,
-            hint: 'City, pickup address or drop-off location',
+            hint: l10n.cityPickupDropoff,
             icon: Icons.trip_origin_rounded,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -837,7 +838,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           _textField(
             controller: _destinationController,
             label: l10n.to,
-            hint: 'City or delivery address',
+            hint: l10n.cityOrDeliveryAddress,
             icon: Icons.location_on_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -851,10 +852,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           const SizedBox(height: 16),
 
           _dropdown(
-            label: 'Pickup Method',
+            label: l10n.pickupMethod,
             icon: Icons.local_shipping_outlined,
             value: _pickupMethod,
             items: _pickupMethods,
+            itemLabel: (item) => _optionLabel(l10n, item),
             onChanged: (value) {
               if (value == null) return;
 
@@ -954,9 +956,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Service Level',
-            style: TextStyle(
+          Text(
+            l10n.serviceLevel,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -968,8 +970,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           _serviceOption(
             value: 'Economy',
             icon: Icons.savings_outlined,
-            title: 'Economy',
-            subtitle: 'Cost-effective delivery for non-urgent parcels.',
+            title: l10n.economy,
+            subtitle: l10n.economyParcelDesc,
           ),
 
           const SizedBox(height: 10),
@@ -978,7 +980,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
             value: 'Express',
             icon: Icons.bolt_rounded,
             title: l10n.express,
-            subtitle: 'Fast delivery for important and time-sensitive parcels.',
+            subtitle: l10n.expressParcelDesc,
           ),
 
           const SizedBox(height: 10),
@@ -987,8 +989,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
             value: 'Priority',
             icon: Icons.workspace_premium_outlined,
             title: l10n.priority,
-            subtitle:
-                'Priority handling for urgent business or valuable shipments.',
+            subtitle: l10n.priorityParcelDesc,
           ),
         ],
       ),
@@ -1106,7 +1107,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           _textField(
             controller: _parcelCountController,
-            label: 'Number of Parcels',
+            label: l10n.numberOfParcels,
             hint: '1',
             icon: Icons.numbers_rounded,
             keyboardType: TextInputType.number,
@@ -1114,7 +1115,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               final count = int.tryParse(value?.trim() ?? '');
 
               if (count == null || count <= 0) {
-                return 'Enter number of parcels';
+                return l10n.enterNumberOfParcels;
               }
 
               return null;
@@ -1125,12 +1126,12 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           _textField(
             controller: _contentsController,
-            label: 'Parcel Contents',
-            hint: 'e.g. Documents, Clothing, Samples, Electronics',
+            label: l10n.parcelContents,
+            hint: l10n.hintParcelContents,
             icon: Icons.category_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please describe the parcel contents';
+                return l10n.pleaseDescribeParcel;
               }
 
               return null;
@@ -1146,7 +1147,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 flex: 3,
                 child: _textField(
                   controller: _declaredValueController,
-                  label: 'Declared Value',
+                  label: l10n.declaredValue,
                   hint: l10n.optional,
                   icon: Icons.payments_outlined,
                   keyboardType: const TextInputType.numberWithOptions(
@@ -1160,7 +1161,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                     final amount = double.tryParse(value.trim());
 
                     if (amount == null || amount <= 0) {
-                      return 'Invalid value';
+                      return l10n.invalidValue;
                     }
 
                     return null;
@@ -1176,7 +1177,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   initialValue: _declaredValueCurrency,
                   isExpanded: true,
                   decoration: InputDecoration(
-                    labelText: 'Currency',
+                    labelText: l10n.currency,
                     filled: true,
                     fillColor: _softGrey,
                     contentPadding: const EdgeInsets.symmetric(
@@ -1235,7 +1236,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
         children: [
           _textField(
             controller: _weightController,
-            label: 'Weight per Parcel',
+            label: l10n.weightPerParcel,
             hint: '0',
             suffix: 'KG',
             icon: Icons.monitor_weight_outlined,
@@ -1244,7 +1245,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               final weight = double.tryParse(value?.trim() ?? '');
 
               if (weight == null || weight <= 0) {
-                return 'Enter parcel weight';
+                return l10n.enterParcelWeight;
               }
 
               return null;
@@ -1253,9 +1254,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           const SizedBox(height: 18),
 
-          const Text(
-            'Average Parcel Dimensions',
-            style: TextStyle(
+          Text(
+            l10n.averageParcelDimensions,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
@@ -1310,19 +1311,19 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
             ),
             child: Column(
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.auto_awesome_rounded,
                       color: Color(0xFF7FC2FF),
                       size: 18,
                     ),
 
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
 
                     Text(
-                      'AUTOMATIC PARCEL CALCULATION',
-                      style: TextStyle(
+                      l10n.automaticParcelCalculation,
+                      style: const TextStyle(
                         color: Color(0xFFD6E8F8),
                         fontSize: 7.8,
                         letterSpacing: .7,
@@ -1406,7 +1407,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 const SizedBox(height: 9),
 
                 Text(
-                  'Total volume: ${_totalVolumeCbm.toStringAsFixed(3)} CBM • Final carrier formula may vary.',
+                  l10n.totalVolumeCarrierNote(_totalVolumeCbm.toStringAsFixed(3)),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFFBFD5E8),
@@ -1455,8 +1456,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
         children: [
           _optionSwitch(
             icon: Icons.broken_image_outlined,
-            title: 'Fragile',
-            subtitle: 'Parcel requires extra-care handling.',
+            title: l10n.fragile,
+            subtitle: l10n.parcelExtraCare,
             value: _fragile,
             onChanged: (value) {
               setState(() {
@@ -1483,8 +1484,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           _optionSwitch(
             icon: Icons.draw_outlined,
-            title: 'Signature on Delivery',
-            subtitle: 'Require recipient confirmation at delivery.',
+            title: l10n.signatureOnDelivery,
+            subtitle: l10n.requireRecipientConfirmation,
             value: _signatureRequired,
             onChanged: (value) {
               setState(() {
@@ -1659,7 +1660,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                   _contactRow(
                     icon: Icons.public_outlined,
-                    label: 'Country',
+                    label: l10n.country,
                     value: _customerCountry,
                   ),
                 ],
@@ -1808,17 +1809,17 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.fact_check_outlined,
                     color: Colors.white,
                     size: 19,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'REQUEST SUMMARY',
-                    style: TextStyle(
+                    l10n.requestSummary,
+                    style: const TextStyle(
                       color: Color(0xFFCFE1F3),
                       fontSize: 8.5,
                       letterSpacing: 1,
@@ -1894,7 +1895,10 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   ),
 
                   if (_fragile)
-                    _summaryBadge(Icons.broken_image_outlined, 'Fragile'),
+                    _summaryBadge(
+                      Icons.broken_image_outlined,
+                      _optionLabel(l10n, 'Fragile'),
+                    ),
                 ],
               ),
 
@@ -1957,10 +1961,10 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
                     const SizedBox(width: 9),
 
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Our team will confirm routing, final chargeable weight and carrier availability before issuing the official rate.',
-                        style: TextStyle(
+                        l10n.parcelRateConfirmHint,
+                        style: const TextStyle(
                           color: Color(0xFFD9E8F6),
                           fontSize: 9.2,
                           height: 1.35,
@@ -2658,6 +2662,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Future<void> _selectReadyDate() async {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
 
     final result = await showDatePicker(
@@ -2665,7 +2670,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       initialDate: _readyDate ?? now,
       firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(now.year + 2),
-      helpText: 'SELECT PARCEL READY DATE',
+      helpText: l10n.selectParcelReadyDate,
     );
 
     if (result == null || !mounted) {
@@ -2685,45 +2690,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   // Map stored English option values to localized display labels.
   String _optionLabel(AppLocalizations l10n, String value) {
-    switch (value) {
-      case 'Door to Door':
-        return l10n.doorToDoor;
-      case 'Port to Port':
-        return l10n.portToPort;
-      case 'Door to Port':
-        return l10n.doorToPort;
-      case 'Port to Door':
-        return l10n.portToDoor;
-      case 'Customs Clearance':
-        return l10n.customsClearance;
-      case 'Pickup':
-        return l10n.pickup;
-      case 'Delivery':
-        return l10n.delivery;
-      case 'Export Documentation':
-        return l10n.exportDocumentation;
-      case 'Packing':
-        return l10n.packing;
-      case 'Open Carrier':
-        return l10n.openCarrier;
-      case 'Standard':
-        return l10n.standard;
-      case 'Express':
-        return l10n.express;
-      case 'Priority':
-        return l10n.priority;
-      case 'Boxes':
-        return l10n.boxes;
-      case 'Pallets':
-        return l10n.pallets;
-      case 'Loose Cargo':
-        return l10n.looseCargo;
-      case 'Crates':
-        return l10n.crates;
-      default:
-        return value;
-    }
+    return LocaleController.optionLabel(l10n, value);
   }
+
 
   String _formatNumber(double value) {
     if (value <= 0) {

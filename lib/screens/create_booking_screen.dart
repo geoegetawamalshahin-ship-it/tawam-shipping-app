@@ -842,7 +842,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _customerName,
+                            _customerName == 'TAWAM Customer'
+                                ? l10n.tawamCustomer
+                                : _customerName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(

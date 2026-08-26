@@ -28,6 +28,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
@@ -40,7 +41,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               child: user == null
                   ? Center(
                       child: Text(
-                        'Please sign in to view your quotations.',
+                        l10n.pleaseSignInToViewQuotes,
                         style: const TextStyle(
                           color: textGrey,
                           fontWeight: FontWeight.w600,
@@ -250,9 +251,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           ),
         ),
         const SizedBox(height: 5),
-        const Text(
-          'Review rates, shipment details and respond to quotations.',
-          style: TextStyle(color: textGrey, fontSize: 11.5, height: 1.4),
+        Text(
+          l10n.reviewRatesSubtitle,
+          style: const TextStyle(color: textGrey, fontSize: 11.5, height: 1.4),
         ),
         const SizedBox(height: 15),
         _buildFilters(),
@@ -271,6 +272,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
@@ -300,20 +302,20 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               color: Colors.white.withValues(alpha: .05),
             ),
           ),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.verified_user_outlined,
                     color: Colors.white,
                     size: 21,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'SECURE CUSTOMER PORTAL',
-                    style: TextStyle(
+                    l10n.secureCustomerPortal,
+                    style: const TextStyle(
                       color: Color(0xFFD8E8F7),
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
@@ -322,19 +324,19 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Text(
-                'Your Shipping Quotations',
-                style: TextStyle(
+                l10n.yourShippingQuotations,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 23,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Track every quotation from request to final decision in one secure place.',
-                style: TextStyle(
+                l10n.trackEveryQuotation,
+                style: const TextStyle(
                   color: Color(0xFFD6E5F4),
                   fontSize: 12,
                   height: 1.45,
@@ -551,9 +553,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'QUOTED PRICE',
-                                style: TextStyle(
+                              Text(
+                                l10n.quotedPrice,
+                                style: const TextStyle(
                                   color: textGrey,
                                   fontSize: 8.8,
                                   letterSpacing: .65,
@@ -574,9 +576,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'RATE STATUS',
-                                style: TextStyle(
+                              Text(
+                                l10n.rateStatus,
+                                style: const TextStyle(
                                   color: textGrey,
                                   fontSize: 8.8,
                                   letterSpacing: .65,
@@ -704,13 +706,13 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
 
     switch (status) {
       case 'in_progress':
-        return 'In Progress';
+        return l10n.statusInProgress;
       case 'quoted':
         return l10n.quoteReady;
       case 'completed':
-        return 'Completed';
+        return l10n.completed;
       case 'cancelled':
-        return 'Cancelled';
+        return l10n.statusCancelled;
       case 'new':
         return l10n.underReview;
       default:
@@ -808,7 +810,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           ),
           const SizedBox(height: 18),
           Text(
-            _fallback(data['quoteNumber'], 'Quotation'),
+            _fallback(data['quoteNumber'], l10n.quotation),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -882,6 +884,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _pricePanel(String currency, double price, String adminNote) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -892,9 +895,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'QUOTED PRICE',
-            style: TextStyle(
+          Text(
+            l10n.quotedPrice,
+            style: const TextStyle(
               color: textGrey,
               fontSize: 9,
               fontWeight: FontWeight.w800,
@@ -914,9 +917,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
             const SizedBox(height: 16),
             const Divider(color: border),
             const SizedBox(height: 12),
-            const Text(
-              'MESSAGE FROM OUR TEAM',
-              style: TextStyle(
+            Text(
+              l10n.messageFromOurTeam,
+              style: const TextStyle(
                 color: textGrey,
                 fontSize: 8.5,
                 fontWeight: FontWeight.w800,
@@ -940,6 +943,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _waitingPanel() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -947,14 +951,14 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: const Color(0xFFF4E4B9)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.hourglass_bottom_rounded, color: Color(0xFFB26A00)),
-          SizedBox(width: 12),
+          const Icon(Icons.hourglass_bottom_rounded, color: Color(0xFFB26A00)),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Our quotation team is reviewing your shipment. Your final rate will appear here once ready.',
-              style: TextStyle(
+              l10n.quoteTeamReviewing,
+              style: const TextStyle(
                 color: Color(0xFF7B5A12),
                 fontSize: 11.5,
                 height: 1.4,
@@ -990,17 +994,22 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           const SizedBox(height: 15),
           _detailRow(
             l10n.cargoType,
-            _fallback(data['cargoType'], l10n.notProvided),
+            _text(data['cargoType']).trim().isEmpty
+                ? l10n.notProvided
+                : LocaleController.optionLabel(
+                    l10n,
+                    _text(data['cargoType']).trim(),
+                  ),
           ),
           _detailRow(l10n.weight, '${_fallback(data['weightKg'], '—')} KG'),
           _detailRow(l10n.quantity, _fallback(data['quantity'], '—')),
-          _detailRow('Dimensions', _dimensions(data)),
+          _detailRow(l10n.dimensions, _dimensions(data)),
           _detailRow(l10n.pickupDate, _formatDate(data['pickupDate'])),
-          _detailRow('Requested On', _formatDate(data['createdAt'])),
+          _detailRow(l10n.requestedOn, _formatDate(data['createdAt'])),
           _detailRow(
             'Notes',
             _text(data['notes']).trim().isEmpty
-                ? 'No additional notes'
+                ? l10n.noAdditionalNotes
                 : _text(data['notes']),
             last: true,
           ),
@@ -1035,7 +1044,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           Expanded(
             child: Text(
               value,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.end,
               style: const TextStyle(
                 color: textDark,
                 fontSize: 11,
@@ -1053,6 +1062,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
     BuildContext sheetContext,
     QueryDocumentSnapshot<Map<String, dynamic>> doc,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         SizedBox(
@@ -1061,9 +1071,12 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           child: ElevatedButton.icon(
             onPressed: () => _confirmDecision(sheetContext, doc, 'accepted'),
             icon: const Icon(Icons.check_circle_outline_rounded),
-            label: const Text(
-              'ACCEPT QUOTE',
-              style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: .4),
+            label: Text(
+              l10n.acceptQuote,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                letterSpacing: .4,
+              ),
             ),
             style: ElevatedButton.styleFrom(
               elevation: 0,
@@ -1082,9 +1095,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           child: OutlinedButton.icon(
             onPressed: () => _confirmDecision(sheetContext, doc, 'declined'),
             icon: const Icon(Icons.close_rounded),
-            label: const Text(
-              'DECLINE QUOTE',
-              style: TextStyle(fontWeight: FontWeight.w800),
+            label: Text(
+              l10n.declineQuote,
+              style: const TextStyle(fontWeight: FontWeight.w800),
             ),
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFFB32635),
@@ -1116,7 +1129,9 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
             borderRadius: BorderRadius.circular(22),
           ),
           title: Text(
-            accepted ? 'Accept Quotation?' : 'Decline Quotation?',
+            accepted
+                ? l10n.acceptQuotationQuestion
+                : l10n.declineQuotationQuestion,
             style: const TextStyle(
               color: textDark,
               fontWeight: FontWeight.w800,
@@ -1124,8 +1139,8 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           ),
           content: Text(
             accepted
-                ? 'Confirm that you would like to accept this quotation.'
-                : 'Confirm that you would like to decline this quotation.',
+                ? l10n.confirmAcceptQuotation
+                : l10n.confirmDeclineQuotation,
             style: const TextStyle(color: textGrey, height: 1.4),
           ),
           actions: [
@@ -1140,7 +1155,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                 backgroundColor: accepted ? deepBlue : const Color(0xFFB32635),
                 foregroundColor: Colors.white,
               ),
-              child: Text(accepted ? 'Accept' : 'Decline'),
+              child: Text(accepted ? l10n.accept : l10n.decline),
             ),
           ],
         );
@@ -1168,8 +1183,8 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           backgroundColor: deepBlue,
           content: Text(
             accepted
-                ? 'Quotation accepted successfully.'
-                : 'Quotation declined.',
+                ? l10n.quotationAccepted
+                : l10n.quotationDeclined,
           ),
         ),
       );
@@ -1181,7 +1196,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           behavior: SnackBarBehavior.floating,
           backgroundColor: const Color(0xFF9D2732),
           content: Text(
-            error.message ?? 'Unable to update your quotation decision.',
+            error.message ?? l10n.unableToUpdateQuoteDecision,
           ),
         ),
       );
@@ -1189,6 +1204,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _decisionResult(String decision) {
+    final l10n = AppLocalizations.of(context)!;
     final accepted = decision == 'accepted';
 
     return Container(
@@ -1208,8 +1224,8 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           Expanded(
             child: Text(
               accepted
-                  ? 'You accepted this quotation.'
-                  : 'You declined this quotation.',
+                  ? l10n.youAcceptedQuotation
+                  : l10n.youDeclinedQuotation,
               style: TextStyle(
                 color: accepted
                     ? const Color(0xFF135B47)
@@ -1225,6 +1241,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   }
 
   Widget _buildEmpty() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 38),
@@ -1233,23 +1250,27 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: border),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Icon(Icons.request_quote_outlined, color: primaryBlue, size: 42),
-          SizedBox(height: 14),
+          const Icon(
+            Icons.request_quote_outlined,
+            color: primaryBlue,
+            size: 42,
+          ),
+          const SizedBox(height: 14),
           Text(
-            'No quotations here yet',
-            style: TextStyle(
+            l10n.noQuotationsYet,
+            style: const TextStyle(
               color: textDark,
               fontSize: 16,
               fontWeight: FontWeight.w800,
             ),
           ),
-          SizedBox(height: 7),
+          const SizedBox(height: 7),
           Text(
-            'Your quotation requests and received rates will appear here automatically.',
+            l10n.quotationsEmptyBody,
             textAlign: TextAlign.center,
-            style: TextStyle(color: textGrey, fontSize: 11, height: 1.4),
+            style: const TextStyle(color: textGrey, fontSize: 11, height: 1.4),
           ),
         ],
       ),
@@ -1285,10 +1306,10 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Unable to load quotations',
+            Text(
+              l10n.unableToLoadQuotations,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: textDark,
                 fontSize: 17,
                 fontWeight: FontWeight.w900,

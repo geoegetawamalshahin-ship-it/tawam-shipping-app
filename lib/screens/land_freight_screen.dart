@@ -270,9 +270,8 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                     _sectionTitle(
                       number: '02',
                       icon: Icons.local_shipping_rounded,
-                      title: 'Transport Type',
-                      subtitle:
-                          'Choose full-truck or partial-load transportation.',
+                      title: l10n.transportType,
+                      subtitle: l10n.chooseFtlLtl,
                     ),
 
                     const SizedBox(height: 13),
@@ -312,7 +311,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                     _sectionTitle(
                       number: _loadType == 'LTL' ? '05' : '04',
                       icon: Icons.health_and_safety_outlined,
-                      title: 'Cargo Requirements',
+                      title: l10n.cargoRequirements,
                       subtitle: l10n.anythingTeamShouldKnow,
                     ),
 
@@ -500,6 +499,8 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   // =========================================================
 
   Widget _buildHero() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 235,
       clipBehavior: Clip.antiAlias,
@@ -533,8 +534,8 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
             ),
           ),
 
-          Positioned(
-            left: 18,
+          PositionedDirectional(
+            start: 18,
             top: 17,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
@@ -542,14 +543,14 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                 color: Colors.white.withValues(alpha: .94),
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.route_rounded, color: _primaryBlue, size: 14),
-                  SizedBox(width: 6),
+                  const Icon(Icons.route_rounded, color: _primaryBlue, size: 14),
+                  const SizedBox(width: 6),
                   Text(
-                    'REGIONAL ROAD FREIGHT',
-                    style: TextStyle(
+                    l10n.regionalRoadFreight,
+                    style: const TextStyle(
                       color: _deepBlue,
                       fontSize: 8,
                       fontWeight: FontWeight.w900,
@@ -561,16 +562,16 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
             ),
           ),
 
-          const Positioned(
-            left: 19,
-            right: 19,
+          PositionedDirectional(
+            start: 19,
+            end: 19,
             bottom: 19,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Road Freight.\nBuilt Around Your Cargo.',
-                  style: TextStyle(
+                  l10n.landHeroTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 25,
                     height: 1.05,
@@ -579,11 +580,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                   ),
                 ),
 
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
 
                 Text(
-                  'Professional FTL, LTL and cross-border transport for commercial and project cargo.',
-                  style: TextStyle(
+                  l10n.landHeroSubtitle,
+                  style: const TextStyle(
                     color: Color(0xFFE2EDF8),
                     fontSize: 10.5,
                     height: 1.45,
@@ -599,6 +600,8 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   }
 
   Widget _buildTrustBar() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       decoration: BoxDecoration(
@@ -606,29 +609,29 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
         borderRadius: BorderRadius.circular(19),
         border: Border.all(color: _border),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
             child: _LandTrustItem(
               icon: Icons.local_shipping_outlined,
               title: 'FTL',
-              subtitle: 'Full Truck Load',
+              subtitle: _optionLabel(l10n, 'Full Truck Load'),
             ),
           ),
-          _LandDivider(),
+          const _LandDivider(),
           Expanded(
             child: _LandTrustItem(
               icon: Icons.inventory_2_outlined,
               title: 'LTL',
-              subtitle: 'Partial Load',
+              subtitle: _optionLabel(l10n, 'Partial Load'),
             ),
           ),
-          _LandDivider(),
+          const _LandDivider(),
           Expanded(
             child: _LandTrustItem(
               icon: Icons.public_rounded,
-              title: 'X-BORDER',
-              subtitle: 'Regional Routes',
+              title: l10n.badgeXBorder,
+              subtitle: l10n.regionalRoutes,
             ),
           ),
         ],
@@ -882,13 +885,15 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   // =========================================================
 
   Widget _buildTransportSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return _premiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Load Type',
-            style: TextStyle(
+          Text(
+            l10n.loadType,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 12,
               fontWeight: FontWeight.w800,
@@ -903,7 +908,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                 child: _loadTypeButton(
                   value: 'FTL',
                   title: 'FTL',
-                  subtitle: 'Full Truck Load',
+                  subtitle: _optionLabel(l10n, 'Full Truck Load'),
                   icon: Icons.local_shipping_rounded,
                 ),
               ),
@@ -914,7 +919,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                 child: _loadTypeButton(
                   value: 'LTL',
                   title: 'LTL',
-                  subtitle: 'Less Than Truck Load',
+                  subtitle: _optionLabel(l10n, 'Less Than Truck Load'),
                   icon: Icons.inventory_2_outlined,
                 ),
               ),
@@ -1011,14 +1016,17 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   }
 
   Widget _buildFtlFields() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       key: const ValueKey('FTL'),
       children: [
         _dropdown(
-          label: 'Truck / Trailer Type',
+          label: l10n.truckTrailerType,
           icon: Icons.local_shipping_outlined,
           value: _truckType,
           items: _truckTypes,
+          itemLabel: (item) => _optionLabel(l10n, item),
           onChanged: (value) {
             if (value == null) return;
 
@@ -1036,7 +1044,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
         _textField(
           controller: _quantityController,
-          label: 'Number of Trucks',
+          label: l10n.numberOfTrucks,
           hint: '1',
           icon: Icons.numbers_rounded,
           keyboardType: TextInputType.number,
@@ -1048,8 +1056,8 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
           _textField(
             controller: _temperatureController,
-            label: 'Required Temperature',
-            hint: 'e.g. +5',
+            label: l10n.requiredTemperature,
+            hint: l10n.hintTemperature,
             suffix: '°C',
             icon: Icons.thermostat_rounded,
             keyboardType: const TextInputType.numberWithOptions(
@@ -1062,7 +1070,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
               final temperature = double.tryParse(value?.trim() ?? '');
 
               if (temperature == null) {
-                return 'Enter required temperature';
+                return l10n.enterRequiredTemperature;
               }
 
               return null;
@@ -1098,7 +1106,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
         _textField(
           controller: _quantityController,
-          label: 'Number of Packages / Pallets',
+          label: l10n.numberOfPackagesPallets,
           hint: '1',
           icon: Icons.numbers_rounded,
           keyboardType: TextInputType.number,
@@ -1108,10 +1116,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
         const SizedBox(height: 14),
 
         _dropdown(
-          label: 'Preferred Vehicle',
+          label: l10n.preferredVehicle,
           icon: Icons.local_shipping_outlined,
           value: _truckType,
           items: _truckTypes,
+          itemLabel: (item) => _optionLabel(l10n, item),
           onChanged: (value) {
             if (value == null) return;
 
@@ -1130,8 +1139,8 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
           _textField(
             controller: _temperatureController,
-            label: 'Required Temperature',
-            hint: 'e.g. +5',
+            label: l10n.requiredTemperature,
+            hint: l10n.hintTemperature,
             suffix: '°C',
             icon: Icons.thermostat_rounded,
             keyboardType: const TextInputType.numberWithOptions(
@@ -1144,7 +1153,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
               final temperature = double.tryParse(value?.trim() ?? '');
 
               if (temperature == null) {
-                return 'Enter required temperature';
+                return l10n.enterRequiredTemperature;
               }
 
               return null;
@@ -1168,7 +1177,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
           _textField(
             controller: _cargoController,
             label: l10n.cargoType,
-            hint: 'e.g. Machinery, Food, Furniture, General Cargo',
+            hint: l10n.hintCargoLand,
             icon: Icons.category_outlined,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
@@ -1214,7 +1223,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                   initialValue: _weightUnit,
                   isExpanded: true,
                   decoration: InputDecoration(
-                    labelText: 'Unit',
+                    labelText: l10n.unit,
                     filled: true,
                     fillColor: _softGrey,
                     enabledBorder: OutlineInputBorder(
@@ -1257,7 +1266,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
             _textField(
               controller: _volumeController,
-              label: 'Total Volume',
+              label: l10n.totalVolume,
               hint: l10n.optional,
               suffix: 'CBM',
               icon: Icons.view_in_ar_rounded,
@@ -1282,9 +1291,9 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Average Package Dimensions',
-            style: TextStyle(
+          Text(
+            l10n.averagePackageDimensions,
+            style: const TextStyle(
               color: _textDark,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
@@ -1348,13 +1357,13 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
                 const SizedBox(width: 10),
 
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'AUTOMATIC VOLUME',
-                        style: TextStyle(
+                        l10n.automaticVolume,
+                        style: const TextStyle(
                           color: Color(0xFFCFE1F3),
                           fontSize: 7.8,
                           letterSpacing: .8,
@@ -1362,11 +1371,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 3),
+                      const SizedBox(height: 3),
 
                       Text(
-                        'Calculated from dimensions × quantity',
-                        style: TextStyle(
+                        l10n.calculatedFromDimensionsQty,
+                        style: const TextStyle(
                           color: Color(0xFFD9E8F6),
                           fontSize: 8.5,
                         ),
@@ -1420,8 +1429,8 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
           _optionSwitch(
             icon: Icons.straighten_rounded,
-            title: 'Oversized / Out-of-Gauge Cargo',
-            subtitle: 'Cargo may require special trailer planning.',
+            title: l10n.oversizedCargo,
+            subtitle: l10n.oversizedMayNeedTrailer,
             value: _oversizedCargo,
             onChanged: (value) {
               setState(() {
@@ -1613,7 +1622,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
                   _contactRow(
                     icon: Icons.public_outlined,
-                    label: 'Country',
+                    label: l10n.country,
                     value: _customerCountry,
                   ),
                 ],
@@ -1764,19 +1773,19 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.fact_check_outlined,
                     color: Colors.white,
                     size: 19,
                   ),
 
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
 
                   Text(
-                    'REQUEST SUMMARY',
-                    style: TextStyle(
+                    l10n.requestSummary,
+                    style: const TextStyle(
                       color: Color(0xFFCFE1F3),
                       fontSize: 8.5,
                       letterSpacing: 1,
@@ -2745,27 +2754,9 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
   // Map stored English option values to localized display labels.
   String _optionLabel(AppLocalizations l10n, String value) {
-    switch (value) {
-      case 'Door to Door':
-        return l10n.doorToDoor;
-      case 'Customs Clearance':
-        return l10n.customsClearance;
-      case 'Pickup':
-        return l10n.pickup;
-      case 'Delivery':
-        return l10n.delivery;
-      case 'Pallets':
-        return l10n.pallets;
-      case 'Boxes':
-        return l10n.boxes;
-      case 'Crates':
-        return l10n.crates;
-      case 'Loose Cargo':
-        return l10n.looseCargo;
-      default:
-        return value;
-    }
+    return LocaleController.optionLabel(l10n, value);
   }
+
 
   String _two(int value) {
     return value.toString().padLeft(2, '0');

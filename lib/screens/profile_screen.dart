@@ -1,6 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'login_screen.dart';
 import 'shipping_documents_screen.dart';
@@ -47,6 +51,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   String? _loadError;
   bool _notificationsEnabled = true;
+  Uint8List? _profilePhotoBytes;
+  bool _isUpdatingPhoto = false;
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
@@ -93,6 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         _customerId =
             data?['customerId']?.toString() ?? 'TW-${shortUid.toUpperCase()}';
+        _profilePhotoBytes = _bytesFromProfilePhoto(data?['profilePhoto']);
         _isLoading = false;
         _loadError = null;
       });
@@ -165,6 +173,208 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
 
       _showMessage(AppLocalizations.of(context)!.somethingWentWrong);
+    }
+  }
+
+  // ==========================================================
+  // PROFILE PHOTO
+  // ==========================================================
+
+  Future<void> _changeProfilePhoto() async {
+    if (_isUpdatingPhoto) return;
+
+    final l10n = AppLocalizations.of(context)!;
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Container(
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDCE2E8),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    l10n.changeProfilePhoto,
+                    style: const TextStyle(
+                      color: _text,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _sheetAction(
+                  icon: Icons.photo_camera_outlined,
+                  title: l10n.takePhoto,
+                  subtitle: l10n.takePhotoHint,
+                  onTap: () => Navigator.pop(sheetContext, 'camera'),
+                ),
+                const SizedBox(height: 9),
+                _sheetAction(
+                  icon: Icons.photo_library_outlined,
+                  title: l10n.chooseFromGallery,
+                  subtitle: l10n.chooseFromGalleryHint,
+                  onTap: () => Navigator.pop(sheetContext, 'gallery'),
+                ),
+                if (_profilePhotoBytes != null) ...[
+                  const SizedBox(height: 9),
+                  _sheetAction(
+                    icon: Icons.delete_outline_rounded,
+                    title: l10n.removePhoto,
+                    subtitle: l10n.removePhotoHint,
+                    danger: true,
+                    onTap: () => Navigator.pop(sheetContext, 'remove'),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted || action == null) return;
+
+    if (action == 'remove') {
+      await _removeProfilePhoto();
+      return;
+    }
+
+    await _pickAndSavePhoto(
+      action == 'camera' ? ImageSource.camera : ImageSource.gallery,
+    );
+  }
+
+  Future<void> _pickAndSavePhoto(ImageSource source) async {
+    final l10n = AppLocalizations.of(context)!;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    Uint8List? previousBytes;
+    var didPreview = false;
+
+    try {
+      final picked = await _imagePicker.pickImage(
+        source: source,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 75,
+        requestFullMetadata: false,
+      );
+
+      if (picked == null || !mounted) return;
+
+      final bytes = await picked.readAsBytes();
+      if (!mounted) return;
+
+      if (bytes.isEmpty || bytes.length > 700 * 1024) {
+        _showMessage(l10n.couldNotUpdatePhoto);
+        return;
+      }
+
+      previousBytes = _profilePhotoBytes;
+
+      setState(() {
+        _profilePhotoBytes = bytes;
+        _isUpdatingPhoto = true;
+      });
+      didPreview = true;
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'profilePhoto': Blob(bytes),
+      }, SetOptions(merge: true));
+
+      if (!mounted) return;
+
+      setState(() {
+        _isUpdatingPhoto = false;
+      });
+
+      _showMessage(l10n.profilePhotoUpdated);
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        if (didPreview) {
+          _profilePhotoBytes = previousBytes;
+        }
+        _isUpdatingPhoto = false;
+      });
+
+      final code = e.code.toLowerCase();
+      if (code.contains('camera')) {
+        _showMessage(l10n.couldNotAccessCamera);
+      } else if (code.contains('photo') || code.contains('gallery')) {
+        _showMessage(l10n.couldNotAccessPhotos);
+      } else {
+        _showMessage(l10n.couldNotUpdatePhoto);
+      }
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        if (didPreview) {
+          _profilePhotoBytes = previousBytes;
+        }
+        _isUpdatingPhoto = false;
+      });
+
+      _showMessage(l10n.couldNotUpdatePhoto);
+    }
+  }
+
+  Future<void> _removeProfilePhoto() async {
+    final l10n = AppLocalizations.of(context)!;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final previousBytes = _profilePhotoBytes;
+
+    setState(() {
+      _profilePhotoBytes = null;
+      _isUpdatingPhoto = true;
+    });
+
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'profilePhoto': FieldValue.delete(),
+      }, SetOptions(merge: true));
+
+      if (!mounted) return;
+
+      setState(() {
+        _isUpdatingPhoto = false;
+      });
+
+      _showMessage(l10n.profilePhotoRemoved);
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _profilePhotoBytes = previousBytes;
+        _isUpdatingPhoto = false;
+      });
+
+      _showMessage(l10n.couldNotUpdatePhoto);
     }
   }
 
@@ -246,6 +456,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final name = _fullName.trim();
     if (name.isEmpty) return 'T';
     return name.substring(0, 1).toUpperCase();
+  }
+
+  // Read a stored profile photo from Firestore without assuming a type.
+  Uint8List? _bytesFromProfilePhoto(dynamic value) {
+    if (value is Blob) return value.bytes;
+    if (value is Uint8List) return value;
+    if (value is List<int>) return Uint8List.fromList(value);
+    return null;
   }
 
   // ==========================================================
@@ -485,7 +703,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _address = address.isEmpty ? 'Not provided' : address;
       });
 
-      _showMessage('Profile updated successfully');
+      _showMessage(l10n.profileUpdated);
     } catch (_) {
       if (!mounted) return;
       _showMessage(l10n.couldNotUpdateProfile);
@@ -753,7 +971,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await user.updatePassword(newPassword);
 
       if (!mounted) return;
-      _showMessage('Password updated successfully');
+      _showMessage(l10n.passwordUpdated);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
@@ -1360,6 +1578,116 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // HEADER
   // ==========================================================
 
+  Widget _buildProfileAvatar() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Tooltip(
+      message: l10n.changeProfilePhoto,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _isUpdatingPhoto ? null : _changeProfilePhoto,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: 80,
+            height: 80,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 74,
+                  height: 74,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: .45),
+                      width: 4,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x26000000),
+                        blurRadius: 17,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: _isUpdatingPhoto
+                        ? const Center(
+                            child: SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.4,
+                                color: _blue,
+                              ),
+                            ),
+                          )
+                        : _profilePhotoBytes != null
+                        ? Image.memory(
+                            _profilePhotoBytes!,
+                            width: 74,
+                            height: 74,
+                            fit: BoxFit.cover,
+                            gaplessPlayback: true,
+                            errorBuilder: (_, _, _) => Center(
+                              child: Text(
+                                _initial,
+                                style: const TextStyle(
+                                  color: _blue,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              _initial,
+                              style: const TextStyle(
+                                color: _blue,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+                PositionedDirectional(
+                  bottom: 2,
+                  end: 0,
+                  child: Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFD6E4F2)),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: _blue,
+                      size: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeader() {
     final l10n = AppLocalizations.of(context)!;
 
@@ -1479,34 +1807,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   Row(
                     children: [
-                      Container(
-                        width: 74,
-                        height: 74,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: .45),
-                            width: 4,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x26000000),
-                              blurRadius: 17,
-                              offset: Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          _initial,
-                          style: const TextStyle(
-                            color: _blue,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
+                      _buildProfileAvatar(),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
@@ -1753,6 +2054,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             _AccountTile(
+              icon: Icons.camera_alt_outlined,
+              title: l10n.changeProfilePhoto,
+              subtitle: l10n.changeProfilePhotoHint,
+              onTap: _changeProfilePhoto,
+            ),
+
+            _divider(),
+
+            _AccountTile(
               icon: Icons.notifications_active_outlined,
               title: l10n.notifications,
               subtitle: l10n.accountServiceUpdates,
@@ -1874,7 +2184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _divider() {
     return const Padding(
-      padding: EdgeInsets.only(left: 62),
+      padding: EdgeInsetsDirectional.only(start: 62),
       child: Divider(color: _border, height: 1, thickness: .8),
     );
   }
@@ -2200,9 +2510,9 @@ class _Footer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 5),
-          const Text(
-            'GLOBAL LOGISTICS CUSTOMER PORTAL',
-            style: TextStyle(
+          Text(
+            l10n.globalLogisticsPortal,
+            style: const TextStyle(
               color: Color(0xFFA7B0BB),
               fontSize: 7.2,
               letterSpacing: 1.05,
@@ -2210,9 +2520,9 @@ class _Footer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Secure • Reliable • Connected',
-            style: TextStyle(color: Color(0xFFB2BAC4), fontSize: 8.2),
+          Text(
+            l10n.secureReliableConnected,
+            style: const TextStyle(color: Color(0xFFB2BAC4), fontSize: 8.2),
           ),
         ],
       ),

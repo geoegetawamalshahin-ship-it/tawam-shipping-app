@@ -1846,6 +1846,7 @@ class _TimelineRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final circleColor = active
         ? activeColor
         : completed
@@ -1926,7 +1927,7 @@ class _TimelineRow extends StatelessWidget {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
-                            'CURRENT',
+                            l10n.currentBadge,
                             style: TextStyle(
                               color: activeColor,
                               fontSize: 7.5,
