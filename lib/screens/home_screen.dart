@@ -541,7 +541,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Text(
-            l10n.rateRequest,
+            l10n.shippingServices,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: textDark,
@@ -844,8 +844,8 @@ class _HomeScreenState extends State<HomeScreen> {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.00,
+        mainAxisSpacing: 12,
+        childAspectRatio: .86,
       ),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -854,29 +854,51 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: item['onTap'] as VoidCallback,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(20),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 11),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: borderColor),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.white, Color(0xFFFBFDFF)],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFD5E3F1), width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: deepBlue.withValues(alpha: .045),
-                    blurRadius: 12,
-                    offset: const Offset(0, 5),
+                    color: primaryBlue.withValues(alpha: .08),
+                    blurRadius: 18,
+                    offset: const Offset(0, 7),
                   ),
                 ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _QuickActionLineIcon(
-                    type: item['icon'] as _QuickActionIconType,
-                    color: const Color(0xFF07569E),
+                  Container(
+                    width: 52,
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFFEAF4FF), Color(0xFFF4F8FD)],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFD8EAFB),
+                        width: .9,
+                      ),
+                    ),
+                    child: _QuickActionLineIcon(
+                      type: item['icon'] as _QuickActionIconType,
+                      color: const Color(0xFF07569E),
+                      size: 40,
+                    ),
                   ),
-                  const SizedBox(height: 9),
+                  const SizedBox(height: 8),
                   Text(
                     item['title'] as String,
                     maxLines: 2,
@@ -884,8 +906,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Color(0xFF0F172A),
-                      fontSize: 11.5,
-                      height: 1.2,
+                      fontSize: 11.7,
+                      height: 1.18,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -1703,15 +1725,20 @@ class _ServiceItem {
 enum _QuickActionIconType { quote, booking, volume, tracking, quotes, bookings }
 
 class _QuickActionLineIcon extends StatelessWidget {
-  const _QuickActionLineIcon({required this.type, required this.color});
+  const _QuickActionLineIcon({
+    required this.type,
+    required this.color,
+    this.size = 40,
+  });
 
   final _QuickActionIconType type;
   final Color color;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
-      dimension: 50,
+      dimension: size,
       child: CustomPaint(
         painter: _QuickActionIconPainter(type: type, color: color),
       ),
