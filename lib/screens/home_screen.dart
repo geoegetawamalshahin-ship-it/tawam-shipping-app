@@ -283,9 +283,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             l10n.quickActionsSubtitle,
                             style: const TextStyle(
-                              color: textGrey,
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF52657A),
+                              fontSize: 12,
+                              height: 1.3,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.1,
                             ),
                           ),
                         ],
@@ -739,15 +741,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     10,
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         service.icon,
                         color: Colors.white,
-                        size: compact ? 30 : 34,
+                        size: compact ? 34 : 38,
+                        shadows: const [
+                          Shadow(
+                            color: Colors.black87,
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
 
-                      const SizedBox(height: 7),
+                      const SizedBox(height: 8),
 
                       Text(
                         service.title,
@@ -756,27 +765,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: compact ? 11 : 12.2,
-                          height: 1.05,
-                          fontWeight: FontWeight.w800,
+                          fontSize: compact ? 12 : 13.5,
+                          height: 1.1,
+                          fontWeight: FontWeight.w900,
                           shadows: const [
-                            Shadow(color: Colors.black54, blurRadius: 6),
+                            Shadow(
+                              color: Colors.black,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                            Shadow(color: Color(0xFF001B35), blurRadius: 12),
                           ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 5),
-
-                      Text(
-                        service.subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: .82),
-                          fontSize: compact ? 8 : 8.8,
-                          height: 1,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -796,42 +795,42 @@ class _HomeScreenState extends State<HomeScreen> {
     final items = [
       {
         'title': l10n.getAQuote,
-        'icon': Icons.request_quote_outlined,
+        'icon': _QuickActionIconType.quote,
         'onTap': () {
           _openPage(context, const GetQuoteScreen());
         },
       },
       {
         'title': l10n.createABooking,
-        'icon': Icons.calendar_month_outlined,
+        'icon': _QuickActionIconType.booking,
         'onTap': () {
           _openPage(context, const CreateBookingScreen());
         },
       },
       {
         'title': l10n.volumeCalculator,
-        'icon': Icons.calculate_outlined,
+        'icon': _QuickActionIconType.volume,
         'onTap': () {
           _openPage(context, const VolumeCalculatorScreen());
         },
       },
       {
         'title': l10n.shipmentTracking,
-        'icon': Icons.local_shipping_outlined,
+        'icon': _QuickActionIconType.tracking,
         'onTap': () {
           _openPage(context, const TrackShipmentScreen());
         },
       },
       {
         'title': l10n.myQuotes,
-        'icon': Icons.request_quote_outlined,
+        'icon': _QuickActionIconType.quotes,
         'onTap': () {
           _openPage(context, const MyQuotesScreen());
         },
       },
       {
         'title': l10n.myBookings,
-        'icon': Icons.calendar_month_outlined,
+        'icon': _QuickActionIconType.bookings,
         'onTap': () {
           _openPage(context, const MyBookingsScreen());
         },
@@ -873,29 +872,21 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3FF),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      item['icon'] as IconData,
-                      color: primaryBlue,
-                      size: 26,
-                    ),
+                  _QuickActionLineIcon(
+                    type: item['icon'] as _QuickActionIconType,
+                    color: const Color(0xFF07569E),
                   ),
                   const SizedBox(height: 9),
                   Text(
                     item['title'] as String,
                     maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: textDark,
-                      fontSize: 10.5,
-                      height: 1.15,
-                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                      fontSize: 11.5,
+                      height: 1.2,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
@@ -1326,9 +1317,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (!opened && context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.couldNotOpenReviews),
-                            ),
+                            SnackBar(content: Text(l10n.couldNotOpenReviews)),
                           );
                         }
                       },
@@ -1350,9 +1339,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (!opened && context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.couldNotOpenWebsite),
-                            ),
+                            SnackBar(content: Text(l10n.couldNotOpenWebsite)),
                           );
                         }
                       },
@@ -1707,6 +1694,348 @@ class _ServiceItem {
   final String image;
   final IconData icon;
   final VoidCallback? onTap;
+}
+
+// ==========================================================
+// PREMIUM QUICK ACTION LINE ICONS
+// ==========================================================
+
+enum _QuickActionIconType { quote, booking, volume, tracking, quotes, bookings }
+
+class _QuickActionLineIcon extends StatelessWidget {
+  const _QuickActionLineIcon({required this.type, required this.color});
+
+  final _QuickActionIconType type;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: 50,
+      child: CustomPaint(
+        painter: _QuickActionIconPainter(type: type, color: color),
+      ),
+    );
+  }
+}
+
+class _QuickActionIconPainter extends CustomPainter {
+  const _QuickActionIconPainter({required this.type, required this.color});
+
+  final _QuickActionIconType type;
+  final Color color;
+
+  Paint get _line => Paint()
+    ..color = color
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2.45
+    ..strokeCap = StrokeCap.round
+    ..strokeJoin = StrokeJoin.round;
+
+  Paint get _whiteMask => Paint()
+    ..color = Colors.white
+    ..style = PaintingStyle.fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 48, size.height / 48);
+
+    switch (type) {
+      case _QuickActionIconType.quote:
+        _drawQuote(canvas);
+        break;
+      case _QuickActionIconType.booking:
+        _drawBooking(canvas);
+        break;
+      case _QuickActionIconType.volume:
+        _drawVolume(canvas);
+        break;
+      case _QuickActionIconType.tracking:
+        _drawTracking(canvas);
+        break;
+      case _QuickActionIconType.quotes:
+        _drawMyQuotes(canvas);
+        break;
+      case _QuickActionIconType.bookings:
+        _drawMyBookings(canvas);
+        break;
+    }
+
+    canvas.restore();
+  }
+
+  void _drawQuote(Canvas canvas) {
+    final line = _line;
+    final document = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(7, 5, 29, 37),
+      const Radius.circular(3),
+    );
+    canvas.drawRRect(document, line);
+
+    final fold = Path()
+      ..moveTo(27, 5)
+      ..lineTo(36, 14)
+      ..lineTo(27, 14)
+      ..close();
+    canvas.drawPath(fold, line);
+    canvas.drawLine(const Offset(12, 19), const Offset(29, 19), line);
+    canvas.drawLine(const Offset(12, 24), const Offset(27, 24), line);
+    canvas.drawLine(const Offset(12, 29), const Offset(23, 29), line);
+
+    canvas.drawCircle(const Offset(35, 34), 8.5, _whiteMask);
+    canvas.drawCircle(const Offset(35, 34), 8.5, line);
+    _drawDollar(canvas, const Offset(35, 34), line);
+  }
+
+  void _drawBooking(Canvas canvas) {
+    final line = _line;
+    _drawCalendarBase(canvas, const Rect.fromLTWH(5, 8, 38, 34), line);
+
+    for (final x in <double>[12, 20, 28, 36]) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(x, 23), width: 3.6, height: 3.6),
+          const Radius.circular(.7),
+        ),
+        line,
+      );
+    }
+    for (final x in <double>[12, 20, 28]) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(x, 31), width: 3.6, height: 3.6),
+          const Radius.circular(.7),
+        ),
+        line,
+      );
+    }
+
+    _drawRoundBadge(canvas, const Offset(38, 36), line);
+    canvas.drawLine(const Offset(34.5, 36), const Offset(41.5, 36), line);
+    canvas.drawLine(const Offset(38, 32.5), const Offset(38, 39.5), line);
+  }
+
+  void _drawVolume(Canvas canvas) {
+    final line = _line;
+    final calculator = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(5, 5, 28, 38),
+      const Radius.circular(3.5),
+    );
+    canvas.drawRRect(calculator, line);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(10, 10, 18, 7),
+        const Radius.circular(1.2),
+      ),
+      line,
+    );
+
+    for (final y in <double>[23, 30, 37]) {
+      for (final x in <double>[11, 18, 25]) {
+        canvas.drawCircle(Offset(x, y), 1.15, line);
+      }
+    }
+
+    canvas.drawCircle(const Offset(37, 28), 7.5, _whiteMask);
+    final box = Path()
+      ..moveTo(30, 25)
+      ..lineTo(37, 21)
+      ..lineTo(44, 25)
+      ..lineTo(37, 29)
+      ..close();
+    canvas.drawPath(box, line);
+    canvas.drawLine(const Offset(30, 25), const Offset(30, 34), line);
+    canvas.drawLine(const Offset(44, 25), const Offset(44, 34), line);
+    canvas.drawLine(const Offset(30, 34), const Offset(37, 39), line);
+    canvas.drawLine(const Offset(44, 34), const Offset(37, 39), line);
+    canvas.drawLine(const Offset(37, 29), const Offset(37, 39), line);
+  }
+
+  void _drawTracking(Canvas canvas) {
+    final line = _line;
+    final route = Path()
+      ..moveTo(10, 15)
+      ..cubicTo(16, 19, 23, 8, 31, 13)
+      ..cubicTo(34, 15, 36, 14, 39, 11);
+    canvas.drawPath(route, line);
+    _drawPin(canvas, const Offset(8, 10), line);
+    _drawPin(canvas, const Offset(40, 8), line);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(5, 25, 25, 11),
+        const Radius.circular(2),
+      ),
+      line,
+    );
+    final cab = Path()
+      ..moveTo(30, 27)
+      ..lineTo(37, 27)
+      ..lineTo(43, 33)
+      ..lineTo(43, 36)
+      ..lineTo(30, 36)
+      ..close();
+    canvas.drawPath(cab, line);
+    canvas.drawLine(const Offset(35, 28), const Offset(35, 33), line);
+    canvas.drawLine(const Offset(35, 33), const Offset(41, 33), line);
+    canvas.drawCircle(const Offset(13, 38), 3, _whiteMask);
+    canvas.drawCircle(const Offset(13, 38), 3, line);
+    canvas.drawCircle(const Offset(36, 38), 3, _whiteMask);
+    canvas.drawCircle(const Offset(36, 38), 3, line);
+  }
+
+  void _drawMyQuotes(Canvas canvas) {
+    final line = _line;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(15, 5, 27, 31),
+        const Radius.circular(3),
+      ),
+      line,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(6, 12, 29, 31),
+        const Radius.circular(3),
+      ),
+      _whiteMask,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(6, 12, 29, 31),
+        const Radius.circular(3),
+      ),
+      line,
+    );
+    canvas.drawLine(const Offset(12, 20), const Offset(29, 20), line);
+    canvas.drawLine(const Offset(12, 25), const Offset(26, 25), line);
+    canvas.drawLine(const Offset(12, 30), const Offset(23, 30), line);
+
+    _drawRoundBadge(canvas, const Offset(36.5, 36), line);
+    canvas.drawLine(const Offset(33, 36), const Offset(35.5, 38.5), line);
+    canvas.drawLine(const Offset(35.5, 38.5), const Offset(40.5, 33.5), line);
+  }
+
+  void _drawMyBookings(Canvas canvas) {
+    final line = _line;
+    _drawCalendarBase(canvas, const Rect.fromLTWH(5, 7, 38, 35), line);
+    canvas.drawLine(const Offset(11, 24), const Offset(37, 24), line);
+    canvas.drawLine(const Offset(11, 30), const Offset(25, 30), line);
+    canvas.drawLine(const Offset(11, 36), const Offset(22, 36), line);
+
+    _drawRoundBadge(canvas, const Offset(37, 35), line);
+    canvas.drawLine(const Offset(33.5, 35), const Offset(36, 37.5), line);
+    canvas.drawLine(const Offset(36, 37.5), const Offset(41, 32.5), line);
+  }
+
+  void _drawCalendarBase(Canvas canvas, Rect rect, Paint line) {
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(4)),
+      line,
+    );
+    canvas.drawLine(
+      Offset(rect.left, rect.top + 10),
+      Offset(rect.right, rect.top + 10),
+      line,
+    );
+    canvas.drawLine(
+      Offset(rect.left + 10, rect.top - 3),
+      Offset(rect.left + 10, rect.top + 5),
+      line,
+    );
+    canvas.drawLine(
+      Offset(rect.right - 10, rect.top - 3),
+      Offset(rect.right - 10, rect.top + 5),
+      line,
+    );
+  }
+
+  void _drawRoundBadge(Canvas canvas, Offset center, Paint line) {
+    canvas.drawCircle(center, 7.5, _whiteMask);
+    canvas.drawCircle(center, 7.5, line);
+  }
+
+  void _drawDollar(Canvas canvas, Offset center, Paint line) {
+    canvas.drawLine(
+      Offset(center.dx, center.dy - 5),
+      Offset(center.dx, center.dy + 5),
+      line,
+    );
+    final dollar = Path()
+      ..moveTo(center.dx + 3, center.dy - 3)
+      ..cubicTo(
+        center.dx + 1,
+        center.dy - 5,
+        center.dx - 3,
+        center.dy - 4,
+        center.dx - 3,
+        center.dy - 1.5,
+      )
+      ..cubicTo(
+        center.dx - 3,
+        center.dy + 1,
+        center.dx + 3,
+        center.dy,
+        center.dx + 3,
+        center.dy + 3,
+      )
+      ..cubicTo(
+        center.dx + 3,
+        center.dy + 5,
+        center.dx - 1,
+        center.dy + 5,
+        center.dx - 3,
+        center.dy + 3,
+      );
+    canvas.drawPath(dollar, line);
+  }
+
+  void _drawPin(Canvas canvas, Offset center, Paint line) {
+    final pin = Path()
+      ..moveTo(center.dx, center.dy + 8)
+      ..cubicTo(
+        center.dx - 1.5,
+        center.dy + 5,
+        center.dx - 5,
+        center.dy + 2,
+        center.dx - 5,
+        center.dy - 1,
+      )
+      ..cubicTo(
+        center.dx - 5,
+        center.dy - 4,
+        center.dx - 3,
+        center.dy - 6,
+        center.dx,
+        center.dy - 6,
+      )
+      ..cubicTo(
+        center.dx + 3,
+        center.dy - 6,
+        center.dx + 5,
+        center.dy - 4,
+        center.dx + 5,
+        center.dy - 1,
+      )
+      ..cubicTo(
+        center.dx + 5,
+        center.dy + 2,
+        center.dx + 1.5,
+        center.dy + 5,
+        center.dx,
+        center.dy + 8,
+      )
+      ..close();
+    canvas.drawPath(pin, _whiteMask);
+    canvas.drawPath(pin, line);
+    canvas.drawCircle(Offset(center.dx, center.dy - 1), 1.7, line);
+  }
+
+  @override
+  bool shouldRepaint(covariant _QuickActionIconPainter oldDelegate) {
+    return oldDelegate.type != type || oldDelegate.color != color;
+  }
 }
 
 // ==========================================================
