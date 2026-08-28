@@ -179,9 +179,150 @@ class LocaleController {
     }
   }
 
+  static const Set<String> _knownNotificationEvents = {
+    'shipment_in_transit',
+    'shipment_delivered',
+    'shipment_out_for_delivery',
+    'shipment_confirmed',
+    'shipment_customs',
+    'shipment_prepared',
+    'shipment_cancelled',
+    'quote_ready',
+    'support_reply',
+  };
+
+  // Normalize backend event names without changing the stored value.
+  static String _normalizeNotificationEvent(String? event) {
+    var value = (event ?? '')
+        .trim()
+        .toLowerCase()
+        .replaceAll('-', '_')
+        .replaceAll(' ', '_');
+
+    if (value == 'canceled') value = 'cancelled';
+    if (value == 'shipment_canceled') value = 'shipment_cancelled';
+    if (value == 'in_transit' || value == 'shipment_update') {
+      return 'shipment_in_transit';
+    }
+    if (value == 'delivered') return 'shipment_delivered';
+    if (value == 'out_for_delivery') return 'shipment_out_for_delivery';
+    if (value == 'confirmed' || value == 'approved') {
+      return 'shipment_confirmed';
+    }
+    if (value == 'customs' || value == 'customs_clearance') {
+      return 'shipment_customs';
+    }
+    if (value == 'prepared') return 'shipment_prepared';
+    if (value == 'cancelled') return 'shipment_cancelled';
+    if (value == 'quote' || value == 'quotation' || value == 'quote_ready') {
+      return 'quote_ready';
+    }
+    if (value == 'support' || value == 'support_reply') return 'support_reply';
+
+    return value;
+  }
+
+  static bool _containsAny(String haystack, List<String> needles) {
+    for (final needle in needles) {
+      if (haystack.contains(needle)) return true;
+    }
+    return false;
+  }
+
+  // Infer a known event from stored English/Arabic title and body.
+  static String inferNotificationEvent({
+    String? event,
+    String? type,
+    String? title,
+    String? message,
+  }) {
+    final explicit = _normalizeNotificationEvent(event);
+    if (_knownNotificationEvents.contains(explicit)) return explicit;
+
+    final haystack = '${title ?? ''} ${message ?? ''}'.toLowerCase();
+
+    if (_containsAny(haystack, [
+      'out for delivery',
+      'out_for_delivery',
+      'خرجت للتسليم',
+    ])) {
+      return 'shipment_out_for_delivery';
+    }
+    if (_containsAny(haystack, ['delivered', 'تم تسليم'])) {
+      return 'shipment_delivered';
+    }
+    if (_containsAny(haystack, ['customs', 'جمرك'])) {
+      return 'shipment_customs';
+    }
+    if (_containsAny(haystack, [
+      'quote ready',
+      'quotation is ready',
+      'your quotation',
+      'عرض السعر',
+    ])) {
+      return 'quote_ready';
+    }
+    if (_containsAny(haystack, [
+      'support reply',
+      'support request',
+      'رد الدعم',
+      'طلب الدعم',
+    ])) {
+      return 'support_reply';
+    }
+    if (_containsAny(haystack, ['confirmed', 'تم تأكيد'])) {
+      return 'shipment_confirmed';
+    }
+    if (_containsAny(haystack, ['prepared', 'تم تجهيز'])) {
+      return 'shipment_prepared';
+    }
+    if (_containsAny(haystack, ['cancelled', 'canceled', 'تم إلغاء'])) {
+      return 'shipment_cancelled';
+    }
+    if (_containsAny(haystack, ['in transit', 'in_transit', 'قيد النقل'])) {
+      return 'shipment_in_transit';
+    }
+    if (_containsAny(haystack, ['shipment update', 'تحديث الشحنة'])) {
+      return 'shipment_in_transit';
+    }
+
+    final normalizedType = (type ?? '').trim().toLowerCase();
+    if (normalizedType == 'quote') return 'quote_ready';
+    if (normalizedType == 'support') return 'support_reply';
+
+    return explicit;
+  }
+
+  static String extractTrackingNumber(
+    Map<String, dynamic>? params,
+    String title,
+    String message,
+  ) {
+    final fromParams =
+        (params?['trackingNumber'] ?? params?['tracking_number'] ?? '')
+            .toString()
+            .trim();
+    if (fromParams.isNotEmpty) return fromParams;
+
+    final text = '$title $message';
+    final patterns = <RegExp>[
+      RegExp(r'Shipment\s+([A-Z0-9][A-Z0-9\-_/]{2,})', caseSensitive: false),
+      RegExp(r'الشحنة\s+([A-Z0-9][A-Z0-9\-_/]{2,})', caseSensitive: false),
+      RegExp(r'\b(TW[-_]?[A-Z0-9]+)\b', caseSensitive: false),
+    ];
+
+    for (final pattern in patterns) {
+      final match = pattern.firstMatch(text);
+      final value = match?.group(1)?.trim() ?? '';
+      if (value.isNotEmpty) return value;
+    }
+
+    return '';
+  }
+
   // Translate known notification events; return null to use stored title/message.
   static String? notificationTitle(AppLocalizations l10n, String? event) {
-    switch ((event ?? '').trim().toLowerCase()) {
+    switch (_normalizeNotificationEvent(event)) {
       case 'shipment_in_transit':
         return l10n.notifShipmentInTransitTitle;
       case 'shipment_delivered':
@@ -192,6 +333,10 @@ class LocaleController {
         return l10n.notifShipmentConfirmedTitle;
       case 'shipment_customs':
         return l10n.notifShipmentCustomsTitle;
+      case 'shipment_prepared':
+        return l10n.notifShipmentPreparedTitle;
+      case 'shipment_cancelled':
+        return l10n.notifShipmentCancelledTitle;
       case 'quote_ready':
         return l10n.notifQuoteReadyTitle;
       case 'support_reply':
@@ -206,19 +351,38 @@ class LocaleController {
     String? event,
     Map<String, dynamic>? params,
   ) {
-    final trackingNumber = (params?['trackingNumber'] ?? '').toString();
+    final trackingNumber = (params?['trackingNumber'] ?? '').toString().trim();
+    final resolvedEvent = _normalizeNotificationEvent(event);
 
-    switch ((event ?? '').trim().toLowerCase()) {
+    switch (resolvedEvent) {
       case 'shipment_in_transit':
-        return l10n.notifShipmentInTransitBody(trackingNumber);
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentInTransitBody(trackingNumber);
       case 'shipment_delivered':
-        return l10n.notifShipmentDeliveredBody(trackingNumber);
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentDeliveredBody(trackingNumber);
       case 'shipment_out_for_delivery':
-        return l10n.notifShipmentOutForDeliveryBody(trackingNumber);
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentOutForDeliveryBody(trackingNumber);
       case 'shipment_confirmed':
-        return l10n.notifShipmentConfirmedBody(trackingNumber);
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentConfirmedBody(trackingNumber);
       case 'shipment_customs':
-        return l10n.notifShipmentCustomsBody(trackingNumber);
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentCustomsBody(trackingNumber);
+      case 'shipment_prepared':
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentPreparedBody(trackingNumber);
+      case 'shipment_cancelled':
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentCancelledBody(trackingNumber);
       case 'quote_ready':
         return l10n.notifQuoteReadyBody;
       case 'support_reply':
@@ -226,6 +390,56 @@ class LocaleController {
       default:
         return null;
     }
+  }
+
+  // Localized title for in-app and stored notifications.
+  static String resolveNotificationTitle(
+    AppLocalizations l10n, {
+    String? event,
+    String? type,
+    String? storedTitle,
+    String? storedMessage,
+  }) {
+    final resolvedEvent = inferNotificationEvent(
+      event: event,
+      type: type,
+      title: storedTitle,
+      message: storedMessage,
+    );
+    final localized = notificationTitle(l10n, resolvedEvent);
+    if (localized != null) return localized;
+
+    final stored = (storedTitle ?? '').trim();
+    if (stored.isNotEmpty) return stored;
+    return l10n.notificationDefault;
+  }
+
+  // Localized body for in-app and stored notifications.
+  static String resolveNotificationBody(
+    AppLocalizations l10n, {
+    String? event,
+    String? type,
+    String? storedTitle,
+    String? storedMessage,
+    Map<String, dynamic>? params,
+  }) {
+    final resolvedEvent = inferNotificationEvent(
+      event: event,
+      type: type,
+      title: storedTitle,
+      message: storedMessage,
+    );
+    final trackingNumber = extractTrackingNumber(
+      params,
+      storedTitle ?? '',
+      storedMessage ?? '',
+    );
+    final localized = notificationBody(l10n, resolvedEvent, {
+      'trackingNumber': trackingNumber,
+    });
+    if (localized != null) return localized;
+
+    return (storedMessage ?? '').trim();
   }
 
   // Localized AM/PM marker for a 24-hour clock value.

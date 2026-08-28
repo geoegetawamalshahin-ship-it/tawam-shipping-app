@@ -1138,6 +1138,25 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get notifShipmentPreparedTitle => 'تم تجهيز الشحنة';
+
+  @override
+  String notifShipmentPreparedBody(String trackingNumber) {
+    return 'تم تجهيز الشحنة $trackingNumber.';
+  }
+
+  @override
+  String get notifShipmentCancelledTitle => 'تم إلغاء الشحنة';
+
+  @override
+  String notifShipmentCancelledBody(String trackingNumber) {
+    return 'تم إلغاء الشحنة $trackingNumber.';
+  }
+
+  @override
+  String get notifShipmentGenericBody => 'تم تحديث حالة شحنتك.';
+
+  @override
   String get notifGenericTitle => 'تحديث';
 
   @override

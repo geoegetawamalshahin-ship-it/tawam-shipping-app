@@ -1146,6 +1146,21 @@ abstract class AppLocalizations {
   /// **"Shipment {trackingNumber} is in customs clearance."**
   String notifShipmentCustomsBody(String trackingNumber);
 
+  /// **"Shipment prepared"**
+  String get notifShipmentPreparedTitle;
+
+  /// **"Shipment {trackingNumber} has been prepared."**
+  String notifShipmentPreparedBody(String trackingNumber);
+
+  /// **"Shipment cancelled"**
+  String get notifShipmentCancelledTitle;
+
+  /// **"Shipment {trackingNumber} has been cancelled."**
+  String notifShipmentCancelledBody(String trackingNumber);
+
+  /// **"Your shipment status has been updated."**
+  String get notifShipmentGenericBody;
+
   /// **"Update"**
   String get notifGenericTitle;
 

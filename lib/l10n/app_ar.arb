@@ -440,6 +440,25 @@
       }
     }
   },
+  "notifShipmentPreparedTitle": "تم تجهيز الشحنة",
+  "notifShipmentPreparedBody": "تم تجهيز الشحنة {trackingNumber}.",
+  "@notifShipmentPreparedBody": {
+    "placeholders": {
+      "trackingNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "notifShipmentCancelledTitle": "تم إلغاء الشحنة",
+  "notifShipmentCancelledBody": "تم إلغاء الشحنة {trackingNumber}.",
+  "@notifShipmentCancelledBody": {
+    "placeholders": {
+      "trackingNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "notifShipmentGenericBody": "تم تحديث حالة شحنتك.",
   "notifGenericTitle": "تحديث",
   "unableToLoadShipments": "تعذر تحميل الشحنات",
   "liveCustomerShipmentPortal": "بوابة شحنات العملاء المباشرة",

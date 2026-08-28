@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -275,6 +276,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    // Wait until the sheet is fully dismissed so the picker can attach
+    // to the Android activity. Opening it immediately often fails.
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
+
     await _pickAndSavePhoto(
       action == 'camera' ? ImageSource.camera : ImageSource.gallery,
     );
@@ -291,18 +297,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final picked = await _imagePicker.pickImage(
         source: source,
-        maxWidth: 512,
-        maxHeight: 512,
-        imageQuality: 75,
+        maxWidth: 400,
+        maxHeight: 400,
+        imageQuality: 55,
         requestFullMetadata: false,
       );
 
       if (picked == null || !mounted) return;
 
-      final bytes = await picked.readAsBytes();
+      final originalBytes = await picked.readAsBytes();
       if (!mounted) return;
 
-      if (bytes.isEmpty || bytes.length > 700 * 1024) {
+      if (originalBytes.isEmpty) {
+        _showMessage(l10n.couldNotUpdatePhoto);
+        return;
+      }
+
+      final bytes = await _prepareProfilePhoto(originalBytes);
+      if (!mounted) return;
+
+      if (bytes.isEmpty || bytes.length > 500 * 1024) {
         _showMessage(l10n.couldNotUpdatePhoto);
         return;
       }
@@ -390,8 +404,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // Save the photo in Firestore, or in the existing documents bucket if the
-  // document would become too large.
+  // Shrink and re-encode the photo so it fits inside a Firestore document.
+  Future<Uint8List> _prepareProfilePhoto(Uint8List bytes) async {
+    const maxBytes = 350 * 1024;
+    if (bytes.length <= maxBytes) return bytes;
+
+    for (final width in <int>[320, 240, 160]) {
+      final resized = await _resizePhotoPng(bytes, width);
+      if (resized == null) continue;
+      if (resized.length <= maxBytes || width == 160) {
+        return resized;
+      }
+    }
+
+    return bytes;
+  }
+
+  Future<Uint8List?> _resizePhotoPng(Uint8List bytes, int targetWidth) async {
+    try {
+      final codec = await ui.instantiateImageCodec(
+        bytes,
+        targetWidth: targetWidth,
+      );
+      final frame = await codec.getNextFrame();
+      final image = frame.image;
+      final png = await image.toByteData(format: ui.ImageByteFormat.png);
+      image.dispose();
+      if (png == null) return null;
+      return png.buffer.asUint8List();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Save the photo in Firestore. Use storage only if the document write fails.
   Future<void> _persistProfilePhoto(String uid, Uint8List bytes) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
@@ -400,19 +446,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }, SetOptions(merge: true));
       return;
     } catch (_) {
-      // Fall through to storage when the Firestore write is rejected.
+      // Some rules or clients reject Blob; store a compact base64 string.
+    }
+
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'profilePhoto': base64Encode(bytes),
+        'profilePhotoPath': FieldValue.delete(),
+      }, SetOptions(merge: true));
+      return;
+    } catch (_) {
+      // Fall through to the existing documents bucket.
     }
 
     const bucket = 'shipping-documents';
-    final path = 'users/$uid/profile.jpg';
+    final isPng = bytes.length >= 8 &&
+        bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47;
+    final path = 'users/$uid/profile.${isPng ? 'png' : 'jpg'}';
 
-    await Supabase.instance.client.storage
-        .from(bucket)
-        .uploadBinary(
-          path,
-          bytes,
-          fileOptions: const FileOptions(upsert: true),
-        );
+    await Supabase.instance.client.storage.from(bucket).uploadBinary(
+      path,
+      bytes,
+      fileOptions: FileOptions(
+        upsert: true,
+        contentType: isPng ? 'image/png' : 'image/jpeg',
+      ),
+    );
 
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'profilePhoto': FieldValue.delete(),
@@ -429,6 +491,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await Supabase.instance.client.storage.from('shipping-documents').remove([
         'users/$uid/profile.jpg',
+        'users/$uid/profile.png',
       ]);
     } catch (_) {
       // Ignore missing storage objects.
