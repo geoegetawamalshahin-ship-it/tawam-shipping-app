@@ -440,6 +440,25 @@
       }
     }
   },
+  "notifShipmentPreparedTitle": "Shipment prepared",
+  "notifShipmentPreparedBody": "Shipment {trackingNumber} has been prepared.",
+  "@notifShipmentPreparedBody": {
+    "placeholders": {
+      "trackingNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "notifShipmentCancelledTitle": "Shipment cancelled",
+  "notifShipmentCancelledBody": "Shipment {trackingNumber} has been cancelled.",
+  "@notifShipmentCancelledBody": {
+    "placeholders": {
+      "trackingNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "notifShipmentGenericBody": "Your shipment status has been updated.",
   "notifGenericTitle": "Update",
   "unableToLoadShipments": "Unable to load shipments",
   "liveCustomerShipmentPortal": "LIVE CUSTOMER SHIPMENT PORTAL",

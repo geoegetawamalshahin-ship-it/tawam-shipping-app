@@ -1164,6 +1164,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get notifShipmentPreparedTitle => 'Shipment prepared';
+
+  @override
+  String notifShipmentPreparedBody(String trackingNumber) {
+    return 'Shipment $trackingNumber has been prepared.';
+  }
+
+  @override
+  String get notifShipmentCancelledTitle => 'Shipment cancelled';
+
+  @override
+  String notifShipmentCancelledBody(String trackingNumber) {
+    return 'Shipment $trackingNumber has been cancelled.';
+  }
+
+  @override
+  String get notifShipmentGenericBody =>
+      'Your shipment status has been updated.';
+
+  @override
   String get notifGenericTitle => 'Update';
 
   @override

@@ -552,20 +552,20 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(
               color: textDark,
               fontSize: 27,
-              height: 1,
+              height: 1.2,
               fontWeight: FontWeight.w800,
-              letterSpacing: -0.6,
+              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             l10n.rateRequestSubtitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: textGrey,
-              fontSize: 13,
-              height: 1.25,
-              fontWeight: FontWeight.w500,
+              color: Color(0xFF52657A),
+              fontSize: 15.5,
+              height: 1.4,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -673,9 +673,9 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: services.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: constraints.maxWidth >= 600 ? 3 : 2,
-            crossAxisSpacing: compact ? 8 : 10,
-            mainAxisSpacing: compact ? 10 : 12,
-            childAspectRatio: compact ? 1.35 : 1.42,
+            crossAxisSpacing: compact ? 10 : 12,
+            mainAxisSpacing: compact ? 12 : 14,
+            childAspectRatio: compact ? 1.12 : 1.16,
           ),
           itemBuilder: (context, index) {
             final service = services[index];
@@ -730,29 +730,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0x12000000),
-                        Color(0x24000000),
-                        Color(0xD600142C),
+                        Color(0x14000000),
+                        Color(0x33000000),
+                        Color(0xEE00142C),
                       ],
-                      stops: [0, .42, 1],
+                      stops: [0, .36, 1],
                     ),
                   ),
                 ),
 
                 Padding(
                   padding: EdgeInsets.fromLTRB(
-                    compact ? 6 : 8,
-                    10,
-                    compact ? 6 : 8,
-                    10,
+                    compact ? 10 : 12,
+                    12,
+                    compact ? 10 : 12,
+                    compact ? 12 : 14,
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Icon(
                         service.icon,
                         color: Colors.white,
-                        size: compact ? 34 : 38,
+                        size: compact ? 30 : 34,
                         shadows: const [
                           Shadow(
                             color: Colors.black87,
@@ -761,9 +761,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 8),
-
                       Text(
                         service.title,
                         maxLines: 2,
@@ -771,16 +769,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: compact ? 12 : 13.5,
-                          height: 1.1,
-                          fontWeight: FontWeight.w900,
+                          fontSize: compact ? 15 : 16.5,
+                          height: 1.25,
+                          fontWeight: FontWeight.w800,
                           shadows: const [
                             Shadow(
-                              color: Colors.black,
-                              blurRadius: 8,
+                              color: Colors.black87,
+                              blurRadius: 10,
                               offset: Offset(0, 2),
                             ),
-                            Shadow(color: Color(0xFF001B35), blurRadius: 12),
+                            Shadow(color: Color(0xFF001B35), blurRadius: 14),
                           ],
                         ),
                       ),
@@ -934,8 +932,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      height: 78,
-      padding: const EdgeInsets.fromLTRB(7, 7, 7, 8),
+      height: 92,
+      padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
@@ -1006,35 +1004,37 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              size: 23,
+              size: 26,
               color: selected ? primaryBlue : const Color(0xFF8B98AA),
             ),
-
-            const SizedBox(height: 4),
-
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? primaryBlue : const Color(0xFF8B98AA),
-                fontSize: 9.4,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            const SizedBox(height: 5),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: selected ? primaryBlue : const Color(0xFF8B98AA),
+                  fontSize: 13,
+                  height: 1.1,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                ),
               ),
             ),
-
             const SizedBox(height: 4),
-
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: selected ? 22 : 0,
-              height: 2,
+              height: 3,
               decoration: BoxDecoration(
                 color: primaryBlue,
                 borderRadius: BorderRadius.circular(4),

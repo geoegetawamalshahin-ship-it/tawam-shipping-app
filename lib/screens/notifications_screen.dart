@@ -82,14 +82,21 @@ class NotificationRouter {
     final params = <String, dynamic>{
       'trackingNumber': payload['trackingNumber'] ?? '',
     };
-    final title =
-        LocaleController.notificationTitle(l10n, event) ??
-        (payload['title']?.isNotEmpty == true
-            ? payload['title']!
-            : l10n.notificationDefault);
-    final body =
-        LocaleController.notificationBody(l10n, event, params) ??
-        (payload['body'] ?? '');
+    final title = LocaleController.resolveNotificationTitle(
+      l10n,
+      event: event,
+      type: payload['type'],
+      storedTitle: payload['title'],
+      storedMessage: payload['body'],
+    );
+    final body = LocaleController.resolveNotificationBody(
+      l10n,
+      event: event,
+      type: payload['type'],
+      storedTitle: payload['title'],
+      storedMessage: payload['body'],
+      params: params,
+    );
 
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
@@ -345,23 +352,27 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     AppLocalizations l10n,
     Map<String, dynamic> notification,
   ) {
-    final event = notification['event'] as String?;
-    final storedTitle = (notification['title'] ?? '').toString();
-
-    return LocaleController.notificationTitle(l10n, event) ??
-        (storedTitle.isNotEmpty ? storedTitle : l10n.notificationDefault);
+    return LocaleController.resolveNotificationTitle(
+      l10n,
+      event: notification['event'] as String?,
+      type: notification['type']?.toString(),
+      storedTitle: (notification['title'] ?? '').toString(),
+      storedMessage: (notification['message'] ?? '').toString(),
+    );
   }
 
   String _displayMessage(
     AppLocalizations l10n,
     Map<String, dynamic> notification,
   ) {
-    final event = notification['event'] as String?;
-    final params = notification['params'] as Map<String, dynamic>?;
-    final storedMessage = (notification['message'] ?? '').toString();
-
-    return LocaleController.notificationBody(l10n, event, params) ??
-        storedMessage;
+    return LocaleController.resolveNotificationBody(
+      l10n,
+      event: notification['event'] as String?,
+      type: notification['type']?.toString(),
+      storedTitle: (notification['title'] ?? '').toString(),
+      storedMessage: (notification['message'] ?? '').toString(),
+      params: notification['params'] as Map<String, dynamic>?,
+    );
   }
 
   @override

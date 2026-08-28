@@ -2318,6 +2318,36 @@ abstract class AppLocalizations {
   /// **'Shipment {trackingNumber} is in customs clearance.'**
   String notifShipmentCustomsBody(String trackingNumber);
 
+  /// No description provided for @notifShipmentPreparedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipment prepared'**
+  String get notifShipmentPreparedTitle;
+
+  /// No description provided for @notifShipmentPreparedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipment {trackingNumber} has been prepared.'**
+  String notifShipmentPreparedBody(String trackingNumber);
+
+  /// No description provided for @notifShipmentCancelledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipment cancelled'**
+  String get notifShipmentCancelledTitle;
+
+  /// No description provided for @notifShipmentCancelledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipment {trackingNumber} has been cancelled.'**
+  String notifShipmentCancelledBody(String trackingNumber);
+
+  /// No description provided for @notifShipmentGenericBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your shipment status has been updated.'**
+  String get notifShipmentGenericBody;
+
   /// No description provided for @notifGenericTitle.
   ///
   /// In en, this message translates to:
