@@ -1111,6 +1111,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveNotificationStatus => 'Live notification status';
 
   @override
+  String get notifShipmentCreatedTitle => 'New Shipment Created';
+
+  @override
+  String notifShipmentCreatedBody(String trackingNumber) {
+    return 'Shipment $trackingNumber has been created.';
+  }
+
+  @override
   String get notifShipmentInTransitTitle => 'Shipment update';
 
   @override

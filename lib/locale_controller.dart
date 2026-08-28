@@ -180,6 +180,7 @@ class LocaleController {
   }
 
   static const Set<String> _knownNotificationEvents = {
+    'shipment_created',
     'shipment_in_transit',
     'shipment_delivered',
     'shipment_out_for_delivery',
@@ -198,7 +199,11 @@ class LocaleController {
         .toLowerCase()
         .replaceAll('-', '_')
         .replaceAll(' ', '_');
-
+    if (value == 'created' ||
+        value == 'new_shipment' ||
+        value == 'new_shipment_created') {
+      return 'shipment_created';
+    }
     if (value == 'canceled') value = 'cancelled';
     if (value == 'shipment_canceled') value = 'shipment_cancelled';
     if (value == 'in_transit' || value == 'shipment_update') {
@@ -240,7 +245,15 @@ class LocaleController {
     if (_knownNotificationEvents.contains(explicit)) return explicit;
 
     final haystack = '${title ?? ''} ${message ?? ''}'.toLowerCase();
-
+    if (_containsAny(haystack, [
+      'new shipment created',
+      'shipment created',
+      'was created for',
+      'تم إنشاء شحنة',
+      'تم إنشاء الشحنة',
+    ])) {
+      return 'shipment_created';
+    }
     if (_containsAny(haystack, [
       'out for delivery',
       'out_for_delivery',
@@ -304,7 +317,7 @@ class LocaleController {
             .trim();
     if (fromParams.isNotEmpty) return fromParams;
 
-    final text = '$title $message';
+    final text = '$message $title';
     final patterns = <RegExp>[
       RegExp(r'Shipment\s+([A-Z0-9][A-Z0-9\-_/]{2,})', caseSensitive: false),
       RegExp(r'الشحنة\s+([A-Z0-9][A-Z0-9\-_/]{2,})', caseSensitive: false),
@@ -323,6 +336,8 @@ class LocaleController {
   // Translate known notification events; return null to use stored title/message.
   static String? notificationTitle(AppLocalizations l10n, String? event) {
     switch (_normalizeNotificationEvent(event)) {
+      case 'shipment_created':
+        return l10n.notifShipmentCreatedTitle;
       case 'shipment_in_transit':
         return l10n.notifShipmentInTransitTitle;
       case 'shipment_delivered':
@@ -355,6 +370,10 @@ class LocaleController {
     final resolvedEvent = _normalizeNotificationEvent(event);
 
     switch (resolvedEvent) {
+      case 'shipment_created':
+        return trackingNumber.isEmpty
+            ? l10n.notifShipmentGenericBody
+            : l10n.notifShipmentCreatedBody(trackingNumber);
       case 'shipment_in_transit':
         return trackingNumber.isEmpty
             ? l10n.notifShipmentGenericBody

@@ -1098,6 +1098,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get liveNotificationStatus => 'حالة الإشعارات المباشرة';
 
   @override
+  String get notifShipmentCreatedTitle => 'تم إنشاء شحنة جديدة';
+
+  @override
+  String notifShipmentCreatedBody(String trackingNumber) {
+    return 'تم إنشاء الشحنة $trackingNumber.';
+  }
+
+  @override
   String get notifShipmentInTransitTitle => 'تحديث الشحنة';
 
   @override

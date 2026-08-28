@@ -391,6 +391,15 @@
   "couldNotLoadNotifications": "We couldn't load your notifications. Please check your connection and try again.",
   "noNotificationsYet": "No notifications yet",
   "liveNotificationStatus": "Live notification status",
+    "notifShipmentCreatedTitle": "New Shipment Created",
+  "notifShipmentCreatedBody": "Shipment {trackingNumber} has been created.",
+  "@notifShipmentCreatedBody": {
+    "placeholders": {
+      "trackingNumber": {
+        "type": "String"
+      }
+    }
+  },
   "notifShipmentInTransitTitle": "Shipment update",
   "notifShipmentInTransitBody": "Shipment {trackingNumber} is now in transit.",
   "@notifShipmentInTransitBody": {

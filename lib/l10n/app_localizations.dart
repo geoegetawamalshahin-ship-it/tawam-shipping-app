@@ -2234,6 +2234,18 @@ abstract class AppLocalizations {
   /// **'Live notification status'**
   String get liveNotificationStatus;
 
+  /// No description provided for @notifShipmentCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Shipment Created'**
+  String get notifShipmentCreatedTitle;
+
+  /// No description provided for @notifShipmentCreatedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipment {trackingNumber} has been created.'**
+  String notifShipmentCreatedBody(String trackingNumber);
+
   /// No description provided for @notifShipmentInTransitTitle.
   ///
   /// In en, this message translates to:

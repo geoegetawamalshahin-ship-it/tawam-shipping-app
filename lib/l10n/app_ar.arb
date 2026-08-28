@@ -391,6 +391,15 @@
   "couldNotLoadNotifications": "تعذر تحميل الإشعارات. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
   "noNotificationsYet": "لا توجد إشعارات بعد",
   "liveNotificationStatus": "حالة الإشعارات المباشرة",
+    "notifShipmentCreatedTitle": "تم إنشاء شحنة جديدة",
+  "notifShipmentCreatedBody": "تم إنشاء الشحنة {trackingNumber}.",
+  "@notifShipmentCreatedBody": {
+    "placeholders": {
+      "trackingNumber": {
+        "type": "String"
+      }
+    }
+  },
   "notifShipmentInTransitTitle": "تحديث الشحنة",
   "notifShipmentInTransitBody": "الشحنة {trackingNumber} أصبحت قيد النقل.",
   "@notifShipmentInTransitBody": {
