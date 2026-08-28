@@ -285,7 +285,7 @@
   "accountCreated": "Account created successfully",
   "couldNotCreateAccount": "Could not create account",
   "registerTitle": "Create your account",
-  "registerSubtitle": "Join TAWAM to manage shipments, quotes and deliveries from one place.",
+ "registerSubtitle": "Join TAWAM AL-SHAHIN TRANSPORT to manage shipments, quotes and deliveries from one place.",
   "confirmPassword": "Confirm password",
   "passwordsDoNotMatch": "Passwords do not match",
   "passwordTooShort": "Password must be at least 6 characters",
