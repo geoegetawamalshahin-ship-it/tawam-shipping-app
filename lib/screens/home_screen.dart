@@ -675,7 +675,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisCount: constraints.maxWidth >= 600 ? 3 : 2,
             crossAxisSpacing: compact ? 10 : 12,
             mainAxisSpacing: compact ? 12 : 14,
-            childAspectRatio: compact ? 1.12 : 1.16,
+            childAspectRatio: compact ? 1.24 : 1.29,
           ),
           itemBuilder: (context, index) {
             final service = services[index];
@@ -932,7 +932,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      height: 92,
+      height: 84,
       padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
       decoration: BoxDecoration(
         color: Colors.white,
