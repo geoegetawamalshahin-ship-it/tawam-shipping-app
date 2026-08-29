@@ -932,8 +932,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      height: 84,
-      padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
+      height: 68,
+      padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
@@ -1012,10 +1012,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(
               icon,
-              size: 26,
+              size: 23,
               color: selected ? primaryBlue : const Color(0xFF8B98AA),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 3),
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
@@ -1024,13 +1024,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: selected ? primaryBlue : const Color(0xFF8B98AA),
-                  fontSize: 13,
+                  fontSize: 11.5,
                   height: 1.1,
                   fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: selected ? 22 : 0,
