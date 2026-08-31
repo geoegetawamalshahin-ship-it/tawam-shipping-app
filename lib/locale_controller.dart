@@ -181,6 +181,7 @@ class LocaleController {
 
   static const Set<String> _knownNotificationEvents = {
     'shipment_created',
+    'shipment_pending',
     'shipment_in_transit',
     'shipment_delivered',
     'shipment_out_for_delivery',
@@ -255,7 +256,15 @@ class LocaleController {
       return 'shipment_created';
     }
     if (_containsAny(haystack, [
+      'awaiting processing',
+      'بانتظار المعالجة',
+      'قيد المعالجة',
+    ])) {
+      return 'shipment_pending';
+    }
+    if (_containsAny(haystack, [
       'out for delivery',
+      'out for final delivery',
       'out_for_delivery',
       'خرجت للتسليم',
     ])) {
@@ -338,6 +347,8 @@ class LocaleController {
     switch (_normalizeNotificationEvent(event)) {
       case 'shipment_created':
         return l10n.notifShipmentCreatedTitle;
+      case 'shipment_pending':
+        return l10n.shipmentStatusUpdated;
       case 'shipment_in_transit':
         return l10n.notifShipmentInTransitTitle;
       case 'shipment_delivered':
@@ -374,6 +385,8 @@ class LocaleController {
         return trackingNumber.isEmpty
             ? l10n.notifShipmentGenericBody
             : l10n.notifShipmentCreatedBody(trackingNumber);
+      case 'shipment_pending':
+        return l10n.statusDescPending;
       case 'shipment_in_transit':
         return trackingNumber.isEmpty
             ? l10n.notifShipmentGenericBody

@@ -100,14 +100,15 @@ class NotificationRouter {
 
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
+    final snackBarController = messenger.showSnackBar(
       SnackBar(
         content: Text(
           body.isEmpty ? title : '$title\n$body',
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 6),
+        duration: const Duration(seconds: 2),
+        persist: false,
         action: SnackBarAction(
           label: l10n.viewDetails,
           onPressed: () {
@@ -117,6 +118,9 @@ class NotificationRouter {
         ),
       ),
     );
+    Future.delayed(const Duration(seconds: 2), () {
+      snackBarController.close();
+    });
   }
 
   static Future<void> openFromPayload(
@@ -191,9 +195,9 @@ class NotificationRouter {
       return;
     }
 
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const NotificationsScreen()));
   }
 }
 

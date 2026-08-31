@@ -1787,7 +1787,9 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
       items.add(
         _HistoryItem(
           title: _prettyStatus(l10n, title),
-          description: description,
+          description: title.trim().toLowerCase() == 'shipment_created'
+              ? l10n.timelineCreatedDesc
+              : description,
           time: time,
           icon: _timelineIcon(title),
         ),
@@ -1802,7 +1804,9 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     if (raw.isEmpty) {
       return l10n.shipmentUpdate;
     }
-
+    if (raw.toLowerCase() == 'shipment_created') {
+      return l10n.notifShipmentCreatedTitle;
+    }
     final normalized = LocaleController.normalizeStatus(raw);
     const known = {
       'pending',
