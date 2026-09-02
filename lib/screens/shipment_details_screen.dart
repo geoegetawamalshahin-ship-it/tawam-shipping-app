@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'support_screen.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../presentation/controllers/shipment_controller.dart';
 
 // ==========================================================
 // BRAND
@@ -45,6 +44,8 @@ class ShipmentDetailsScreen extends StatefulWidget {
 }
 
 class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
+  final ShipmentController _shipmentController =
+      Get.find<ShipmentController>();
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
   _shipmentSubscription;
 
@@ -92,11 +93,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
       return;
     }
 
-    _shipmentSubscription = FirebaseFirestore.instance
-        .collection('shipments')
-        .doc(documentId)
-        .snapshots()
-        .listen(
+    _shipmentSubscription = _shipmentController.watchById(documentId).listen(
           (document) {
             if (!mounted || !document.exists || document.data() == null) {
               return;
@@ -128,9 +125,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     }
 
     final shipmentId = (_shipment['id'] ?? '').toString().trim();
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (shipmentId.isEmpty || user == null) {
+    if (shipmentId.isEmpty || _shipmentController.currentUser == null) {
       return;
     }
 
@@ -141,81 +136,25 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
       });
     }
 
-    final client = HttpClient();
-
     try {
-      final token = await user.getIdToken();
-
-      if (token == null || token.trim().isEmpty) {
-        throw Exception('Authentication token unavailable');
-      }
-
-      final request = await client.postUrl(
-        Uri.parse(
-          'https://ofbnwaivxxdrxhtsniny.supabase.co/functions/v1/live-shipment',
-        ),
-      );
-
-      request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
-
-      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
-
-      request.write(jsonEncode({'shipmentId': shipmentId}));
-
-      final response = await request.close();
-
-      final responseBody = await response.transform(utf8.decoder).join();
-
-      final decoded = jsonDecode(responseBody);
-
-      if (response.statusCode == 200 &&
-          decoded is Map<String, dynamic> &&
-          decoded['success'] == true) {
-        final data = decoded['data'];
-
-        if (data is Map<String, dynamic>) {
-          if (!mounted) {
-            return;
-          }
-
-          setState(() {
-            _liveLocation = data['address']?.toString().trim();
-
-            _liveLastUpdated = data['lastUpdated']?.toString().trim();
-
-            _liveLatitude = (data['latitude'] as num?)?.toDouble();
-
-            _liveLongitude = (data['longitude'] as num?)?.toDouble();
-
-            _liveLocationError = null;
-          });
-        }
-      } else {
-        String message = 'generic';
-
-        if (decoded is Map<String, dynamic>) {
-          final serverMessage = decoded['message']?.toString().trim();
-
-          if (serverMessage != null && serverMessage.isNotEmpty) {
-            message = serverMessage;
-          }
-        }
-
-        if (mounted) {
-          setState(() {
-            _liveLocationError = message;
-          });
-        }
-      }
-    } catch (_) {
+      final data = await _shipmentController.loadLiveLocation(shipmentId);
+      if (!mounted) return;
+      setState(() {
+        _liveLocation = data['address']?.toString().trim();
+        _liveLastUpdated = data['lastUpdated']?.toString().trim();
+        _liveLatitude = (data['latitude'] as num?)?.toDouble();
+        _liveLongitude = (data['longitude'] as num?)?.toDouble();
+        _liveLocationError = null;
+      });
+    } on StateError catch (error) {
       if (mounted) {
         setState(() {
-          _liveLocationError = 'generic';
+          _liveLocationError = error.message.toString();
         });
       }
+    } catch (_) {
+      if (mounted) setState(() => _liveLocationError = 'generic');
     } finally {
-      client.close(force: true);
-
       if (mounted) {
         setState(() {
           _isLoadingLiveLocation = false;

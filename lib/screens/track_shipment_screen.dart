@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
+import '../presentation/controllers/shipment_controller.dart';
 import 'shipment_details_screen.dart';
 
 // ==========================================================
@@ -42,6 +43,8 @@ class TrackShipmentScreen extends StatefulWidget {
 }
 
 class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
+  final ShipmentController _shipmentController =
+      Get.find<ShipmentController>();
   final TextEditingController _trackingController = TextEditingController();
 
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
@@ -95,7 +98,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _shipmentController.currentUser;
 
     if (user == null) {
       _showMessage(l10n.pleaseSignInToTrack);
@@ -121,16 +124,13 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       //
       // So a customer cannot use this page to view another
       // customer's shipment.
-      final snapshot = await FirebaseFirestore.instance
-          .collection('shipments')
-          .where('userId', isEqualTo: user.uid)
-          .where('trackingNumber', isEqualTo: trackingNumber)
-          .limit(1)
-          .get();
+      final doc = await _shipmentController.findByTrackingNumber(
+        trackingNumber,
+      );
 
       if (!mounted) return;
 
-      if (snapshot.docs.isEmpty) {
+      if (doc == null) {
         setState(() {
           _isSearching = false;
           _showResult = false;
@@ -142,15 +142,13 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
         return;
       }
 
-      final doc = snapshot.docs.first;
-
       _applyShipment(documentId: doc.id, data: doc.data());
 
       // REAL-TIME:
       // Once the shipment is found, listen to this exact
       // Firestore document. Any admin update to the document
       // will appear automatically on the customer's screen.
-      _shipmentSubscription = doc.reference.snapshots().listen(
+      _shipmentSubscription = _shipmentController.watchById(doc.id).listen(
         (document) {
           if (!mounted) return;
 

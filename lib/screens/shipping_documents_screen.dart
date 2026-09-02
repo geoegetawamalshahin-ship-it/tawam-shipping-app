@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get/get.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 import '../l10n/app_localizations.dart';
+import '../presentation/controllers/shipment_controller.dart';
 
 class ShippingDocumentsScreen extends StatefulWidget {
   const ShippingDocumentsScreen({super.key});
@@ -15,6 +15,8 @@ class ShippingDocumentsScreen extends StatefulWidget {
 }
 
 class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
+  final ShipmentController _shipmentController =
+      Get.find<ShipmentController>();
   static const Color _primaryBlue = Color(0xFF07569E);
   static const Color _darkNavy = Color(0xFF10233F);
   static const Color _pageBackground = Color(0xFFF4F7FB);
@@ -29,20 +31,17 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
   }
 
   Future<List<Map<String, dynamic>>> _loadDocuments() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _shipmentController.currentUser;
 
     if (user == null) {
       return [];
     }
 
-    final shipments = await FirebaseFirestore.instance
-        .collection('shipments')
-        .where('userId', isEqualTo: user.uid)
-        .get();
+    final shipments = await _shipmentController.loadMine();
 
     final documents = <Map<String, dynamic>>[];
 
-    for (final shipmentDoc in shipments.docs) {
+    for (final shipmentDoc in shipments) {
       final shipment = shipmentDoc.data();
 
       final rawDocuments = shipment['documents'];
@@ -88,9 +87,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
         throw Exception(l10n.documentPathMissing);
       }
 
-      final signedUrl = await Supabase.instance.client.storage
-          .from('shipping-documents')
-          .createSignedUrl(path, 600);
+      final signedUrl = await _shipmentController.createDocumentUrl(path);
 
       if (!mounted) return;
 

@@ -7,10 +7,14 @@ import '../../data/services/auth_service.dart';
 import '../../data/services/booking_service.dart';
 import '../../data/services/home_service.dart';
 import '../../data/services/quote_service.dart';
+import '../../data/services/shipment_service.dart';
+import '../../data/services/support_service.dart';
 import '../../presentation/controllers/auth_controller.dart';
 import '../../presentation/controllers/booking_controller.dart';
 import '../../presentation/controllers/home_controller.dart';
 import '../../presentation/controllers/quote_controller.dart';
+import '../../presentation/controllers/shipment_controller.dart';
+import '../../presentation/controllers/support_controller.dart';
 
 /// Registers the shared SDK clients once for the whole application.
 ///
@@ -42,12 +46,32 @@ class InitialBinding extends Bindings {
       BookingService(Get.find<FirebaseAuth>(), Get.find<FirebaseFirestore>()),
       permanent: true,
     );
+    Get.put<ShipmentService>(
+      ShipmentService(
+        Get.find<FirebaseAuth>(),
+        Get.find<FirebaseFirestore>(),
+        Get.find<SupabaseClient>(),
+      ),
+      permanent: true,
+    );
+    Get.put<SupportService>(
+      SupportService(Get.find<FirebaseAuth>(), Get.find<FirebaseFirestore>()),
+      permanent: true,
+    );
     Get.lazyPut<QuoteController>(
       () => QuoteController(Get.find<QuoteService>()),
       fenix: true,
     );
     Get.lazyPut<BookingController>(
       () => BookingController(Get.find<BookingService>()),
+      fenix: true,
+    );
+    Get.lazyPut<ShipmentController>(
+      () => ShipmentController(Get.find<ShipmentService>()),
+      fenix: true,
+    );
+    Get.lazyPut<SupportController>(
+      () => SupportController(Get.find<SupportService>()),
       fenix: true,
     );
     Get.lazyPut<HomeController>(
