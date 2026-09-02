@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../core/responsive/feature_page_body.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import '../presentation/controllers/quote_controller.dart';
@@ -207,13 +208,14 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
       }
     }).toList();
 
-    return ListView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
-      children: [
-        _buildHero(),
-        const SizedBox(height: 18),
-        Row(
+    return FeaturePageBody(
+      child: ListView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
+        children: [
+          _buildHero(),
+          const SizedBox(height: 18),
+          Row(
           children: [
             Expanded(
               child: _summaryBox(
@@ -239,34 +241,35 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 24),
-        Text(
+          ),
+          const SizedBox(height: 24),
+          Text(
           l10n.yourQuotations,
           style: const TextStyle(
             color: textDark,
             fontSize: 21,
             fontWeight: FontWeight.w800,
           ),
-        ),
-        const SizedBox(height: 5),
-        Text(
+          ),
+          const SizedBox(height: 5),
+          Text(
           l10n.reviewRatesSubtitle,
           style: const TextStyle(color: textGrey, fontSize: 11.5, height: 1.4),
-        ),
-        const SizedBox(height: 15),
-        _buildFilters(),
-        const SizedBox(height: 16),
-        if (filtered.isEmpty)
-          _buildEmpty()
-        else
-          ...filtered.map(
-            (doc) => Padding(
-              padding: const EdgeInsets.only(bottom: 13),
-              child: _buildQuoteCard(doc),
-            ),
           ),
-      ],
+          const SizedBox(height: 15),
+          _buildFilters(),
+          const SizedBox(height: 16),
+          if (filtered.isEmpty)
+            _buildEmpty()
+          else
+            ...filtered.map(
+              (doc) => Padding(
+                padding: const EdgeInsets.only(bottom: 13),
+                child: _buildQuoteCard(doc),
+              ),
+            ),
+        ],
+      ),
     );
   }
 

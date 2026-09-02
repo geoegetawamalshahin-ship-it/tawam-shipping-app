@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../core/responsive/feature_page_body.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import '../presentation/controllers/booking_controller.dart';
@@ -137,14 +138,15 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
           children: [
             _buildHeader(context),
             Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              child: FeaturePageBody(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                       _buildHero(),
                       const SizedBox(height: 24),
                       _sectionHeading(
@@ -201,7 +203,8 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                           ),
                         ),
                       ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
