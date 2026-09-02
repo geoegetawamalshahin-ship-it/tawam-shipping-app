@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
+import '../presentation/controllers/booking_controller.dart';
 
 class CreateBookingScreen extends StatefulWidget {
   const CreateBookingScreen({super.key, this.initialServiceType});
@@ -15,6 +16,7 @@ class CreateBookingScreen extends StatefulWidget {
 }
 
 class _CreateBookingScreenState extends State<CreateBookingScreen> {
+  final BookingController _bookingController = Get.find<BookingController>();
   static const Color deepBlue = Color(0xFF062B55);
   static const Color primaryBlue = Color(0xFF0B4F9C);
   static const Color brightBlue = Color(0xFF1268BC);
@@ -88,7 +90,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Future<void> _loadCustomerProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _bookingController.currentUser;
     if (user == null) {
       if (mounted) setState(() => _loadingProfile = false);
       return;
@@ -99,11 +101,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     String phone = user.phoneNumber?.trim() ?? '';
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      final data = snapshot.data() ?? <String, dynamic>{};
+      final data = await _bookingController.loadCurrentUserProfile();
 
       name = _firstNonEmpty([
         data['name'],
@@ -1058,7 +1056,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _bookingController.currentUser;
     if (user == null) {
       _showMessage(l10n.pleaseSignInBeforeBooking, isError: true);
       return;
@@ -1106,9 +1104,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         'source': 'customer_app',
       };
 
-      await FirebaseFirestore.instance
-          .collection('shipment_requests')
-          .add(bookingData);
+      await _bookingController.submit(bookingData);
 
       if (!mounted) return;
       setState(() => _submitting = false);

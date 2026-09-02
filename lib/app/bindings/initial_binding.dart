@@ -4,9 +4,13 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../data/services/auth_service.dart';
+import '../../data/services/booking_service.dart';
 import '../../data/services/home_service.dart';
+import '../../data/services/quote_service.dart';
 import '../../presentation/controllers/auth_controller.dart';
+import '../../presentation/controllers/booking_controller.dart';
 import '../../presentation/controllers/home_controller.dart';
+import '../../presentation/controllers/quote_controller.dart';
 
 /// Registers the shared SDK clients once for the whole application.
 ///
@@ -29,6 +33,22 @@ class InitialBinding extends Bindings {
     Get.put<HomeService>(
       HomeService(Get.find<FirebaseFirestore>()),
       permanent: true,
+    );
+    Get.put<QuoteService>(
+      QuoteService(Get.find<FirebaseAuth>(), Get.find<FirebaseFirestore>()),
+      permanent: true,
+    );
+    Get.put<BookingService>(
+      BookingService(Get.find<FirebaseAuth>(), Get.find<FirebaseFirestore>()),
+      permanent: true,
+    );
+    Get.lazyPut<QuoteController>(
+      () => QuoteController(Get.find<QuoteService>()),
+      fenix: true,
+    );
+    Get.lazyPut<BookingController>(
+      () => BookingController(Get.find<BookingService>()),
+      fenix: true,
     );
     Get.lazyPut<HomeController>(
       () => HomeController(

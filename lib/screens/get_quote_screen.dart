@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
+import '../presentation/controllers/quote_controller.dart';
 
 class GetQuoteScreen extends StatefulWidget {
   const GetQuoteScreen({
@@ -29,6 +30,7 @@ class GetQuoteScreen extends StatefulWidget {
 }
 
 class _GetQuoteScreenState extends State<GetQuoteScreen> {
+  final QuoteController _quoteController = Get.find<QuoteController>();
   static const Color primaryBlue = Color(0xFF0B4F9C);
   static const Color deepBlue = Color(0xFF062B55);
   static const Color softBlue = Color(0xFFEAF3FF);
@@ -841,7 +843,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       _showMessage(l10n.pleaseSignInBeforeQuote, isError: true);
@@ -853,12 +855,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     });
 
     try {
-      final userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      final userData = userSnapshot.data() ?? <String, dynamic>{};
+      final userData = await _quoteController.loadCurrentUserProfile();
 
       final customerName = _firstNonEmpty([
         userData['name'],
@@ -922,9 +919,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         'source': 'customer_app',
       };
 
-      final reference = await FirebaseFirestore.instance
-          .collection('quote_requests')
-          .add(quoteData);
+      final reference = await _quoteController.submit(quoteData);
 
       if (!mounted) return;
 
