@@ -19,13 +19,14 @@ import 'land_freight_screen.dart';
 import 'car_shipping_screen.dart';
 import 'international_moving_screen.dart';
 import 'parcel_shipping_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import '../core/responsive/responsive_content.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
+import '../presentation/controllers/home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final HomeController _homeController;
   // ==========================================================
   // TAWAM BRAND
   // ==========================================================
@@ -66,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     _bannerController = PageController();
+    _homeController = Get.find<HomeController>();
     LocaleController.restoreFromFirestore();
 
     _bannerTimer = Timer.periodic(
@@ -256,10 +259,13 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                padding: EdgeInsets.zero,
+                child: ResponsiveContent(
+                  maxWidth: 1120,
+                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     _buildBannerSlider(),
 
                     const SizedBox(height: 24),
@@ -303,7 +309,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 14),
 
                     _buildQuickActions(context),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -387,26 +394,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('notifications')
-                    .where(
-                      'userId',
-                      isEqualTo:
-                          FirebaseAuth.instance.currentUser?.uid ??
-                          '__no_user__',
-                    )
-                    .snapshots(),
+              child: StreamBuilder<int>(
+                stream: _homeController.unreadNotificationCount,
                 builder: (context, snapshot) {
-                  int unreadCount = 0;
-
-                  if (snapshot.hasData) {
-                    unreadCount = snapshot.data!.docs.where((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-
-                      return data['isRead'] != true;
-                    }).length;
-                  }
+                  final unreadCount = snapshot.data ?? 0;
 
                   return Stack(
                     clipBehavior: Clip.none,
@@ -1448,7 +1439,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             if (shouldLogout != true) return;
 
-                            await FirebaseAuth.instance.signOut();
+                            await _homeController.signOut();
 
                             if (!context.mounted) return;
 

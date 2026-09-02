@@ -56,4 +56,6 @@ class AuthController extends GetxController {
       isBusy.value = false;
     }
   }
+
+  Future<void> signOut() => _authService.signOut();
 }

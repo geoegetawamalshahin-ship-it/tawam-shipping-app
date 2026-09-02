@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../locale_controller.dart';
+import '../presentation/controllers/auth_controller.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 
@@ -25,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = Get.find<AuthController>().currentUser;
 
     if (user != null) {
       await LocaleController.restoreFromFirestore();
