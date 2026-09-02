@@ -1,0 +1,28 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../data/services/auth_service.dart';
+import '../../presentation/controllers/auth_controller.dart';
+
+/// Registers the shared SDK clients once for the whole application.
+///
+/// Feature controllers depend on these registrations instead of constructing
+/// Firebase and Supabase clients directly inside widgets.
+class InitialBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.put<FirebaseAuth>(FirebaseAuth.instance, permanent: true);
+    Get.put<FirebaseFirestore>(FirebaseFirestore.instance, permanent: true);
+    Get.put<SupabaseClient>(Supabase.instance.client, permanent: true);
+    Get.put<AuthService>(
+      AuthService(Get.find<FirebaseAuth>(), Get.find<FirebaseFirestore>()),
+      permanent: true,
+    );
+    Get.put<AuthController>(
+      AuthController(Get.find<AuthService>()),
+      permanent: true,
+    );
+  }
+}

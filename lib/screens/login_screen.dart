@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../locale_controller.dart';
+import 'package:get/get.dart';
 import '../l10n/app_localizations.dart';
+import '../presentation/controllers/auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,12 +36,14 @@ class _LoginScreenState extends State<LoginScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final result = await Get.find<AuthController>().signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      await LocaleController.restoreFromFirestore();
+      if (!result.isSuccess) {
+        throw FirebaseAuthException(code: result.errorCode!);
+      }
 
       if (!mounted) return;
 

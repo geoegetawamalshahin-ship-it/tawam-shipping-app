@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import '../l10n/app_localizations.dart';
+import '../data/models/registration_data.dart';
+import '../presentation/controllers/auth_controller.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -38,26 +40,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          );
-
-      await userCredential.user?.updateDisplayName(_nameController.text.trim());
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-            'name': _nameController.text.trim(),
-            'phone': _phoneController.text.trim(),
-            'email': _emailController.text.trim(),
-            'role': 'customer',
-            'customerId':
-                'TW-${userCredential.user!.uid.substring(0, 8).toUpperCase()}',
-            'createdAt': FieldValue.serverTimestamp(),
-          });
-      await FirebaseAuth.instance.signOut();
+      final result = await Get.find<AuthController>().register(
+        RegistrationData(
+          name: _nameController.text,
+          phone: _phoneController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
+        ),
+      );
+      if (!result.isSuccess) {
+        throw FirebaseAuthException(code: result.errorCode!);
+      }
 
       if (!mounted) return;
 
