@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
+import '../presentation/controllers/booking_controller.dart';
 
 class ShipmentRequestPage extends StatefulWidget {
   const ShipmentRequestPage({super.key});
@@ -12,6 +13,7 @@ class ShipmentRequestPage extends StatefulWidget {
 }
 
 class _ShipmentRequestPageState extends State<ShipmentRequestPage> {
+  final BookingController _bookingController = Get.find<BookingController>();
   final _formKey = GlobalKey<FormState>();
 
   final pickupController = TextEditingController();
@@ -32,18 +34,11 @@ class _ShipmentRequestPageState extends State<ShipmentRequestPage> {
   }
 
   Future<Map<String, dynamic>?> _getCurrentUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _bookingController.currentUser;
 
     if (user == null) return null;
 
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
-
-    if (!doc.exists) return null;
-
-    return doc.data();
+    return _bookingController.loadCurrentUserProfile();
   }
 
   Future<void> _selectDate() async {
@@ -65,7 +60,7 @@ class _ShipmentRequestPageState extends State<ShipmentRequestPage> {
     if (!_formKey.currentState!.validate()) return;
 
     final l10n = AppLocalizations.of(context)!;
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _bookingController.currentUser;
 
     if (currentUser == null) {
       if (!mounted) return;
@@ -93,11 +88,7 @@ class _ShipmentRequestPageState extends State<ShipmentRequestPage> {
       final customerEmail = (userData?['email'] ?? currentUser.email ?? '')
           .toString();
 
-      final requestRef = FirebaseFirestore.instance
-          .collection('shipment_requests')
-          .doc();
-
-      await requestRef.set({
+      await _bookingController.submitWithGeneratedId({
         'userId': currentUser.uid,
         'customerName': customerName,
         'customerEmail': customerEmail,
@@ -113,8 +104,6 @@ class _ShipmentRequestPageState extends State<ShipmentRequestPage> {
         'notes': notesController.text.trim(),
 
         'status': 'pending_review',
-        'requestId': requestRef.id,
-
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });

@@ -19,6 +19,9 @@ class BookingController extends GetxController {
     Map<String, dynamic> data,
   ) => _service.submit(data);
 
+  Future<void> submitWithGeneratedId(Map<String, dynamic> data) =>
+      _service.submitWithGeneratedId(data);
+
   Stream<QuerySnapshot<Map<String, dynamic>>> watchMyBookings() =>
       _service.watchForCurrentUser();
 }

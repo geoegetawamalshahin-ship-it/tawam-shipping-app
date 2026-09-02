@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 import '../l10n/app_localizations.dart';
+import '../core/responsive/feature_page_body.dart';
 import '../presentation/controllers/shipment_controller.dart';
 
 class ShippingDocumentsScreen extends StatefulWidget {
@@ -222,7 +223,12 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
           return RefreshIndicator(
             onRefresh: _refresh,
             child: ListView.separated(
-              padding: const EdgeInsets.all(20),
+              padding: FeaturePageInsets.list(
+                context,
+                horizontal: 20,
+                top: 20,
+                bottom: 20,
+              ),
               itemCount: documents.length,
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
+import '../core/responsive/feature_page_body.dart';
 import '../locale_controller.dart';
 import '../presentation/controllers/support_controller.dart';
 
@@ -122,7 +123,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
                         return ListView(
                           physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                          padding: FeaturePageInsets.list(context),
                           children: [
                             _buildHero(requests),
 

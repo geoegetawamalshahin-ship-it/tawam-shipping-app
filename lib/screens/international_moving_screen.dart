@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
+import '../presentation/controllers/quote_controller.dart';
 import 'my_quotes_screen.dart';
 
 class InternationalMovingScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class InternationalMovingScreen extends StatefulWidget {
 }
 
 class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
+  final QuoteController _quoteController = Get.find<QuoteController>();
   // =========================================================
   // BRAND
   // =========================================================
@@ -177,7 +179,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   Future<void> _loadCustomerProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       if (mounted) {
@@ -195,12 +197,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     String country = '';
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      final data = snapshot.data() ?? <String, dynamic>{};
+      final data = await _quoteController.loadCurrentUserProfile();
 
       name = _firstNonEmpty([
         data['name'],
@@ -2031,7 +2028,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       _showMessage(l10n.pleaseSignInBeforeQuote, error: true);
@@ -2185,9 +2182,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      await FirebaseFirestore.instance
-          .collection('quote_requests')
-          .add(quoteData);
+      await _quoteController.submit(quoteData);
 
       if (!mounted) return;
 

@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/booking_service.dart';
 import '../../data/services/home_service.dart';
+import '../../data/services/notification_service.dart';
 import '../../data/services/profile_service.dart';
 import '../../data/services/quote_service.dart';
 import '../../data/services/shipment_service.dart';
@@ -14,6 +15,7 @@ import '../../data/services/support_service.dart';
 import '../../presentation/controllers/auth_controller.dart';
 import '../../presentation/controllers/booking_controller.dart';
 import '../../presentation/controllers/home_controller.dart';
+import '../../presentation/controllers/notification_controller.dart';
 import '../../presentation/controllers/profile_controller.dart';
 import '../../presentation/controllers/quote_controller.dart';
 import '../../presentation/controllers/shipment_controller.dart';
@@ -70,6 +72,13 @@ class InitialBinding extends Bindings {
       ),
       permanent: true,
     );
+    Get.put<NotificationService>(
+      NotificationService(
+        Get.find<FirebaseAuth>(),
+        Get.find<FirebaseFirestore>(),
+      ),
+      permanent: true,
+    );
     Get.lazyPut<QuoteController>(
       () => QuoteController(Get.find<QuoteService>()),
       fenix: true,
@@ -88,6 +97,10 @@ class InitialBinding extends Bindings {
     );
     Get.lazyPut<ProfileController>(
       () => ProfileController(Get.find<ProfileService>()),
+      fenix: true,
+    );
+    Get.lazyPut<NotificationController>(
+      () => NotificationController(Get.find<NotificationService>()),
       fenix: true,
     );
     Get.lazyPut<HomeController>(

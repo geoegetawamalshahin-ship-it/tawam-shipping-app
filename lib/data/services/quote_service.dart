@@ -20,6 +20,10 @@ class QuoteService {
     Map<String, dynamic> data,
   ) => _firestore.collection('quote_requests').add(data);
 
+  Future<DocumentReference<Map<String, dynamic>>> submitLegacy(
+    Map<String, dynamic> data,
+  ) => _firestore.collection('quotes').add(data);
+
   Stream<QuerySnapshot<Map<String, dynamic>>> watchForCurrentUser() {
     final user = currentUser;
     if (user == null) return const Stream.empty();

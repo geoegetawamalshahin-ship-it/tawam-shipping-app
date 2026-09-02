@@ -19,6 +19,10 @@ class QuoteController extends GetxController {
     Map<String, dynamic> data,
   ) => _service.submit(data);
 
+  Future<DocumentReference<Map<String, dynamic>>> submitLegacy(
+    Map<String, dynamic> data,
+  ) => _service.submitLegacy(data);
+
   Stream<QuerySnapshot<Map<String, dynamic>>> watchMyQuotes() =>
       _service.watchForCurrentUser();
 

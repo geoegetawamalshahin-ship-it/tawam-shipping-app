@@ -25,3 +25,19 @@ class FeaturePageBody extends StatelessWidget {
     );
   }
 }
+
+abstract final class FeaturePageInsets {
+  static EdgeInsets list(
+    BuildContext context, {
+    double horizontal = 16,
+    double top = 18,
+    double bottom = 34,
+    double maxWidth = 900,
+  }) {
+    final width = MediaQuery.sizeOf(context).width;
+    final side = width > maxWidth
+        ? ((width - maxWidth) / 2) + horizontal
+        : horizontal;
+    return EdgeInsets.fromLTRB(side, top, side, bottom);
+  }
+}

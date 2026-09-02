@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
+import '../core/responsive/feature_page_body.dart';
 import '../locale_controller.dart';
 import 'support_screen.dart';
 import 'package:get/get.dart';
@@ -245,7 +246,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                padding: FeaturePageInsets.list(context),
                 children: [
                   _buildHero(
                     trackingNumber: trackingNumber,

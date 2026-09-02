@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
+import '../core/responsive/feature_page_body.dart';
 import '../locale_controller.dart';
 import '../presentation/controllers/support_controller.dart';
 
@@ -459,7 +460,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 key: _formKey,
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 36),
+                  padding: FeaturePageInsets.list(context, bottom: 36),
                   children: [
                     _buildHero(),
 

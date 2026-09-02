@@ -20,6 +20,11 @@ class BookingService {
     Map<String, dynamic> data,
   ) => _firestore.collection('shipment_requests').add(data);
 
+  Future<void> submitWithGeneratedId(Map<String, dynamic> data) async {
+    final reference = _firestore.collection('shipment_requests').doc();
+    await reference.set({...data, 'requestId': reference.id});
+  }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> watchForCurrentUser() {
     final user = currentUser;
     if (user == null) return const Stream.empty();

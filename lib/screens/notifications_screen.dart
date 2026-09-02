@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'dart:async';
 
 import 'my_support_requests_screen.dart';
@@ -8,6 +8,8 @@ import 'shipment_details_screen.dart';
 import 'my_quotes_screen.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
+import '../core/responsive/feature_page_body.dart';
+import '../presentation/controllers/notification_controller.dart';
 
 // ==========================================================
 // TAWAM PREMIUM BRAND
@@ -155,14 +157,12 @@ class NotificationRouter {
 
     if (type == 'shipment' && referenceId.isNotEmpty) {
       try {
-        final document = await FirebaseFirestore.instance
-            .collection('shipments')
-            .doc(referenceId)
-            .get();
+        final shipment = await Get.find<NotificationController>()
+            .loadShipment(referenceId);
 
         if (!context.mounted) return;
 
-        if (!document.exists || document.data() == null) {
+        if (shipment == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n?.shipmentNotFoundShort ?? ''),
@@ -171,11 +171,6 @@ class NotificationRouter {
           );
           return;
         }
-
-        final shipment = <String, dynamic>{
-          ...document.data()!,
-          'id': document.id,
-        };
 
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -213,10 +208,13 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  final NotificationController _notificationController =
+      Get.find<NotificationController>();
   String _selectedFilter = 'All';
 
   List<Map<String, dynamic>> _notifications = [];
-  StreamSubscription<QuerySnapshot>? _notificationsSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+      _notificationsSubscription;
   bool _isLoading = true;
   String? _loadError;
 
@@ -231,7 +229,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   // ==========================================================
 
   void _listenToNotifications() {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _notificationController.currentUser;
 
     if (user == null) return;
     if (mounted) {
@@ -241,11 +239,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       });
     }
 
-    _notificationsSubscription = FirebaseFirestore.instance
-        .collection('notifications')
-        .where('userId', isEqualTo: user.uid)
-        .snapshots()
-        .listen(
+    _notificationsSubscription = _notificationController.watchMine().listen(
           (snapshot) {
             final items = snapshot.docs.map((doc) {
               final data = doc.data();
@@ -444,29 +438,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   // ==========================================================
 
   Future<void> _markAllAsRead() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _notificationController.currentUser;
 
     if (user == null) return;
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('notifications')
-        .where('userId', isEqualTo: user.uid)
-        .where('isRead', isEqualTo: false)
-        .get();
+    final didUpdate = await _notificationController.markAllAsRead();
 
-    if (snapshot.docs.isEmpty) {
+    if (!didUpdate) {
       if (!mounted) return;
       _showMessage(AppLocalizations.of(context)!.noUnreadNotifications);
       return;
     }
-
-    final batch = FirebaseFirestore.instance.batch();
-
-    for (final doc in snapshot.docs) {
-      batch.update(doc.reference, {'isRead': true});
-    }
-
-    await batch.commit();
 
     if (!mounted) return;
 
@@ -474,22 +456,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Future<void> _markAsRead(String id) async {
-    await FirebaseFirestore.instance.collection('notifications').doc(id).update(
-      {'isRead': true},
-    );
+    await _notificationController.setRead(id, true);
   }
 
   Future<void> _markAsUnread(String id) async {
-    await FirebaseFirestore.instance.collection('notifications').doc(id).update(
-      {'isRead': false},
-    );
+    await _notificationController.setRead(id, false);
   }
 
   Future<void> _deleteNotification(String id) async {
-    await FirebaseFirestore.instance
-        .collection('notifications')
-        .doc(id)
-        .delete();
+    await _notificationController.delete(id);
 
     if (!mounted) return;
 
@@ -677,7 +652,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       body: SafeArea(
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 34),
+          padding: FeaturePageInsets.list(
+            context,
+            horizontal: 14,
+            top: 14,
+          ),
           children: [
             _buildHeader(l10n),
 

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
+import '../presentation/controllers/quote_controller.dart';
 
 const Color _primaryBlue = Color(0xFF07569E);
 const Color _darkNavy = Color(0xFF10233F);
@@ -20,6 +21,7 @@ class RequestQuoteScreen extends StatefulWidget {
 }
 
 class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
+  final QuoteController _quoteController = Get.find<QuoteController>();
   final _formKey = GlobalKey<FormState>();
 
   final _pickupController = TextEditingController();
@@ -137,7 +139,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
     if (!_formKey.currentState!.validate()) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       final l10n = AppLocalizations.of(context)!;
@@ -154,7 +156,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
     });
 
     try {
-      await FirebaseFirestore.instance.collection('quotes').add({
+      await _quoteController.submitLegacy({
         'userId': user.uid,
         'pickupLocation': _pickupController.text.trim(),
         'deliveryLocation': _deliveryController.text.trim(),

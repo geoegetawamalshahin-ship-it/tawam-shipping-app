@@ -34,4 +34,26 @@ void main() {
 
     expect(tester.getSize(find.byKey(contentKey)).width, 900);
   });
+
+  testWidgets('feature list padding centers tablet content', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    late EdgeInsets padding;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            padding = FeaturePageInsets.list(context);
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
+
+    expect(padding.left, 166);
+    expect(padding.right, 166);
+  });
 }

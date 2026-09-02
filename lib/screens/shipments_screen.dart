@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../l10n/app_localizations.dart';
+import '../core/responsive/feature_page_body.dart';
 import '../locale_controller.dart';
 import '../presentation/controllers/shipment_controller.dart';
 import 'shipment_details_screen.dart';
@@ -204,7 +205,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                padding: FeaturePageInsets.list(context),
                 children: [
                   _buildHero(),
                   const SizedBox(height: 16),

@@ -16,6 +16,7 @@ import 'privacy_policy_screen.dart';
 import 'terms_conditions_screen.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
+import '../core/responsive/feature_page_body.dart';
 import '../presentation/controllers/profile_controller.dart';
 
 // ==========================================================
@@ -1473,7 +1474,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   physics: const AlwaysScrollableScrollPhysics(
                     parent: BouncingScrollPhysics(),
                   ),
-                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 34),
+                  padding: FeaturePageInsets.list(
+                    context,
+                    horizontal: 14,
+                    top: 14,
+                  ),
                   children: [
                     _buildHeader(),
 
