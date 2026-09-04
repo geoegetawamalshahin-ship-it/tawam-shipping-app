@@ -66,7 +66,6 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   bool _submitting = false;
 
   @override
-  @override
   void initState() {
     super.initState();
 
