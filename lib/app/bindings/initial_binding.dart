@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +13,7 @@ class InitialBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<AuthService>(
-      () => AuthService(FirebaseAuth.instance),
+      () => AuthService(FirebaseAuth.instance, FirebaseFirestore.instance),
       fenix: true,
     );
     Get.lazyPut<AuthController>(
