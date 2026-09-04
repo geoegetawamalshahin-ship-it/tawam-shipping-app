@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'support_screen.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -45,6 +46,8 @@ class ShipmentDetailsScreen extends StatefulWidget {
 }
 
 class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
+  final ShipmentController _shipmentController = Get.find<ShipmentController>();
+
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
   _shipmentSubscription;
 
@@ -92,11 +95,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
       return;
     }
 
-    _shipmentSubscription = FirebaseFirestore.instance
-        .collection('shipments')
-        .doc(documentId)
-        .snapshots()
-        .listen(
+    _shipmentSubscription = _shipmentController.watchShipment(documentId).listen(
           (document) {
             if (!mounted || !document.exists || document.data() == null) {
               return;
@@ -128,7 +127,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     }
 
     final shipmentId = (_shipment['id'] ?? '').toString().trim();
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _shipmentController.currentUser;
 
     if (shipmentId.isEmpty || user == null) {
       return;
