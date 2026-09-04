@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/auth_controller.dart';
 import '../locale_controller.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -13,6 +14,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final AuthController _authController = Get.find<AuthController>();
+
   @override
   void initState() {
     super.initState();
@@ -25,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
 
     if (user != null) {
       await LocaleController.restoreFromFirestore();
