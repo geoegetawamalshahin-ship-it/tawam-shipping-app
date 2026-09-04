@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tawam_shipping_app/core/firestore_collections.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations.dart';
 import 'package:tawam_shipping_app/locale_controller.dart';
 
@@ -43,18 +44,19 @@ void main() {
         .map((file) => file.readAsStringSync())
         .join('\n');
 
-    const collections = <String>{
-      'users',
-      'shipments',
-      'quote_requests',
+    expect(FirestoreCollections.users, 'users');
+    expect(FirestoreCollections.shipments, 'shipments');
+    expect(FirestoreCollections.quoteRequests, 'quote_requests');
+    expect(FirestoreCollections.shipmentRequests, 'shipment_requests');
+    expect(FirestoreCollections.supportRequests, 'support_requests');
+    expect(FirestoreCollections.notifications, 'notifications');
+
+    const remainingCollections = <String>{
       'quotes',
-      'shipment_requests',
-      'support_requests',
-      'notifications',
       'account_deletion_requests',
     };
 
-    for (final collection in collections) {
+    for (final collection in remainingCollections) {
       expect(
         source,
         contains(".collection('$collection')"),
