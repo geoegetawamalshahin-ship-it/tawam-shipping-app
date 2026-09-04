@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+
+import '../../controllers/auth_controller.dart';
+import '../../services/auth_service.dart';
 
 /// Application-wide GetX registrations will be added here incrementally.
 ///
@@ -6,5 +10,14 @@ import 'package:get/get.dart';
 /// behavior while establishing the MVC migration entry point.
 class InitialBinding extends Bindings {
   @override
-  void dependencies() {}
+  void dependencies() {
+    Get.lazyPut<AuthService>(
+      () => AuthService(FirebaseAuth.instance),
+      fenix: true,
+    );
+    Get.lazyPut<AuthController>(
+      () => AuthController(Get.find<AuthService>()),
+      fenix: true,
+    );
+  }
 }
