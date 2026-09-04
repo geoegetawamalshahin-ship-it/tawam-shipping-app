@@ -3,8 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/auth_controller.dart';
+import '../../controllers/booking_controller.dart';
 import '../../controllers/quote_controller.dart';
 import '../../services/auth_service.dart';
+import '../../services/booking_service.dart';
 import '../../services/quote_service.dart';
 
 /// Application-wide GetX registrations are added here incrementally while
@@ -18,6 +20,14 @@ class InitialBinding extends Bindings {
     );
     Get.lazyPut<AuthController>(
       () => AuthController(Get.find<AuthService>()),
+      fenix: true,
+    );
+    Get.lazyPut<BookingService>(
+      () => BookingService(FirebaseAuth.instance, FirebaseFirestore.instance),
+      fenix: true,
+    );
+    Get.lazyPut<BookingController>(
+      () => BookingController(Get.find<BookingService>()),
       fenix: true,
     );
     Get.lazyPut<QuoteService>(
