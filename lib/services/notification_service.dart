@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../core/firestore_collections.dart';
+
 class NotificationService {
   NotificationService(this._firebaseAuth, this._firestore);
 
@@ -12,21 +14,21 @@ class NotificationService {
   Future<DocumentSnapshot<Map<String, dynamic>>> loadShipment(
     String documentId,
   ) {
-    return _firestore.collection('shipments').doc(documentId).get();
+    return _firestore.collection(FirestoreCollections.shipments).doc(documentId).get();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchNotifications(
     String userId,
   ) {
     return _firestore
-        .collection('notifications')
+        .collection(FirestoreCollections.notifications)
         .where('userId', isEqualTo: userId)
         .snapshots();
   }
 
   Future<bool> markAllAsRead(String userId) async {
     final snapshot = await _firestore
-        .collection('notifications')
+        .collection(FirestoreCollections.notifications)
         .where('userId', isEqualTo: userId)
         .where('isRead', isEqualTo: false)
         .get();
@@ -44,12 +46,12 @@ class NotificationService {
   }
 
   Future<void> setReadState(String id, {required bool isRead}) {
-    return _firestore.collection('notifications').doc(id).update({
+    return _firestore.collection(FirestoreCollections.notifications).doc(id).update({
       'isRead': isRead,
     });
   }
 
   Future<void> deleteNotification(String id) {
-    return _firestore.collection('notifications').doc(id).delete();
+    return _firestore.collection(FirestoreCollections.notifications).doc(id).delete();
   }
 }
