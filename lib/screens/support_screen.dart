@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../controllers/support_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 
@@ -38,6 +39,8 @@ class SupportScreen extends StatefulWidget {
 }
 
 class _SupportScreenState extends State<SupportScreen> {
+  final SupportController _supportController = Get.find<SupportController>();
+
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
@@ -71,7 +74,7 @@ class _SupportScreenState extends State<SupportScreen> {
   void initState() {
     super.initState();
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _supportController.currentUser;
 
     if (user != null) {
       final displayName = user.displayName?.trim() ?? '';
@@ -194,7 +197,7 @@ class _SupportScreenState extends State<SupportScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _supportController.currentUser;
 
     if (user == null) {
       _showMessage(AppLocalizations.of(context)!.pleaseSignInBeforeSupport);
@@ -208,7 +211,7 @@ class _SupportScreenState extends State<SupportScreen> {
     try {
       // Keep the same Firestore field structure used by
       // the existing support system/admin panel.
-      await FirebaseFirestore.instance.collection('support_requests').add({
+      await _supportController.createSupportRequest({
         'userId': user.uid,
         'category': _selectedCategory,
         'shipmentNumber': _shipmentController.text.trim().toUpperCase(),
