@@ -27,6 +27,11 @@ void main() {
     );
   });
 
+  test('a new application session defaults to English', () {
+    LocaleController.setLanguage('English');
+    expect(LocaleController.locale.value, const Locale('en'));
+  });
+
   test('language switching preserves the existing locale mapping', () {
     addTearDown(() => LocaleController.setLanguage('English'));
 
