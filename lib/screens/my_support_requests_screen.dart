@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/support_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 
@@ -30,6 +31,8 @@ class MySupportRequestsScreen extends StatefulWidget {
 }
 
 class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
+  final SupportController _supportController = Get.find<SupportController>();
+
   String _selectedFilter = 'all';
   bool _openedInitialRequest = false;
 
@@ -37,7 +40,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _supportController.currentUser;
 
     return Scaffold(
       backgroundColor: _pageBg,
@@ -49,10 +52,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
               child: user == null
                   ? _buildSignedOut()
                   : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('support_requests')
-                          .where('userId', isEqualTo: user.uid)
-                          .snapshots(),
+                      stream: _supportController.watchSupportRequests(user.uid),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
