@@ -8,6 +8,8 @@ class AuthController extends GetxController {
 
   final AuthService _authService;
 
+  User? get currentUser => _authService.currentUser;
+
   Future<UserCredential> signIn({
     required String email,
     required String password,
@@ -32,4 +34,6 @@ class AuthController extends GetxController {
   Future<void> sendPasswordResetEmail({required String email}) {
     return _authService.sendPasswordResetEmail(email: email);
   }
+
+  Future<void> signOut() => _authService.signOut();
 }
