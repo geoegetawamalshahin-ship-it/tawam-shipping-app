@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../core/firestore_collections.dart';
+
 class ShipmentService {
   ShipmentService(this._firebaseAuth, this._firestore);
 
@@ -13,7 +15,7 @@ class ShipmentService {
     String userId,
   ) {
     return _firestore
-        .collection('shipments')
+        .collection(FirestoreCollections.shipments)
         .where('userId', isEqualTo: userId)
         .snapshots();
   }
@@ -23,7 +25,7 @@ class ShipmentService {
     required String trackingNumber,
   }) {
     return _firestore
-        .collection('shipments')
+        .collection(FirestoreCollections.shipments)
         .where('userId', isEqualTo: userId)
         .where('trackingNumber', isEqualTo: trackingNumber)
         .limit(1)
@@ -34,7 +36,7 @@ class ShipmentService {
     String documentId,
   ) {
     return _firestore
-        .collection('shipments')
+        .collection(FirestoreCollections.shipments)
         .doc(documentId)
         .snapshots();
   }
