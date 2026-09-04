@@ -14,4 +14,22 @@ class AuthController extends GetxController {
   }) {
     return _authService.signIn(email: email, password: password);
   }
+
+  Future<void> createAccount({
+    required String name,
+    required String phone,
+    required String email,
+    required String password,
+  }) {
+    return _authService.createAccount(
+      name: name,
+      phone: phone,
+      email: email,
+      password: password,
+    );
+  }
+
+  Future<void> sendPasswordResetEmail({required String email}) {
+    return _authService.sendPasswordResetEmail(email: email);
+  }
 }
