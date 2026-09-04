@@ -63,7 +63,6 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
 
   Timer? _liveLocationTimer;
   @override
-  @override
   void initState() {
     super.initState();
 
