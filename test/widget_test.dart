@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tawam_shipping_app/app/widgets/responsive_app_frame.dart';
 import 'package:tawam_shipping_app/core/firestore_collections.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations.dart';
 import 'package:tawam_shipping_app/locale_controller.dart';
@@ -66,4 +67,49 @@ void main() {
 
     expect(source, contains(".from('shipping-documents')"));
   });
+
+  testWidgets('responsive frame leaves phone width unchanged', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final childKey = GlobalKey();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ResponsiveAppFrame(
+            child: SizedBox.expand(key: childKey),
+          ),
+        ),
+      ),
+    );
+
+    final box = childKey.currentContext!.findRenderObject()! as RenderBox;
+    expect(box.size.width, 390);
+  });
+
+  testWidgets('responsive frame caps wide tablet content', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final childKey = GlobalKey();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ResponsiveAppFrame(
+            child: SizedBox.expand(key: childKey),
+          ),
+        ),
+      ),
+    );
+
+    final box = childKey.currentContext!.findRenderObject()! as RenderBox;
+    expect(box.size.width, ResponsiveAppFrame.maxContentWidth);
+  });
+
 }
