@@ -4,12 +4,16 @@ import 'package:get/get.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/booking_controller.dart';
+import '../../controllers/notification_controller.dart';
 import '../../controllers/quote_controller.dart';
 import '../../controllers/shipment_controller.dart';
+import '../../controllers/support_controller.dart';
 import '../../services/auth_service.dart';
 import '../../services/booking_service.dart';
+import '../../services/notification_service.dart';
 import '../../services/quote_service.dart';
 import '../../services/shipment_service.dart';
+import '../../services/support_service.dart';
 
 /// Application-wide GetX registrations are added here incrementally while
 /// preserving each feature's existing behavior.
@@ -38,6 +42,25 @@ class InitialBinding extends Bindings {
     );
     Get.lazyPut<ShipmentController>(
       () => ShipmentController(Get.find<ShipmentService>()),
+      fenix: true,
+    );
+    Get.lazyPut<NotificationService>(
+      () => NotificationService(
+        FirebaseAuth.instance,
+        FirebaseFirestore.instance,
+      ),
+      fenix: true,
+    );
+    Get.lazyPut<NotificationController>(
+      () => NotificationController(Get.find<NotificationService>()),
+      fenix: true,
+    );
+    Get.lazyPut<SupportService>(
+      () => SupportService(FirebaseAuth.instance, FirebaseFirestore.instance),
+      fenix: true,
+    );
+    Get.lazyPut<SupportController>(
+      () => SupportController(Get.find<SupportService>()),
       fenix: true,
     );
     Get.lazyPut<QuoteService>(
