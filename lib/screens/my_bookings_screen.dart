@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/booking_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 
@@ -13,6 +14,8 @@ class MyBookingsScreen extends StatefulWidget {
 }
 
 class _MyBookingsScreenState extends State<MyBookingsScreen> {
+  final BookingController _bookingController = Get.find<BookingController>();
+
   static const Color deepBlue = Color(0xFF062B55);
   static const Color primaryBlue = Color(0xFF0B4F9C);
   static const Color pageBg = Color(0xFFF4F7FB);
@@ -26,7 +29,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _bookingController.currentUser;
 
     return Scaffold(
       backgroundColor: pageBg,
@@ -51,10 +54,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
             else
               Expanded(
                 child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('shipment_requests')
-                      .where('userId', isEqualTo: user.uid)
-                      .snapshots(),
+                  stream: _bookingController.watchBookingRequests(user.uid),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return _buildError(snapshot.error.toString());
