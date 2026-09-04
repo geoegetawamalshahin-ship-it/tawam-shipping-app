@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/auth_controller.dart';
 import 'notifications_screen.dart';
 import 'profile_screen.dart';
 import 'shipments_screen.dart';
@@ -35,6 +37,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AuthController _authController = Get.find<AuthController>();
+
   // ==========================================================
   // TAWAM BRAND
   // ==========================================================
@@ -1448,7 +1452,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             if (shouldLogout != true) return;
 
-                            await FirebaseAuth.instance.signOut();
+                            await _authController.signOut();
 
                             if (!context.mounted) return;
 
