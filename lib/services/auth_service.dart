@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../core/firestore_collections.dart';
+
 class AuthService {
   AuthService(this._firebaseAuth, this._firestore);
 
@@ -31,7 +33,7 @@ class AuthService {
     );
 
     await userCredential.user?.updateDisplayName(name);
-    await _firestore.collection('users').doc(userCredential.user!.uid).set({
+    await _firestore.collection(FirestoreCollections.users).doc(userCredential.user!.uid).set({
       'name': name,
       'phone': phone,
       'email': email,
