@@ -1,0 +1,75 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+
+import '../../controllers/auth_controller.dart';
+import '../../controllers/booking_controller.dart';
+import '../../controllers/notification_controller.dart';
+import '../../controllers/quote_controller.dart';
+import '../../controllers/shipment_controller.dart';
+import '../../controllers/support_controller.dart';
+import '../../services/auth_service.dart';
+import '../../services/booking_service.dart';
+import '../../services/notification_service.dart';
+import '../../services/quote_service.dart';
+import '../../services/shipment_service.dart';
+import '../../services/support_service.dart';
+
+/// Application-wide GetX registrations are added here incrementally while
+/// preserving each feature's existing behavior.
+class InitialBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<AuthService>(
+      () => AuthService(FirebaseAuth.instance, FirebaseFirestore.instance),
+      fenix: true,
+    );
+    Get.lazyPut<AuthController>(
+      () => AuthController(Get.find<AuthService>()),
+      fenix: true,
+    );
+    Get.lazyPut<BookingService>(
+      () => BookingService(FirebaseAuth.instance, FirebaseFirestore.instance),
+      fenix: true,
+    );
+    Get.lazyPut<BookingController>(
+      () => BookingController(Get.find<BookingService>()),
+      fenix: true,
+    );
+    Get.lazyPut<ShipmentService>(
+      () => ShipmentService(FirebaseAuth.instance, FirebaseFirestore.instance),
+      fenix: true,
+    );
+    Get.lazyPut<ShipmentController>(
+      () => ShipmentController(Get.find<ShipmentService>()),
+      fenix: true,
+    );
+    Get.lazyPut<NotificationService>(
+      () => NotificationService(
+        FirebaseAuth.instance,
+        FirebaseFirestore.instance,
+      ),
+      fenix: true,
+    );
+    Get.lazyPut<NotificationController>(
+      () => NotificationController(Get.find<NotificationService>()),
+      fenix: true,
+    );
+    Get.lazyPut<SupportService>(
+      () => SupportService(FirebaseAuth.instance, FirebaseFirestore.instance),
+      fenix: true,
+    );
+    Get.lazyPut<SupportController>(
+      () => SupportController(Get.find<SupportService>()),
+      fenix: true,
+    );
+    Get.lazyPut<QuoteService>(
+      () => QuoteService(FirebaseAuth.instance, FirebaseFirestore.instance),
+      fenix: true,
+    );
+    Get.lazyPut<QuoteController>(
+      () => QuoteController(Get.find<QuoteService>()),
+      fenix: true,
+    );
+  }
+}

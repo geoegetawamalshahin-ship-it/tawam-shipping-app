@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 
@@ -15,6 +16,8 @@ class MyQuotesScreen extends StatefulWidget {
 }
 
 class _MyQuotesScreenState extends State<MyQuotesScreen> {
+  final QuoteController _quoteController = Get.find<QuoteController>();
+
   static const Color deepBlue = Color(0xFF062B55);
   static const Color primaryBlue = Color(0xFF0B4F9C);
   static const Color pageBg = Color(0xFFF4F7FB);
@@ -29,7 +32,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     return Scaffold(
       backgroundColor: pageBg,
@@ -49,10 +52,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                       ),
                     )
                   : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('quote_requests')
-                          .where('userId', isEqualTo: user.uid)
-                          .snapshots(),
+                      stream: _quoteController.watchQuoteRequests(user.uid),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return _buildError();
@@ -1164,11 +1164,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
     if (confirmed != true) return;
 
     try {
-      await doc.reference.update({
-        'customerDecision': decision,
-        'customerDecisionAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _quoteController.updateCustomerDecision(doc.reference, decision);
 
       if (!mounted) return;
 

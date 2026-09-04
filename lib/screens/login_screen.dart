@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../controllers/auth_controller.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
@@ -15,6 +18,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  final AuthController _authController = Get.find<AuthController>();
 
   final TextEditingController _emailController = TextEditingController();
 
@@ -35,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await _authController.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );

@@ -1,0 +1,45 @@
+name: Safe refactor checks
+
+on:
+  push:
+    branches:
+      - safe/getx-mvc-v2
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  protect-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Protect translations and platform configuration
+        shell: bash
+        run: |
+          git fetch origin main
+          git diff --exit-code origin/main...HEAD -- \
+            lib/l10n \
+            lib/locale_controller.dart \
+            l10n.yaml \
+            android/app/google-services.json \
+            android/app/src/main/AndroidManifest.xml \
+            ios/Runner/Info.plist
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test

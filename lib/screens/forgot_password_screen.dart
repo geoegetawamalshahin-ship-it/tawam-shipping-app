@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+
+import '../controllers/auth_controller.dart';
 import '../l10n/app_localizations.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -12,6 +15,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final AuthController _authController = Get.find<AuthController>();
   bool _isSending = false;
 
   @override
@@ -33,7 +37,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final email = _emailController.text.trim();
 
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      await _authController.sendPasswordResetEmail(email: email);
 
       if (!mounted) return;
 

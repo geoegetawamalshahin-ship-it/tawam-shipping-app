@@ -1,7 +1,11 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/auth_controller.dart';
+import '../controllers/notification_controller.dart';
 import 'notifications_screen.dart';
 import 'profile_screen.dart';
 import 'shipments_screen.dart';
@@ -19,11 +23,9 @@ import 'land_freight_screen.dart';
 import 'car_shipping_screen.dart';
 import 'international_moving_screen.dart';
 import 'parcel_shipping_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
 
@@ -35,6 +37,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AuthController _authController = Get.find<AuthController>();
+  final NotificationController _notificationController =
+      Get.find<NotificationController>();
+
   // ==========================================================
   // TAWAM BRAND
   // ==========================================================
@@ -216,6 +222,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (selected == null || !context.mounted) return;
+
+    LocaleController.setLanguage(selected);
+    await Get.updateLocale(LocaleController.locale.value);
     await LocaleController.saveLanguage(selected);
   }
 
@@ -388,15 +397,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('notifications')
-                    .where(
-                      'userId',
-                      isEqualTo:
-                          FirebaseAuth.instance.currentUser?.uid ??
-                          '__no_user__',
-                    )
-                    .snapshots(),
+                stream: _notificationController.watchNotifications(
+                    _notificationController.currentUser?.uid ?? '__no_user__',
+                  ),
                 builder: (context, snapshot) {
                   int unreadCount = 0;
 
@@ -1448,7 +1451,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             if (shouldLogout != true) return;
 
-                            await FirebaseAuth.instance.signOut();
+                            await _authController.signOut();
 
                             if (!context.mounted) return;
 

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -117,6 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
 
       LocaleController.setLanguage(_selectedLanguage);
+      await Get.updateLocale(LocaleController.locale.value);
     } catch (_) {
       if (!mounted) return;
 
@@ -1003,6 +1005,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _selectedLanguage = selected;
     });
 
+    LocaleController.setLanguage(selected);
+    await Get.updateLocale(LocaleController.locale.value);
     await LocaleController.saveLanguage(selected);
   }
 
