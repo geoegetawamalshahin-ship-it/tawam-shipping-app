@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'shipment_details_screen.dart';
@@ -49,6 +50,8 @@ class ShipmentsScreen extends StatefulWidget {
 }
 
 class _ShipmentsScreenState extends State<ShipmentsScreen> {
+  final ShipmentController _shipmentController = Get.find<ShipmentController>();
+
   final TextEditingController _searchController = TextEditingController();
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
   String? _loadError;
@@ -82,7 +85,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   }
 
   void _listenToShipments() {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _shipmentController.currentUser;
 
     if (user == null) {
       setState(() {
@@ -99,11 +102,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     }
     _subscription?.cancel();
 
-    _subscription = FirebaseFirestore.instance
-        .collection('shipments')
-        .where('userId', isEqualTo: user.uid)
-        .snapshots()
-        .listen(
+    _subscription = _shipmentController.watchUserShipments(user.uid).listen(
           (snapshot) {
             final items = snapshot.docs.map((doc) {
               final data = doc.data();
