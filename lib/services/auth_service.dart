@@ -7,6 +7,8 @@ class AuthService {
   final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
 
+  User? get currentUser => _firebaseAuth.currentUser;
+
   Future<UserCredential> signIn({
     required String email,
     required String password,
@@ -44,4 +46,6 @@ class AuthService {
   Future<void> sendPasswordResetEmail({required String email}) {
     return _firebaseAuth.sendPasswordResetEmail(email: email);
   }
+
+  Future<void> signOut() => _firebaseAuth.signOut();
 }
