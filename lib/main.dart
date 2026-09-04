@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 import 'app/bindings/initial_binding.dart';
+import 'app/widgets/responsive_app_frame.dart';
 import 'screens/splash_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'theme/app_theme.dart';
@@ -279,6 +280,12 @@ class TawamShippingApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
 
           navigatorKey: NotificationRouter.navigatorKey,
+
+          builder: (context, child) {
+            return ResponsiveAppFrame(
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
 
           initialBinding: InitialBinding(),
 
