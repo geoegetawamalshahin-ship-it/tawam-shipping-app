@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
+import 'app/bindings/initial_binding.dart';
 import 'screens/splash_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'theme/app_theme.dart';
@@ -278,6 +279,8 @@ class TawamShippingApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
 
           navigatorKey: NotificationRouter.navigatorKey,
+
+          initialBinding: InitialBinding(),
 
           theme: AppTheme.lightTheme,
 
