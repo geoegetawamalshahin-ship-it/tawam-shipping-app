@@ -222,6 +222,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (selected == null || !context.mounted) return;
+
+    LocaleController.setLanguage(selected);
+    await Get.updateLocale(LocaleController.locale.value);
     await LocaleController.saveLanguage(selected);
   }
 
