@@ -798,6 +798,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildQuickActions(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
 
     final items = [
       {
@@ -844,14 +845,33 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ];
 
-    final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
+    if (isTablet) {
+      items.addAll([
+        {
+          'title': l10n.customerReviews,
+          'icon': _QuickActionIconType.reviews,
+          'onTap': () {
+            _openExternalUrl(
+              'https://share.google/tEGndxjEovXjiF15o',
+            );
+          },
+        },
+        {
+          'title': l10n.ourWebsite,
+          'icon': _QuickActionIconType.website,
+          'onTap': () {
+            _openExternalUrl('https://tawam-alshahin.ae/');
+          },
+        },
+      ]);
+    }
 
     final grid = GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+        crossAxisCount: isTablet ? 4 : 3,
         crossAxisSpacing: 10,
         mainAxisSpacing: 12,
         childAspectRatio: isTablet ? 1.18 : .86,
@@ -932,10 +952,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 780),
+        constraints: const BoxConstraints(maxWidth: 900),
         child: grid,
       ),
     );
+  }
+
+  Future<void> _openExternalUrl(String link) async {
+    final opened = await launchUrl(
+      Uri.parse(link),
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!opened && mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(l10n.couldNotOpenLink),
+        ),
+      );
+    }
   }
 
   // ==========================================================
@@ -1742,7 +1779,16 @@ class _ServiceItem {
 // PREMIUM QUICK ACTION LINE ICONS
 // ==========================================================
 
-enum _QuickActionIconType { quote, booking, volume, tracking, quotes, bookings }
+enum _QuickActionIconType {
+  quote,
+  booking,
+  volume,
+  tracking,
+  quotes,
+  bookings,
+  reviews,
+  website,
+}
 
 class _QuickActionLineIcon extends StatelessWidget {
   const _QuickActionLineIcon({
@@ -1806,6 +1852,12 @@ class _QuickActionIconPainter extends CustomPainter {
         break;
       case _QuickActionIconType.bookings:
         _drawMyBookings(canvas);
+        break;
+      case _QuickActionIconType.reviews:
+        _drawReviews(canvas);
+        break;
+      case _QuickActionIconType.website:
+        _drawWebsite(canvas);
         break;
     }
 
@@ -1974,6 +2026,46 @@ class _QuickActionIconPainter extends CustomPainter {
     _drawRoundBadge(canvas, const Offset(37, 35), line);
     canvas.drawLine(const Offset(33.5, 35), const Offset(36, 37.5), line);
     canvas.drawLine(const Offset(36, 37.5), const Offset(41, 32.5), line);
+  }
+
+  void _drawReviews(Canvas canvas) {
+    final line = _line;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(5, 7, 38, 29),
+        const Radius.circular(5),
+      ),
+      line,
+    );
+    final tail = Path()
+      ..moveTo(14, 36)
+      ..lineTo(11, 43)
+      ..lineTo(22, 36);
+    canvas.drawPath(tail, line);
+    for (final x in <double>[13, 20, 27, 34]) {
+      canvas.drawCircle(Offset(x, 21), 2.2, line);
+    }
+  }
+
+  void _drawWebsite(Canvas canvas) {
+    final line = _line;
+    canvas.drawCircle(const Offset(24, 24), 19, line);
+    canvas.drawOval(const Rect.fromLTWH(15, 5, 18, 38), line);
+    canvas.drawLine(const Offset(5, 24), const Offset(43, 24), line);
+    canvas.drawArc(
+      const Rect.fromLTWH(7, 13, 34, 22),
+      0,
+      3.14159,
+      false,
+      line,
+    );
+    canvas.drawArc(
+      const Rect.fromLTWH(7, 13, 34, 22),
+      3.14159,
+      3.14159,
+      false,
+      line,
+    );
   }
 
   void _drawCalendarBase(Canvas canvas, Rect rect, Paint line) {
