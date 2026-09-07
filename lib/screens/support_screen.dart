@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/support_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -601,7 +602,7 @@ class _SupportScreenState extends State<SupportScreen> {
       ),
       child: Row(
         children: [
-          _SquareButton(
+          ShipmentSquareButton(
             icon: Icons.arrow_back_rounded,
             onTap: () => Navigator.pop(context),
           ),
@@ -696,7 +697,7 @@ class _SupportScreenState extends State<SupportScreen> {
             children: [
               Row(
                 children: [
-                  const _LiveDot(),
+                  const ShipmentLiveDot(),
                   const SizedBox(width: 7),
                   Text(
                     l10n.logisticsSupportCenter,
@@ -739,17 +740,20 @@ class _SupportScreenState extends State<SupportScreen> {
 
               Row(
                 children: [
-                  _HeroFeature(
+                  ShipmentHeroFeature(
                     icon: Icons.lock_outline_rounded,
                     label: l10n.secure,
                   ),
                   const SizedBox(width: 18),
-                  _HeroFeature(
+                  ShipmentHeroFeature(
                     icon: Icons.support_agent_rounded,
                     label: l10n.expertTeam,
                   ),
                   const SizedBox(width: 18),
-                  _HeroFeature(icon: Icons.sync_rounded, label: l10n.connected),
+                  ShipmentHeroFeature(
+                    icon: Icons.sync_rounded,
+                    label: l10n.connected,
+                  ),
                 ],
               ),
             ],
@@ -1483,70 +1487,3 @@ class _HoursRow extends StatelessWidget {
 // ==========================================================
 // HEADER / HERO SMALL COMPONENTS
 // ==========================================================
-
-class _SquareButton extends StatelessWidget {
-  const _SquareButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF7F9FC),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: _border),
-        ),
-        child: Icon(icon, color: _deepBlue, size: 22),
-      ),
-    );
-  }
-}
-
-class _LiveDot extends StatelessWidget {
-  const _LiveDot();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 9,
-      height: 9,
-      decoration: const BoxDecoration(
-        color: Color(0xFF55D6A5),
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-}
-
-class _HeroFeature extends StatelessWidget {
-  const _HeroFeature({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Colors.white, size: 13),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
-    );
-  }
-}
