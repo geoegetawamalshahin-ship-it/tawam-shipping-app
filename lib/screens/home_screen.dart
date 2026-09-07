@@ -844,21 +844,19 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
+    final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
 
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: items.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: isTablet ? 4 : 3,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 12,
-            childAspectRatio: isTablet ? 1.05 : .86,
-          ),
-          itemBuilder: (context, index) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: isTablet ? 4 : 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 12,
+        childAspectRatio: isTablet ? 1.05 : .86,
+      ),
+      itemBuilder: (context, index) {
         final item = items[index];
 
         return Material(
@@ -926,8 +924,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-        );
-          },
         );
       },
     );
