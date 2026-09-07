@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../app/widgets/shipping_form_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -580,26 +581,41 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _TrustItem(
+            child: ShippingTrustItem(
               icon: Icons.inventory_2_outlined,
               title: 'FCL',
               subtitle: _optionLabel(l10n, 'Full Container'),
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
+              titleFontSize: 11,
+              subtitleFontWeight: FontWeight.w500,
             ),
           ),
-          const _VerticalDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _TrustItem(
+            child: ShippingTrustItem(
               icon: Icons.widgets_outlined,
               title: 'LCL',
               subtitle: _optionLabel(l10n, 'Shared Cargo'),
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
+              titleFontSize: 11,
+              subtitleFontWeight: FontWeight.w500,
             ),
           ),
-          const _VerticalDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _TrustItem(
+            child: ShippingTrustItem(
               icon: Icons.home_work_outlined,
               title: 'D2D',
               subtitle: l10n.doorToDoor,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
+              titleFontSize: 11,
+              subtitleFontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -1346,7 +1362,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                   value: _customerName,
                 ),
 
-                const _ContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.phone_outlined,
@@ -1356,7 +1372,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                       : _customerPhone,
                 ),
 
-                const _ContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.email_outlined,
@@ -1367,7 +1383,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                 ),
 
                 if (_customerCompany.isNotEmpty) ...[
-                  const _ContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.business_outlined,
@@ -1377,7 +1393,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
                 ],
 
                 if (_customerCountry.isNotEmpty) ...[
-                  const _ContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.public_outlined,
@@ -2426,79 +2442,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: error ? const Color(0xFF9E2A2A) : _deepBlue,
       ),
-    );
-  }
-}
-
-// ===========================================================
-// SMALL WIDGETS
-// ===========================================================
-
-class _TrustItem extends StatelessWidget {
-  const _TrustItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: _SeaFreightScreenState._primaryBlue, size: 20),
-
-        const SizedBox(height: 6),
-
-        Text(
-          title,
-          style: const TextStyle(
-            color: _SeaFreightScreenState._textDark,
-            fontSize: 11,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-
-        const SizedBox(height: 2),
-
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: _SeaFreightScreenState._textGrey,
-            fontSize: 7.5,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _VerticalDivider extends StatelessWidget {
-  const _VerticalDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 38,
-      color: _SeaFreightScreenState._border,
-    );
-  }
-}
-
-class _ContactDivider extends StatelessWidget {
-  const _ContactDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 13),
-      child: Divider(color: _SeaFreightScreenState._border, height: 1),
     );
   }
 }

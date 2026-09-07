@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../app/widgets/shipping_form_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -612,26 +613,35 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _LandTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.local_shipping_outlined,
               title: 'FTL',
               subtitle: _optionLabel(l10n, 'Full Truck Load'),
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _LandDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _LandTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.inventory_2_outlined,
               title: 'LTL',
               subtitle: _optionLabel(l10n, 'Partial Load'),
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _LandDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _LandTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.public_rounded,
               title: l10n.badgeXBorder,
               subtitle: l10n.regionalRoutes,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
         ],
@@ -1587,7 +1597,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                   value: _customerName,
                 ),
 
-                const _LandContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.phone_outlined,
@@ -1597,7 +1607,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                       : _customerPhone,
                 ),
 
-                const _LandContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.email_outlined,
@@ -1608,7 +1618,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                 ),
 
                 if (_customerCompany.isNotEmpty) ...[
-                  const _LandContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.business_outlined,
@@ -1618,7 +1628,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
                 ],
 
                 if (_customerCountry.isNotEmpty) ...[
-                  const _LandContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.public_outlined,
@@ -2800,78 +2810,6 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: error ? const Color(0xFF9E2A2A) : _deepBlue,
       ),
-    );
-  }
-}
-
-// ===========================================================
-// SMALL WIDGETS
-// ===========================================================
-
-class _LandTrustItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _LandTrustItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: _LandFreightScreenState._primaryBlue, size: 20),
-
-        const SizedBox(height: 6),
-
-        Text(
-          title,
-          style: const TextStyle(
-            color: _LandFreightScreenState._textDark,
-            fontSize: 10.5,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-
-        const SizedBox(height: 2),
-
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: _LandFreightScreenState._textGrey,
-            fontSize: 7.5,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _LandDivider extends StatelessWidget {
-  const _LandDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 38,
-      color: _LandFreightScreenState._border,
-    );
-  }
-}
-
-class _LandContactDivider extends StatelessWidget {
-  const _LandContactDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 13),
-      child: Divider(color: _LandFreightScreenState._border, height: 1),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../app/widgets/shipping_form_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -677,26 +678,35 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _ParcelTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.bolt_rounded,
               title: l10n.badgeExpress,
               subtitle: l10n.priority,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _ParcelDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _ParcelTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.public_rounded,
               title: l10n.badgeIntl,
               subtitle: l10n.globalParcels,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _ParcelDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _ParcelTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.home_work_outlined,
               title: 'D2D',
               subtitle: l10n.doorToDoor,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
         ],
@@ -1466,7 +1476,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
             },
           ),
 
-          const _ParcelCardDivider(),
+          const ShippingContactDivider(color: _border),
 
           _optionSwitch(
             icon: Icons.shield_outlined,
@@ -1480,7 +1490,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
             },
           ),
 
-          const _ParcelCardDivider(),
+          const ShippingContactDivider(color: _border),
 
           _optionSwitch(
             icon: Icons.draw_outlined,
@@ -1625,7 +1635,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                   value: _customerName,
                 ),
 
-                const _ParcelContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.phone_outlined,
@@ -1635,7 +1645,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                       : _customerPhone,
                 ),
 
-                const _ParcelContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.email_outlined,
@@ -1646,7 +1656,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 ),
 
                 if (_customerCompany.isNotEmpty) ...[
-                  const _ParcelContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.business_outlined,
@@ -1656,7 +1666,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 ],
 
                 if (_customerCountry.isNotEmpty) ...[
-                  const _ParcelContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.public_outlined,
@@ -2733,90 +2743,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: error ? const Color(0xFF9E2A2A) : _deepBlue,
       ),
-    );
-  }
-}
-
-// ===========================================================
-// SMALL WIDGETS
-// ===========================================================
-
-class _ParcelTrustItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _ParcelTrustItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: _ParcelShippingScreenState._primaryBlue, size: 20),
-
-        const SizedBox(height: 6),
-
-        Text(
-          title,
-          style: const TextStyle(
-            color: _ParcelShippingScreenState._textDark,
-            fontSize: 10.5,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-
-        const SizedBox(height: 2),
-
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: _ParcelShippingScreenState._textGrey,
-            fontSize: 7.5,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ParcelDivider extends StatelessWidget {
-  const _ParcelDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 38,
-      color: _ParcelShippingScreenState._border,
-    );
-  }
-}
-
-class _ParcelContactDivider extends StatelessWidget {
-  const _ParcelContactDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 13),
-      child: Divider(color: _ParcelShippingScreenState._border, height: 1),
-    );
-  }
-}
-
-class _ParcelCardDivider extends StatelessWidget {
-  const _ParcelCardDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 13),
-      child: Divider(color: _ParcelShippingScreenState._border, height: 1),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../app/widgets/shipping_form_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -601,26 +602,35 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _CarTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.local_shipping_outlined,
               title: l10n.badgeRoad,
               subtitle: l10n.carrierTransport,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _CarDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _CarTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.directions_boat_outlined,
               title: 'RoRo',
               subtitle: l10n.portShipping,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _CarDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _CarTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.inventory_2_outlined,
               title: l10n.containerUpper,
               subtitle: l10n.protectedShipping,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
         ],
@@ -1470,7 +1480,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                   value: _customerName,
                 ),
 
-                const _CarContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.phone_outlined,
@@ -1480,7 +1490,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                       : _customerPhone,
                 ),
 
-                const _CarContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   icon: Icons.email_outlined,
@@ -1491,7 +1501,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                 ),
 
                 if (_customerCompany.isNotEmpty) ...[
-                  const _CarContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.business_outlined,
@@ -1501,7 +1511,7 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
                 ],
 
                 if (_customerCountry.isNotEmpty) ...[
-                  const _CarContactDivider(),
+                  const ShippingContactDivider(color: _border),
 
                   _contactRow(
                     icon: Icons.public_outlined,
@@ -2538,78 +2548,6 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: error ? const Color(0xFF9E2A2A) : _deepBlue,
       ),
-    );
-  }
-}
-
-// ===========================================================
-// SMALL WIDGETS
-// ===========================================================
-
-class _CarTrustItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _CarTrustItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: _CarShippingScreenState._primaryBlue, size: 20),
-
-        const SizedBox(height: 6),
-
-        Text(
-          title,
-          style: const TextStyle(
-            color: _CarShippingScreenState._textDark,
-            fontSize: 10.5,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-
-        const SizedBox(height: 2),
-
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: _CarShippingScreenState._textGrey,
-            fontSize: 7.5,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CarDivider extends StatelessWidget {
-  const _CarDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 38,
-      color: _CarShippingScreenState._border,
-    );
-  }
-}
-
-class _CarContactDivider extends StatelessWidget {
-  const _CarContactDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 13),
-      child: Divider(color: _CarShippingScreenState._border, height: 1),
     );
   }
 }

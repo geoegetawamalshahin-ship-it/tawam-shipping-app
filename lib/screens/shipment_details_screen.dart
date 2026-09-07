@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -397,7 +398,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
       ),
       child: Row(
         children: [
-          _SquareButton(
+          ShipmentSquareButton(
             icon: Icons.arrow_back_rounded,
             onTap: () => Navigator.pop(context),
           ),
@@ -493,7 +494,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
             children: [
               Row(
                 children: [
-                  const _LiveDot(),
+                  const ShipmentLiveDot(),
                   const SizedBox(width: 7),
                   Text(
                     l10n.liveShipmentRecord,
@@ -1856,47 +1857,6 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
 // ==========================================================
 // SMALL COMPONENTS
 // ==========================================================
-
-class _SquareButton extends StatelessWidget {
-  const _SquareButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF7F9FC),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: _border),
-        ),
-        child: Icon(icon, color: _deepBlue, size: 22),
-      ),
-    );
-  }
-}
-
-class _LiveDot extends StatelessWidget {
-  const _LiveDot();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 9,
-      height: 9,
-      decoration: const BoxDecoration(
-        color: Color(0xFF55D6A5),
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-}
 
 class _RoutePoint extends StatelessWidget {
   const _RoutePoint({

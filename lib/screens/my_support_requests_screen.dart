@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import '../app/widgets/shipment_status_widgets.dart';
 import 'package:get/get.dart';
 
 import '../controllers/support_controller.dart';
@@ -297,7 +299,7 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
             children: [
               Row(
                 children: [
-                  const _LiveDot(),
+                  const ShipmentLiveDot(),
                   const SizedBox(width: 7),
                   Text(
                     l10n.liveSupportPortal,
@@ -1126,22 +1128,6 @@ class _DetailBox extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _LiveDot extends StatelessWidget {
-  const _LiveDot();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 9,
-      height: 9,
-      decoration: const BoxDecoration(
-        color: Color(0xFF55D6A5),
-        shape: BoxShape.circle,
       ),
     );
   }
