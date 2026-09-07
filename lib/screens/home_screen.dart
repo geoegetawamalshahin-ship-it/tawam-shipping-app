@@ -846,12 +846,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
 
-    return GridView.builder(
+    final grid = GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isTablet ? 4 : 3,
+        crossAxisCount: 3,
         crossAxisSpacing: 10,
         mainAxisSpacing: 12,
         childAspectRatio: isTablet ? 1.05 : .86,
@@ -926,6 +926,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
+    );
+
+    if (!isTablet) return grid;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 600),
+        child: grid,
+      ),
     );
   }
 
