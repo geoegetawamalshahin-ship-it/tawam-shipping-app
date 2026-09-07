@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../app/widgets/shipping_form_widgets.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -650,26 +651,35 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _AirTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.bolt_rounded,
               title: l10n.express.toUpperCase(),
               subtitle: l10n.priorityCargo,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _AirDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _AirTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.flight_takeoff_rounded,
               title: 'A2A',
               subtitle: l10n.airportToAirport,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
-          const _AirDivider(),
+          const ShippingTrustDivider(color: _border),
           Expanded(
-            child: _AirTrustItem(
+            child: ShippingTrustItem(
               icon: Icons.home_work_outlined,
               title: 'D2D',
               subtitle: l10n.doorToDoor,
+              primaryColor: _primaryBlue,
+              titleColor: _textDark,
+              subtitleColor: _textGrey,
             ),
           ),
         ],
@@ -1486,7 +1496,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
                   _customerName,
                 ),
 
-                const _AirContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   Icons.phone_outlined,
@@ -1496,7 +1506,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
                       : _customerPhone,
                 ),
 
-                const _AirContactDivider(),
+                const ShippingContactDivider(color: _border),
 
                 _contactRow(
                   Icons.email_outlined,
@@ -1507,7 +1517,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
                 ),
 
                 if (_customerCompany.isNotEmpty) ...[
-                  const _AirContactDivider(),
+                  const ShippingContactDivider(color: _border),
                   _contactRow(
                     Icons.business_outlined,
                     l10n.company,
@@ -1516,7 +1526,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
                 ],
 
                 if (_customerCountry.isNotEmpty) ...[
-                  const _AirContactDivider(),
+                  const ShippingContactDivider(color: _border),
                   _contactRow(
                     Icons.public_outlined,
                     l10n.country,
@@ -2407,78 +2417,6 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
         behavior: SnackBarBehavior.floating,
         backgroundColor: error ? const Color(0xFF9E2A2A) : _deepBlue,
       ),
-    );
-  }
-}
-
-// ===========================================================
-// TRUST ITEM
-// ===========================================================
-
-class _AirTrustItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _AirTrustItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: _AirFreightScreenState._primaryBlue, size: 20),
-
-        const SizedBox(height: 6),
-
-        Text(
-          title,
-          style: const TextStyle(
-            color: _AirFreightScreenState._textDark,
-            fontSize: 10.5,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-
-        const SizedBox(height: 2),
-
-        Text(
-          subtitle,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: _AirFreightScreenState._textGrey,
-            fontSize: 7.5,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AirDivider extends StatelessWidget {
-  const _AirDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 38,
-      color: _AirFreightScreenState._border,
-    );
-  }
-}
-
-class _AirContactDivider extends StatelessWidget {
-  const _AirContactDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 13),
-      child: Divider(color: _AirFreightScreenState._border, height: 1),
     );
   }
 }
