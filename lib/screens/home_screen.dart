@@ -854,7 +854,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisCount: 3,
         crossAxisSpacing: 10,
         mainAxisSpacing: 12,
-        childAspectRatio: isTablet ? 1.05 : .86,
+        childAspectRatio: isTablet ? 1.18 : .86,
       ),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -932,7 +932,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
+        constraints: const BoxConstraints(maxWidth: 780),
         child: grid,
       ),
     );
