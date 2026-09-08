@@ -2060,22 +2060,13 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
-    return TextFormField(
+    return shippingTextField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
       onChanged: (_) => setState(() {}),
-      style: const TextStyle(
-        color: _textDark,
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
-      ),
-      decoration: _inputDecoration(
-        label: label,
-        hint: hint,
-        icon: icon,
-        suffix: suffix,
-      ),
+      textColor: _textDark,
+      decoration: _inputDecoration(label: label, hint: hint, icon: icon, suffix: suffix),
     );
   }
 
@@ -2148,34 +2139,17 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     required IconData icon,
     String? suffix,
   }) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      suffixText: suffix,
-      prefixIcon: Icon(icon, color: _primaryBlue, size: 19),
-      labelStyle: const TextStyle(color: _textGrey, fontSize: 10),
-      hintStyle: const TextStyle(color: Color(0xFFA4AFBB), fontSize: 10.5),
-      suffixStyle: const TextStyle(
-        color: _primaryBlue,
-        fontSize: 9,
-        fontWeight: FontWeight.w900,
-      ),
-      filled: true,
+    return shippingInputDecoration(
+      label: label,
+      hint: hint,
+      icon: icon,
+      suffix: suffix,
+      primaryColor: _primaryBlue,
+      labelColor: _textGrey,
       fillColor: _softGrey,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: _border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: _primaryBlue, width: 1.4),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Color(0xFFC23B3B)),
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+      borderColor: _border,
+      labelWeight: null,
+      focusedErrorBorderEnabled: false,
     );
   }
 
