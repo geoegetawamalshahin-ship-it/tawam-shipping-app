@@ -1,3 +1,4 @@
+export 'shipping/customer_details.dart';
 export 'shipping/dividers.dart';
 export 'shipping/form_header.dart';
 export 'shipping/notes_field.dart';
