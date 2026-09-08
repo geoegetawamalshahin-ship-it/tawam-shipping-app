@@ -603,15 +603,9 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildTrustBar() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: _border),
-      ),
-      child: Row(
-        children: [
+    return ShippingTrustBar(
+      borderColor: _border,
+      children: [
           Expanded(
             child: ShippingTrustItem(
               icon: Icons.local_shipping_outlined,
@@ -644,8 +638,7 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
               subtitleColor: _textGrey,
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 
