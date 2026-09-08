@@ -1609,42 +1609,14 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return _premiumCard(
-      child: TextFormField(
+      child: ShippingNotesField(
         controller: _notesController,
-        minLines: 4,
-        maxLines: 7,
-        textCapitalization: TextCapitalization.sentences,
-        style: const TextStyle(
-          color: _textDark,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          hintText: l10n.specialHandlingHint,
-          hintStyle: const TextStyle(
-            color: Color(0xFFA1ACB9),
-            fontSize: 10,
-            height: 1.45,
-          ),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(bottom: 70),
-            child: Icon(Icons.edit_note_rounded, color: _primaryBlue),
-          ),
-          filled: true,
-          fillColor: _softGrey,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _border),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _primaryBlue, width: 1.4),
-          ),
-        ),
+        hintText: l10n.specialHandlingHint,
+        textColor: _textDark,
+        hintColor: const Color(0xFFA1ACB9),
+        primaryColor: _primaryBlue,
+        fillColor: _softGrey,
+        borderColor: _border,
       ),
     );
   }
