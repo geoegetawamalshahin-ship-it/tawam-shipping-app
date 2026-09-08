@@ -409,89 +409,22 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(bottom: BorderSide(color: _border)),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .035),
-            blurRadius: 18,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Navigator.pop(context),
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: _softGrey,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: _border),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_rounded,
-                  color: _deepBlue,
-                  size: 23,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 14),
-
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.landFreightQuote,
-                  style: const TextStyle(
-                    color: _textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.officialRateRequest,
-                  style: const TextStyle(
-                    color: _primaryBlue,
-                    fontSize: 8.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.15,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.local_shipping_rounded,
-              color: _primaryBlue,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+    return ShippingFormHeader(
+      title: l10n.landFreightQuote,
+      subtitle: l10n.officialRateRequest,
+      trailingIcon: Icons.local_shipping_rounded,
+      onBack: () => Navigator.pop(context),
+      borderColor: _border,
+      shadowColor: _deepBlue,
+      leadingBackgroundColor: _softGrey,
+      leadingIconColor: _deepBlue,
+      trailingBackgroundColor: _softBlue,
+      trailingIconColor: _primaryBlue,
+      titleColor: _textDark,
+      titleFontSize: 20,
+      subtitleFontSize: 8.5,
+      subtitleLetterSpacing: 1.15,
+      trailingIconSize: 23,
     );
   }
 
