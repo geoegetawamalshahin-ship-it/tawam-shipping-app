@@ -717,68 +717,15 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required String title,
     required String subtitle,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 43,
-          height: 43,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 21),
-        ),
-
-        const SizedBox(width: 12),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    number,
-                    style: const TextStyle(
-                      color: _primaryBlue,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: .8,
-                    ),
-                  ),
-
-                  const SizedBox(width: 7),
-
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        color: _textDark,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -.2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: _textGrey,
-                  fontSize: 10,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return ShippingSectionTitle(
+      number: number,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      primaryColor: _primaryBlue,
+      softColor: _softBlue,
+      titleColor: _textDark,
+      subtitleColor: _textGrey,
     );
   }
 
