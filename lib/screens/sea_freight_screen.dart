@@ -1929,26 +1929,18 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     required ValueChanged<String?> onChanged,
     String Function(String item)? itemLabel,
   }) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      isExpanded: true,
-      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _primaryBlue),
-      dropdownColor: Colors.white,
+    return shippingDropdown(
+      value: value,
+      items: items,
+      onChanged: onChanged,
+      itemLabel: itemLabel,
+      primaryColor: _primaryBlue,
+      decoration: _inputDecoration(label: label, hint: '', icon: icon),
       style: const TextStyle(
         color: _textDark,
         fontSize: 11.5,
         fontWeight: FontWeight.w700,
       ),
-      decoration: _inputDecoration(label: label, hint: '', icon: icon),
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String>(
-              value: item,
-              child: Text(itemLabel?.call(item) ?? item),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
     );
   }
 
@@ -1977,53 +1969,16 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 20),
-        ),
-
-        const SizedBox(width: 11),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-
-              const SizedBox(height: 3),
-
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: _textGrey,
-                  fontSize: 8.8,
-                  height: 1.35,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        Switch(
-          value: value,
-          activeThumbColor: _primaryBlue,
-          onChanged: onChanged,
-        ),
-      ],
+    return shippingOptionSwitch(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      value: value,
+      onChanged: onChanged,
+      softBlue: _softBlue,
+      primaryBlue: _primaryBlue,
+      textDark: _textDark,
+      textGrey: _textGrey,
     );
   }
 

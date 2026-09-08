@@ -2074,36 +2074,14 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     required TextEditingController controller,
     required String label,
   }) {
-    return TextFormField(
+    return shippingDimensionField(
       controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        color: _textDark,
-        fontSize: 11,
-        fontWeight: FontWeight.w800,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        suffixText: 'CM',
-        labelStyle: const TextStyle(color: _textGrey, fontSize: 8.5),
-        suffixStyle: const TextStyle(
-          color: _primaryBlue,
-          fontSize: 7.5,
-          fontWeight: FontWeight.w800,
-        ),
-        filled: true,
-        fillColor: _softGrey,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: _border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: _primaryBlue),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
-      ),
+      label: label,
+      textDark: _textDark,
+      textGrey: _textGrey,
+      primaryBlue: _primaryBlue,
+      softGrey: _softGrey,
+      border: _border,
     );
   }
 
@@ -2115,21 +2093,13 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     required ValueChanged<String?> onChanged,
     String Function(String item)? itemLabel,
   }) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      isExpanded: true,
-      dropdownColor: Colors.white,
-      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _primaryBlue),
-      decoration: _inputDecoration(label: label, hint: '', icon: icon),
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String>(
-              value: item,
-              child: Text(itemLabel?.call(item) ?? item),
-            ),
-          )
-          .toList(),
+    return shippingDropdown(
+      value: value,
+      items: items,
       onChanged: onChanged,
+      itemLabel: itemLabel,
+      primaryColor: _primaryBlue,
+      decoration: _inputDecoration(label: label, hint: '', icon: icon),
     );
   }
 

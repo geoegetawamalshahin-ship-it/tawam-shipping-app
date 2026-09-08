@@ -69,3 +69,10 @@ Counts below describe matching method source, not completed or approved extracti
 ## Verification status
 
 The baseline passed the existing GitHub Actions analysis, tests, and protected translation/platform checks in run `34274690110`. These checks do not cover all runtime workflows or visual parity. This inventory changes no runtime code. APK and manual device verification remain pending.
+
+## Progress after the initial inventory
+
+- Premium card: extracted across six shipping forms (44 uses); analysis and existing tests passed at `93d4bd2`.
+- Text fields and input decoration: extracted across six forms with explicit air-form style exceptions; analysis and behavior tests passed at `aad190e`.
+- Current batch: dropdown rendering extracted across six forms; dimension inputs across air/land/parcel; option switches across car/land/parcel/international/sea. Preserved page callbacks, controller ownership, item labels and raw values. Added interaction tests. CI result must be checked before accepting this batch.
+- Still pending: remaining variants and inline clones; service sections, date selectors, submission/success UI, summary elements, cross-feature helpers, full manual device verification and APK handoff. The baseline candidate table is historical; extracted adapters should not be counted as duplicated implementations.

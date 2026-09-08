@@ -2228,36 +2228,14 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required TextEditingController controller,
     required String label,
   }) {
-    return TextFormField(
+    return shippingDimensionField(
       controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        color: _textDark,
-        fontSize: 11,
-        fontWeight: FontWeight.w800,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        suffixText: 'CM',
-        labelStyle: const TextStyle(color: _textGrey, fontSize: 8.5),
-        suffixStyle: const TextStyle(
-          color: _primaryBlue,
-          fontSize: 7.5,
-          fontWeight: FontWeight.w800,
-        ),
-        filled: true,
-        fillColor: _softGrey,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: _border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: _primaryBlue),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
-      ),
+      label: label,
+      textDark: _textDark,
+      textGrey: _textGrey,
+      primaryBlue: _primaryBlue,
+      softGrey: _softGrey,
+      border: _border,
     );
   }
 
@@ -2269,26 +2247,18 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required ValueChanged<String?> onChanged,
     String Function(String item)? itemLabel,
   }) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      isExpanded: true,
-      dropdownColor: Colors.white,
-      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _primaryBlue),
+    return shippingDropdown(
+      value: value,
+      items: items,
+      onChanged: onChanged,
+      itemLabel: itemLabel,
+      primaryColor: _primaryBlue,
+      decoration: _inputDecoration(label: label, hint: '', icon: icon),
       style: const TextStyle(
         color: _textDark,
         fontSize: 11.5,
         fontWeight: FontWeight.w700,
       ),
-      decoration: _inputDecoration(label: label, hint: '', icon: icon),
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String>(
-              value: item,
-              child: Text(itemLabel?.call(item) ?? item),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
     );
   }
 
@@ -2317,53 +2287,16 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 20),
-        ),
-
-        const SizedBox(width: 11),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-
-              const SizedBox(height: 3),
-
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: _textGrey,
-                  fontSize: 8.8,
-                  height: 1.35,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        Switch(
-          value: value,
-          activeThumbColor: _primaryBlue,
-          onChanged: onChanged,
-        ),
-      ],
+    return shippingOptionSwitch(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      value: value,
+      onChanged: onChanged,
+      softBlue: _softBlue,
+      primaryBlue: _primaryBlue,
+      textDark: _textDark,
+      textGrey: _textGrey,
     );
   }
 
