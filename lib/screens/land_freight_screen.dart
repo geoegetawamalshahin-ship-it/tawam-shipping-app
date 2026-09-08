@@ -604,7 +604,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildRouteSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         children: [
           _textField(
@@ -770,7 +774,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildTransportSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1054,7 +1062,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildCargoSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         children: [
           _textField(
@@ -1170,7 +1182,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildDimensionsSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1290,7 +1306,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildRequirementsSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         children: [
           _optionSwitch(
@@ -1350,7 +1370,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildServicesSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1418,7 +1442,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildCustomerSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: ShippingCustomerDetails(
         loading: _loadingProfile,
         verifiedMessage: l10n.contactFilledFromAccount,
@@ -1450,7 +1478,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   Widget _buildNotesSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: ShippingNotesField(
         controller: _notesController,
         hintText: l10n.specialHandlingHint,
@@ -2170,25 +2202,6 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
   // COMMON UI
   // =========================================================
 
-  Widget _premiumCard({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: _border),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .035),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
 
   Widget _textField({
     required TextEditingController controller,

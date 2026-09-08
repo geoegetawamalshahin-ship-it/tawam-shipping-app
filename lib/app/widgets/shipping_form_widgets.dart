@@ -5,3 +5,4 @@ export 'shipping/notes_field.dart';
 export 'shipping/section_title.dart';
 export 'shipping/trust_bar.dart';
 export 'shipping/trust_item.dart';
+export 'shipping/premium_card.dart';
