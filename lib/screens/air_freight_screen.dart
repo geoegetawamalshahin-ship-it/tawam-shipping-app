@@ -641,15 +641,9 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   Widget _buildTrustBar() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: _border),
-      ),
-      child: Row(
-        children: [
+    return ShippingTrustBar(
+      borderColor: _border,
+      children: [
           Expanded(
             child: ShippingTrustItem(
               icon: Icons.bolt_rounded,
@@ -682,8 +676,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
               subtitleColor: _textGrey,
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 
