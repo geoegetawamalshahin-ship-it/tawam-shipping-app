@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/utils/value_formatters.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -1479,25 +1480,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
   // ==========================================================
 
   Object? _firstValue(Map<String, dynamic> data, List<String> keys) {
-    for (final key in keys) {
-      if (!data.containsKey(key)) {
-        continue;
-      }
-
-      final value = data[key];
-
-      if (value == null) {
-        continue;
-      }
-
-      if (value is String && value.trim().isEmpty) {
-        continue;
-      }
-
-      return value;
-    }
-
-    return null;
+    return firstKeyedValue(data, keys);
   }
 
   String _stringValue(
@@ -1505,13 +1488,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     List<String> keys, {
     String fallback = '-',
   }) {
-    final value = _firstValue(data, keys);
-
-    if (value == null) {
-      return fallback;
-    }
-
-    return value.toString().trim();
+    return stringFromKeys(data, keys, fallback: fallback);
   }
 
   _StatusInfo _statusInfo(AppLocalizations l10n, String status) {
@@ -1684,58 +1661,19 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
   }
 
   String _formatDate(AppLocalizations l10n, Object? value) {
-    final date = _toDateTime(value);
-
-    if (date == null) {
-      final text = value?.toString().trim() ?? '';
-
-      return text.isEmpty ? l10n.notSpecified : text;
-    }
-
-    return '${date.day} '
-        '${LocaleController.monthAbbrev(l10n, date.month)} '
-        '${date.year}';
+    return formatOptionalLocalizedDate(
+      l10n,
+      value,
+      emptyFallback: l10n.notSpecified,
+    );
   }
 
   String _formatDateTime(AppLocalizations l10n, Object? value) {
-    final date = _toDateTime(value);
-
-    if (date == null) {
-      final text = value?.toString().trim() ?? '';
-
-      return text.isEmpty ? l10n.awaitingUpdate : text;
-    }
-
-    final hour12 = date.hour == 0
-        ? 12
-        : date.hour > 12
-        ? date.hour - 12
-        : date.hour;
-
-    final minute = date.minute.toString().padLeft(2, '0');
-
-    final amPm = LocaleController.timePeriod(l10n, date.hour);
-
-    return '${date.day} '
-        '${LocaleController.monthAbbrev(l10n, date.month)} '
-        '${date.year} • '
-        '$hour12:$minute $amPm';
-  }
-
-  DateTime? _toDateTime(Object? value) {
-    if (value is Timestamp) {
-      return value.toDate().toLocal();
-    }
-
-    if (value is DateTime) {
-      return value.toLocal();
-    }
-
-    if (value is String && value.trim().isNotEmpty) {
-      return DateTime.tryParse(value.trim())?.toLocal();
-    }
-
-    return null;
+    return formatOptionalLocalizedDateTime(
+      l10n,
+      value,
+      emptyFallback: l10n.awaitingUpdate,
+    );
   }
 
   List<_HistoryItem> _historyItems(AppLocalizations l10n) {

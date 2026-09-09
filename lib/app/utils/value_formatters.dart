@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../l10n/app_localizations.dart';
 import '../../locale_controller.dart';
 
@@ -18,6 +20,100 @@ String firstNonEmpty(List<dynamic> values) {
   return '';
 }
 
+Object? firstKeyedValue(Map<String, dynamic> data, List<String> keys) {
+  for (final key in keys) {
+    if (!data.containsKey(key)) {
+      continue;
+    }
+
+    final value = data[key];
+
+    if (value == null) {
+      continue;
+    }
+
+    if (value is String && value.trim().isEmpty) {
+      continue;
+    }
+
+    return value;
+  }
+
+  return null;
+}
+
+String stringFromKeys(
+  Map<String, dynamic> data,
+  List<String> keys, {
+  String fallback = '-',
+}) {
+  final value = firstKeyedValue(data, keys);
+
+  if (value == null) {
+    return fallback;
+  }
+
+  return value.toString().trim();
+}
+
+DateTime? toLocalDateTime(Object? value) {
+  if (value is Timestamp) {
+    return value.toDate().toLocal();
+  }
+
+  if (value is DateTime) {
+    return value.toLocal();
+  }
+
+  if (value is String && value.trim().isNotEmpty) {
+    return DateTime.tryParse(value.trim())?.toLocal();
+  }
+
+  return null;
+}
+
 String formatLocalizedDate(AppLocalizations l10n, DateTime date) {
   return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+}
+
+String formatOptionalLocalizedDate(
+  AppLocalizations l10n,
+  Object? value, {
+  required String emptyFallback,
+}) {
+  final date = toLocalDateTime(value);
+
+  if (date == null) {
+    final text = value?.toString().trim() ?? '';
+
+    return text.isEmpty ? emptyFallback : text;
+  }
+
+  return formatLocalizedDate(l10n, date);
+}
+
+String formatOptionalLocalizedDateTime(
+  AppLocalizations l10n,
+  Object? value, {
+  required String emptyFallback,
+}) {
+  final date = toLocalDateTime(value);
+
+  if (date == null) {
+    final text = value?.toString().trim() ?? '';
+
+    return text.isEmpty ? emptyFallback : text;
+  }
+
+  final hour12 = date.hour == 0
+      ? 12
+      : date.hour > 12
+      ? date.hour - 12
+      : date.hour;
+
+  final minute = date.minute.toString().padLeft(2, '0');
+
+  final amPm = LocaleController.timePeriod(l10n, date.hour);
+
+  return '${formatLocalizedDate(l10n, date)} • $hour12:$minute $amPm';
 }

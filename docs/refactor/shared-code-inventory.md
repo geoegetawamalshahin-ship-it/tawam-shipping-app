@@ -1,78 +1,125 @@
 # Shared-code inventory
 
-Reviewed baseline: `50393fb856b732c918057307bcf1728def1a7f7f` on `refactor/organized-widgets-pages`.
+Reviewed on `refactor/organized-widgets-pages` after sharing tracking/details value and date helpers. Previous candidate table at `50393fb` is historical.
+
+This document replaces the candidate table taken at `50393fb`. Many rows in that table were later extracted and now exist only as page adapters.
 
 ## Scope and limits
 
-Scanned all 28 Dart files in `lib/screens` for repeated named block methods, comparing whitespace-normalized source. This is a candidate inventory, not an exhaustive AST clone analysis: inline widgets, renamed methods, arrow functions and near-duplicates require further review. Identical method source can still depend on different page constants, state, localization or callbacks. Each extraction requires checking those dependencies. Generated localization files are excluded from deduplication.
+Scanned `lib/screens` (28 Dart files), `lib/app/widgets`, and `lib/app/utils/value_formatters.dart`. Compared named methods and confirmed whether remaining methods still contain widget trees or only pass local values into shared implementations.
 
-## Already shared
+This is not an exhaustive AST clone analysis. Inline trees, renamed methods, and near-duplicates can still exist. Identical source can still depend on different page constants, state, localization, empty-value fallbacks, or date conversion. Generated localization files are excluded.
 
-Shipping headers, section titles and trust bars are shared across six shipping forms. Notes and customer details are shared across five forms; the air form retains its differences. Shared dividers and shipment-status widgets already exist. Small page methods that pass local values to these widgets are adapters, not duplicated widget implementations.
+A short page method that only supplies colors, labels, controllers, or callbacks to a shared widget is an **adapter**, not duplicated presentation code.
 
-## Execution order
+Shared UI belongs under `lib/app/widgets/` with feature subfolders. Shared non-UI logic belongs in a helper such as `lib/app/utils/value_formatters.dart`. Do not add empty controllers or bindings only to imitate another project's folders.
 
-1. Extract `_premiumCard` from six shipping forms, preserving each page's border/shadow colors and child tree. This is the next implementation batch.
-2. Review input decoration, text fields, dropdowns and dimension fields together. Preserve controllers, validators, keyboard types, callbacks and every style difference; the air form differs in several helpers.
-3. Review option switches, summary badges and calculation rows. Keep page state and callbacks with their current owners.
-4. Review service sections, date selectors, submit buttons and success dialogs. Preserve date bounds, submission guards and navigation callbacks.
-5. Review cross-feature helpers: booking/calculator headings, tracking/detail date and value formatting, Home/Profile language labels, and input validators. Check semantics before sharing.
-6. Inspect inline widget trees and similar-but-not-identical methods in all screens, including authentication, Home, Profile, lists, support, legal, documents and notifications. Record deliberate exceptions rather than forcing one design.
-7. For each implementation batch, review the diff and run Flutter analysis/tests. Add targeted behavior tests where state or callbacks introduce concrete regression risks.
-8. Build APK and manually verify phone/tablet appearance, English/Arabic, authentication, bookings, quotes, shipments, live/manual tracking, notifications and support. Merge only after successful verification and owner approval.
+## Already shared and actually called
 
-Shared UI belongs under `lib/app/widgets/` with feature subfolders. Shared non-UI logic belongs in a suitable helper/service location, not in widget classes. No empty controllers or bindings are required merely to imitate another project's folder layout.
+Callers listed below invoke the shared implementation. Remaining private methods with the same names on those pages are adapters unless noted later.
 
-## Candidate matches
+| Shared unit | Location | Called from |
+| --- | --- | --- |
+| `ShippingFormHeader` | `lib/app/widgets/shipping/form_header.dart` | Six shipping forms |
+| `ShippingSectionTitle` | `lib/app/widgets/shipping/section_title.dart` | Six shipping forms |
+| `ShippingTrustBar` / `ShippingTrustItem` / `ShippingTrustDivider` | `trust_bar.dart`, `trust_item.dart`, `dividers.dart` | Six shipping forms |
+| `ShippingContactDivider` | `dividers.dart` | Shipping forms that show contact rows (including air) |
+| `ShippingNotesField` | `notes_field.dart` | Car, land, parcel, international, sea (not air) |
+| `ShippingCustomerDetails` | `customer_details.dart` | Car, land, parcel, international, sea (not air) |
+| `ShippingPremiumCard` | `premium_card.dart` | Six shipping forms (many section cards) |
+| `shippingTextField` / `shippingInputDecoration` | `form_fields.dart` | Six shipping forms; air passes `labelWeight: null` and `focusedErrorBorderEnabled: false` |
+| `shippingDropdown` | `form_controls.dart` | Six shipping forms |
+| `shippingDimensionField` | `form_controls.dart` | Air, land, parcel adapters |
+| `shippingOptionSwitch` | `form_controls.dart` | Car, land, parcel, international, sea (not air) |
+| `ShippingServicesSection` | `services_section.dart` | Car, air, land, parcel, sea (not international) |
+| `ShippingSubmitButton` | `submit_button.dart` | Six shipping forms |
+| `ShippingQuoteSuccessDialog` | `quote_success_dialog.dart` | Car, parcel, international |
+| `ShippingDateSelector` | `date_selector.dart` | Six shipping forms; each page still owns `showDatePicker` |
+| `ShippingSummaryBadge` | `summary_badge.dart` | Six shipping forms; sea passes `showBorder: true`; air omits icon |
+| `ShippingCalculationItem` | `calculation_item.dart` | Air, parcel |
+| `twoDigits` / `parseOptionalDouble` / `firstNonEmpty` / `formatLocalizedDate` | `lib/app/utils/value_formatters.dart` | Six shipping forms; booking and get-quote use the value helpers |
+| `firstKeyedValue` / `stringFromKeys` / `toLocalDateTime` / `formatOptionalLocalizedDate` / `formatOptionalLocalizedDateTime` | `lib/app/utils/value_formatters.dart` | `shipment_details_screen.dart` and `track_shipment_screen.dart` via adapters. Default string fallback `'-'`. Date empty fallbacks remain `notSpecified` and `awaitingUpdate`. Unparsed text is shown as-is. Dates use `.toLocal()` |
+| Shipment-status widgets | `lib/app/widgets/shipment_status/` | Existing barrel `shipment_status_widgets.dart` |
 
-Counts below describe matching method source, not completed or approved extractions. Source locations refer to the reviewed baseline.
+Targeted tests for several of these units live under `test/shipping_*.dart` and `test/value_formatters_test.dart`.
 
-| Method | Copies | Lines per method | Locations | Treatment |
-| --- | ---: | ---: | --- | --- |
-| `_showSuccessDialog` | 3 | 167 | `lib/screens/car_shipping_screen.dart:1831`; `lib/screens/parcel_shipping_screen.dart:2003`; `lib/screens/international_moving_screen.dart:1957` | Candidate; verify dependencies before extraction |
-| `_buildServicesSection` | 5 | 63 | `lib/screens/car_shipping_screen.dart:1233`; `lib/screens/air_freight_screen.dart:1254`; `lib/screens/land_freight_screen.dart:1350`; `lib/screens/parcel_shipping_screen.dart:1388`; `lib/screens/sea_freight_screen.dart:1119` | Candidate; verify dependencies before extraction |
-| `_optionSwitch` | 5 | 56 | `lib/screens/car_shipping_screen.dart:2129`; `lib/screens/land_freight_screen.dart:2336`; `lib/screens/parcel_shipping_screen.dart:2338`; `lib/screens/international_moving_screen.dart:2255`; `lib/screens/sea_freight_screen.dart:2006` | Candidate; verify dependencies before extraction |
-| `_inputDecoration` | 5 | 44 | `lib/screens/car_shipping_screen.dart:2084`; `lib/screens/land_freight_screen.dart:2291`; `lib/screens/parcel_shipping_screen.dart:2293`; `lib/screens/international_moving_screen.dart:2210`; `lib/screens/sea_freight_screen.dart:1961` | Candidate; verify dependencies before extraction |
-| `_buildSubmitButton` | 3 | 50 | `lib/screens/car_shipping_screen.dart:1597`; `lib/screens/parcel_shipping_screen.dart:1751`; `lib/screens/international_moving_screen.dart:1701` | Candidate; verify dependencies before extraction |
-| `_textField` | 5 | 29 | `lib/screens/car_shipping_screen.dart:2023`; `lib/screens/land_freight_screen.dart:2193`; `lib/screens/parcel_shipping_screen.dart:2195`; `lib/screens/international_moving_screen.dart:2149`; `lib/screens/sea_freight_screen.dart:1868` | Candidate; verify dependencies before extraction |
-| `_dateSelector` | 2 | 70 | `lib/screens/car_shipping_screen.dart:682`; `lib/screens/parcel_shipping_screen.dart:760` | Candidate; verify dependencies before extraction |
-| `_dateSelector` | 2 | 70 | `lib/screens/land_freight_screen.dart:695`; `lib/screens/sea_freight_screen.dart:663` | Candidate; verify dependencies before extraction |
-| `_buildCustomerSection` | 5 | 27 | `lib/screens/car_shipping_screen.dart:1301`; `lib/screens/land_freight_screen.dart:1418`; `lib/screens/parcel_shipping_screen.dart:1456`; `lib/screens/international_moving_screen.dart:1396`; `lib/screens/sea_freight_screen.dart:1187` | Existing shared-widget adapter; review only |
-| `_sectionHeading` | 2 | 62 | `lib/screens/volume_calculator_screen.dart:403`; `lib/screens/create_booking_screen.dart:391` | Candidate; verify dependencies before extraction |
-| `_loadCustomerProfile` | 2 | 62 | `lib/screens/car_shipping_screen.dart:167`; `lib/screens/parcel_shipping_screen.dart:231` | Candidate; verify dependencies before extraction |
-| `_dropdown` | 4 | 30 | `lib/screens/car_shipping_screen.dart:2053`; `lib/screens/land_freight_screen.dart:2260`; `lib/screens/parcel_shipping_screen.dart:2262`; `lib/screens/international_moving_screen.dart:2179` | Candidate; verify dependencies before extraction |
-| `_premiumCard` | 6 | 19 | `lib/screens/car_shipping_screen.dart:2003`; `lib/screens/air_freight_screen.dart:2025`; `lib/screens/land_freight_screen.dart:2173`; `lib/screens/parcel_shipping_screen.dart:2175`; `lib/screens/international_moving_screen.dart:2129`; `lib/screens/sea_freight_screen.dart:1848` | Candidate; verify dependencies before extraction |
-| `_dimensionField` | 3 | 36 | `lib/screens/air_freight_screen.dart:2073`; `lib/screens/land_freight_screen.dart:2223`; `lib/screens/parcel_shipping_screen.dart:2225` | Candidate; verify dependencies before extraction |
-| `_summaryBadge` | 4 | 26 | `lib/screens/car_shipping_screen.dart:1566`; `lib/screens/land_freight_screen.dart:1700`; `lib/screens/parcel_shipping_screen.dart:1720`; `lib/screens/international_moving_screen.dart:1670` | Candidate; verify dependencies before extraction |
-| `_sectionTitle` | 5 | 17 | `lib/screens/car_shipping_screen.dart:571`; `lib/screens/land_freight_screen.dart:582`; `lib/screens/parcel_shipping_screen.dart:647`; `lib/screens/international_moving_screen.dart:593`; `lib/screens/sea_freight_screen.dart:554` | Existing shared-widget adapter; review only |
-| `_firstNonEmpty` | 6 | 13 | `lib/screens/car_shipping_screen.dart:2253`; `lib/screens/air_freight_screen.dart:2274`; `lib/screens/land_freight_screen.dart:2515`; `lib/screens/parcel_shipping_screen.dart:2448`; `lib/screens/international_moving_screen.dart:2449`; `lib/screens/sea_freight_screen.dart:2151` | Candidate; verify dependencies before extraction |
-| `_buildNotesSection` | 5 | 15 | `lib/screens/car_shipping_screen.dart:1333`; `lib/screens/land_freight_screen.dart:1450`; `lib/screens/parcel_shipping_screen.dart:1488`; `lib/screens/international_moving_screen.dart:1428`; `lib/screens/sea_freight_screen.dart:1219` | Existing shared-widget adapter; review only |
-| `_showMessage` | 6 | 11 | `lib/screens/car_shipping_screen.dart:2267`; `lib/screens/air_freight_screen.dart:2288`; `lib/screens/land_freight_screen.dart:2529`; `lib/screens/parcel_shipping_screen.dart:2462`; `lib/screens/international_moving_screen.dart:2463`; `lib/screens/sea_freight_screen.dart:2165` | Candidate; verify dependencies before extraction |
-| `_formatDateTime` | 2 | 24 | `lib/screens/shipment_details_screen.dart:1700`; `lib/screens/track_shipment_screen.dart:1507` | Candidate; verify dependencies before extraction |
-| `_calculationItem` | 2 | 21 | `lib/screens/air_freight_screen.dart:1228`; `lib/screens/parcel_shipping_screen.dart:1308` | Candidate; verify dependencies before extraction |
-| `_selectReadyDate` | 2 | 17 | `lib/screens/air_freight_screen.dart:2230`; `lib/screens/land_freight_screen.dart:2397` | Candidate; verify dependencies before extraction |
-| `_formatDate` | 6 | 5 | `lib/screens/car_shipping_screen.dart:2237`; `lib/screens/air_freight_screen.dart:2248`; `lib/screens/land_freight_screen.dart:2491`; `lib/screens/parcel_shipping_screen.dart:2420`; `lib/screens/international_moving_screen.dart:2425`; `lib/screens/sea_freight_screen.dart:2127` | Candidate; verify dependencies before extraction |
-| `_showMessage` | 2 | 15 | `lib/screens/track_shipment_screen.dart:205`; `lib/screens/support_screen.dart:108` | Candidate; verify dependencies before extraction |
-| `_stringValue` | 2 | 13 | `lib/screens/shipment_details_screen.dart:1503`; `lib/screens/track_shipment_screen.dart:1373` | Candidate; verify dependencies before extraction |
-| `_formatDate` | 2 | 13 | `lib/screens/shipment_details_screen.dart:1686`; `lib/screens/track_shipment_screen.dart:1493` | Candidate; verify dependencies before extraction |
-| `_two` | 7 | 3 | `lib/screens/car_shipping_screen.dart:2249`; `lib/screens/air_freight_screen.dart:2270`; `lib/screens/get_quote_screen.dart:1228`; `lib/screens/land_freight_screen.dart:2503`; `lib/screens/parcel_shipping_screen.dart:2444`; `lib/screens/international_moving_screen.dart:2445`; `lib/screens/sea_freight_screen.dart:2139` | Candidate; verify dependencies before extraction |
-| `_parseOptionalDouble` | 4 | 5 | `lib/screens/create_booking_screen.dart:1451`; `lib/screens/get_quote_screen.dart:1232`; `lib/screens/land_freight_screen.dart:2507`; `lib/screens/sea_freight_screen.dart:2143` | Candidate; verify dependencies before extraction |
-| `_languageLabel` | 2 | 10 | `lib/screens/home_screen.dart:231`; `lib/screens/profile_screen.dart:613` | Candidate; verify dependencies before extraction |
-| `_optionLabel` | 6 | 3 | `lib/screens/car_shipping_screen.dart:2244`; `lib/screens/air_freight_screen.dart:2255`; `lib/screens/land_freight_screen.dart:2498`; `lib/screens/parcel_shipping_screen.dart:2427`; `lib/screens/international_moving_screen.dart:2432`; `lib/screens/sea_freight_screen.dart:2134` | Candidate; verify dependencies before extraction |
-| `_quantityValidator` | 2 | 9 | `lib/screens/land_freight_screen.dart:2481`; `lib/screens/sea_freight_screen.dart:2117` | Candidate; verify dependencies before extraction |
-| `_firstNonEmpty` | 2 | 8 | `lib/screens/create_booking_screen.dart:1457`; `lib/screens/get_quote_screen.dart:1238` | Candidate; verify dependencies before extraction |
-| `_requiredValidator` | 2 | 7 | `lib/screens/request_quote_screen.dart:367`; `lib/screens/support_screen.dart:165` | Candidate; verify dependencies before extraction |
-| `_refreshSummary` | 2 | 5 | `lib/screens/car_shipping_screen.dart:157`; `lib/screens/international_moving_screen.dart:170` | Candidate; verify dependencies before extraction |
-| `_refreshCalculations` | 2 | 5 | `lib/screens/air_freight_screen.dart:206`; `lib/screens/parcel_shipping_screen.dart:157` | Candidate; verify dependencies before extraction |
-| `_formatDate` | 2 | 3 | `lib/screens/create_booking_screen.dart:1445`; `lib/screens/get_quote_screen.dart:1224` | Candidate; verify dependencies before extraction |
+## Remaining adapters (do not count as duplication)
+
+These still exist as private methods but only wrap the shared unit:
+
+- `_buildHeader`, `_buildTrustBar`, `_sectionTitle`
+- `_buildCustomerSection` / `_buildNotesSection` on the five forms that use the shared widgets
+- `_premiumCard` is gone from the six shipping forms; they construct `ShippingPremiumCard` directly
+- `_textField`, `_dropdown`, `_inputDecoration`, `_dimensionField` (air/land/parcel)
+- `_optionSwitch` on car/land/parcel/international/sea
+- `_buildServicesSection` on the five chip-based forms
+- `_dateSelector` on the six shipping forms
+- `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`
+- `_showSuccessDialog` on car/parcel/international (shows `ShippingQuoteSuccessDialog`)
+- `_formatDate` on shipping forms, booking, and get-quote (calls `formatLocalizedDate`)
+- `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime` on details and tracking (call the shared helpers; tracking/details `_formatDate` still passes `notSpecified`)
+- `_optionLabel` (calls `LocaleController.optionLabel`)
+- `_selectReadyDate` / `_selectMovingDate` (page-owned pickers; keep bounds and `helpText` on the page)
+
+## Remaining duplication suitable for extraction
+
+Verify dependencies, empty-value behavior, and visual values before each extraction. Do not change submit, navigation, validators' messages, or calculation formulas while sharing.
+
+| Item | Copies | Locations | Notes |
+| --- | ---: | --- | --- |
+| `_sectionHeading` (numbered badge) | 2 | `create_booking_screen.dart`; `volume_calculator_screen.dart` | Matching layout, sizes, and colors. Strong candidate. |
+| `_languageLabel` | 2 | `home_screen.dart`; `profile_screen.dart` | Identical Arabic/French/English mapping. |
+| `_loadCustomerProfile` | 6 | Six shipping forms | Same Firestore `users/{uid}` field order and `tawamCustomer` fallback. Booking's loader is different; do not merge with it. Prefer a small helper that returns values, not a new service layer. |
+| `_showMessage` (shipping forms) | 6 | Six shipping forms | Same floating SnackBar; error color `0xFF9E2A2A` vs `_deepBlue`. |
+| `_formatNumber` | 3 | Air, parcel, international | Same `0` / integer / two-decimal rules. Used for display, not pricing formulas. |
+| `_quantityValidator` | 2 | Land, sea | Same `int.tryParse` and `enterQuantity`. Do not merge with `request_quote_screen`'s different messages. |
+| Land `_showSuccessDialog` | 1 leftover full tree | `land_freight_screen.dart` | Chrome matches `ShippingQuoteSuccessDialog` (styled Done button, no extra letter-spacing). Candidate to switch to the existing dialog without redesign. |
+| Air `_optionSwitch` | 1 leftover full tree | `air_freight_screen.dart` | Same structure as `shippingOptionSwitch` except subtitle has no `height: 1.35`. Extract only if that difference is preserved. |
+| `_requiredValidator` | 2 | `request_quote_screen.dart`; `support_screen.dart` | Identical trim/empty check. Tiny; optional. |
+| `_emailValidator` | 2 | Same two screens | Same empty and regex checks; keep current messages. Tiny; optional. |
+
+## Keep separate (different on purpose or unsafe to merge)
+
+| Item | Why it stays separate |
+| --- | --- |
+| Air customer block (`_buildCustomerSection` / `_contactRow`) | Near the shared widget but labels omit `FontWeight.w600` and the verified line omits `height: 1.35`. |
+| Air notes field | No prefix icon; hint color `0xFFA1ACB9` without `height: 1.45`. `ShippingNotesField` would change the screen. |
+| International additional services | `FilterChip` wrap, not `ShippingServicesSection` chips. |
+| Air / sea quote success dialogs | Air Done button is an unstyled `OutlinedButton`. Sea My Quotes label uses `letterSpacing: .35`. Sea also takes unused `documentId`. Do not force them onto `ShippingQuoteSuccessDialog` without preserving those values. |
+| Booking / get-quote / support / request-quote success dialogs | Different titles, actions, and booking vs quote copy. |
+| Booking `_premiumCard` | Same padding/radius as shipping card but shadow blur `14` / offset `5` vs shipping `18` / `7`. |
+| Get-quote `_card` | Radius `20`, blur `12`. |
+| Calculator dimension card | Radius `22`, blur `14`. |
+| Booking `_dateSelector` | Height `62`, no 39×39 icon well, no trailing chevron, different type sizes/weights than `ShippingDateSelector`. |
+| Booking `_loadCustomerProfile` | Uses booking controller, extra keys (`customerName` / `customerEmail` / `customerPhone`), writes `_phoneController`, hardcoded `'TAWAM Customer'`. |
+| Support `_sectionHeading` | Title/subtitle only; no numbered badge. Not the booking/calculator heading. |
+| `shipment_request_page` `_inputDecoration` | Radius `18`, padding `18`, different fill. |
+| Get-quote / booking text and dimension fields | Own capitalization, padding, and radii. |
+| `_selectReadyDate` implementations | Shared calendar chrome is already extracted; help text and which field is set stay on the page. |
+| `_refreshSummary` / `_refreshCalculations` | One-line `setState` wrappers. |
+| List date formatters | `my_bookings_screen` formats Timestamp without `toLocal()` and falls back to `'-'`. `my_quotes_screen` uses epoch-0 → `notProvided`. `shipments_screen` uses `toLocal()` and `notSpecified`. Do not merge these with each other or with details/tracking without preserving those fallbacks. |
+| Tracking/support `_showMessage` vs shipping vs profile vs notifications | Tracking/support: rounded `14`, no background color. Profile: navy, margin `14`, radius `16`, bold text. Notifications: radius `16`, no hide-current in the same way. Keep SnackBar chrome per screen. |
+| Land/sea `_quantityValidator` vs request-quote quantity validator | Different empty handling and localization keys (`enterQuantity` vs `pleaseEnterNumberOfItems` / `pleaseEnterValidQuantity`). |
+| `firstNonEmpty` vs `firstKeyedValue` | List of values vs map key order. Do not combine. |
+
+## Cross-feature review status
+
+- **Booking vs volume calculator:** numbered `_sectionHeading` is the clear shared piece. Cards, inputs, and date rows differ and should stay on their pages.
+- **Tracking vs shipment details:** map/date helpers are shared and called. Status cards, search, live tracking chrome, and history rendering stay on their pages until a later inline-tree review.
+- **Home vs profile:** only `_languageLabel` matches. Language pickers and layout stay separate.
+- **Auth, lists, documents, legal, notifications:** no shipping-form widget reuse. SnackBars and date formatters differ as listed. A later pass can still inspect unnamed inline clones.
+
+## Suggested execution order from this baseline
+
+1. Done: details/tracking value and local-date helpers live in `value_formatters.dart`, with fallback arguments, `.toLocal()`, and targeted empty/date-type tests.
+2. Extract booking/calculator numbered `_sectionHeading`, passing number, icon, title, subtitle, and colors.
+3. Optional small helpers: shipping `_showMessage`, `_formatNumber`, land/sea quantity validator, Home/Profile language label, shipping profile-field loading helper.
+4. Switch land success dialog onto the existing shared dialog only after a side-by-side style check. Leave air and sea dialogs separate unless their differences are parameterized.
+5. Revisit air `_optionSwitch` only with the subtitle `height` difference preserved.
+6. Continue scanning inline trees (auth, lists, support, documents). Record exceptions rather than forcing one design.
+7. After each batch: review the diff, run Flutter analysis and tests, add behavior tests where callbacks or empty values can regress.
+8. APK plus phone/tablet, English/Arabic, and core flows remain pending. Do not merge to `main` without owner approval.
 
 ## Verification status
 
-The baseline passed the existing GitHub Actions analysis, tests, and protected translation/platform checks in run `34274690110`. These checks do not cover all runtime workflows or visual parity. This inventory changes no runtime code. APK and manual device verification remain pending.
-
-## Progress after the initial inventory
-
-- Premium card: extracted across six shipping forms (44 uses); analysis and existing tests passed at `93d4bd2`.
-- Text fields and input decoration: extracted across six forms with explicit air-form style exceptions; analysis and behavior tests passed at `aad190e`.
-- Current batch: dropdown rendering extracted across six forms; dimension inputs across air/land/parcel; option switches across car/land/parcel/international/sea. Preserved page callbacks, controller ownership, item labels and raw values. Added interaction tests. CI result must be checked before accepting this batch.
-- Still pending: remaining variants and inline clones; service sections, date selectors, submission/success UI, summary elements, cross-feature helpers, full manual device verification and APK handoff. The baseline candidate table is historical; extracted adapters should not be counted as duplicated implementations.
+Local `flutter analyze` and `flutter test` passed after sharing the tracking/details helpers. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.
