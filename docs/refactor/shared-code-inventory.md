@@ -1,6 +1,6 @@
 # Shared-code inventory (closing review)
 
-Re-verified on `refactor/organized-widgets-pages` after get-quote `showShippingMessage`. Remaining-duplication candidates below were **not** implemented.
+Re-verified on `refactor/organized-widgets-pages` after international `ShippingServicesSection`. Remaining-duplication candidates below were **not** implemented.
 
 **This topic is not complete.** Agreed batches are in shared files and called from the intended pages. Do not treat this branch as finished duplication work.
 
@@ -30,7 +30,7 @@ Previous candidate tables at `50393fb` are historical.
 | `shippingDropdown` | `form_controls.dart` | Six forms |
 | `shippingDimensionField` | `form_controls.dart` | Air, land, parcel |
 | `shippingOptionSwitch` | `form_controls.dart` | Six forms; default subtitle `height: 1.35`; air `subtitleHeight: null` |
-| `ShippingServicesSection` | `services_section.dart` | Car, air, land, parcel, sea (**not international additional/special**) |
+| `ShippingServicesSection` | `services_section.dart` | Car, air, land, parcel, sea, international additional services. Special items stay separate (`_deepBlue`, `fontSize: 9.3`) |
 | `ShippingSubmitButton` | `submit_button.dart` | Six forms |
 | `ShippingQuoteSuccessDialog` | `quote_success_dialog.dart` | Car, land, parcel, international. **Air and sea still inline** |
 | `ShippingDateSelector` | `date_selector.dart` | Six forms; each page still owns `showDatePicker` |
@@ -52,7 +52,7 @@ Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.da
 
 ## Adapters kept (not leftover duplication)
 
-Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (car/land/parcel/international), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form and get-quote `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
+Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), international `_buildAdditionalServicesSection`, `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (car/land/parcel/international), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form and get-quote `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
 
 ## Unresolved candidates (not done)
 
@@ -60,7 +60,6 @@ Do not announce completion while these remain. Implement only when the owner ord
 
 | Candidate | Status |
 | --- | --- |
-| International `_buildAdditionalServicesSection` | Matches `ShippingServicesSection`; still inlined. Special items (`_deepBlue`, `fontSize: 9.3`) stay separate |
 | Home / Profile `_selectLanguage` sheets | Near-identical UI; different current-value source |
 | Track / details `_fallbackTimeline`, status map, location, `_TimelineRow`, route point, info tile | Largest leftover trees; row APIs differ (`isLast` vs `showLine`) |
 | Track + support SnackBar (radius 14, no fill) | Optional tiny helper; not merged with shipping/profile |
@@ -85,7 +84,7 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 
 **Done (agreed batches)**
 
-- Shipping form chrome: header, section title, trust bar, premium card, fields, dropdowns, dimensions, option switches (air height preserved), services (five forms), date selector chrome, submit, summary badges, calculation rows.
+- Shipping form chrome: header, section title, trust bar, premium card, fields, dropdowns, dimensions, option switches (air height preserved), services (six forms; international additional only), date selector chrome, submit, summary badges, calculation rows.
 - Notes + customer details on five forms (air kept different).
 - Quote success dialog on car, land, parcel, international.
 - Helpers: dates/values, display numbers, land/sea quantity, required field, quote/support email field, language labels, shipping snackbars (six forms + get-quote), shipping customer profile load (`users/{uid}`).
@@ -111,7 +110,7 @@ Use the following body for the draft PR (title may stay or become: `Share duplic
 - Extract duplicate shipping-form UI and small helpers into `lib/app/widgets/shipping/` and `lib/app/utils/`, with page adapters for colors, copy, and callbacks.
 - Share quote success on car, land, parcel, and international; land now uses the same dialog. Air and sea stay inline (Done style / letterSpacing).
 - Share tracking/details value and date helpers, booking/calculator numbered headings, Home/Profile language labels, and request-quote/support required-field and email validation.
-- This does **not** finish all duplication. Leftovers (international extra services, language sheets, track/details timeline) are listed in `docs/refactor/shared-code-inventory.md`.
+- This does **not** finish all duplication. Leftovers (language sheets, track/details timeline) are listed in `docs/refactor/shared-code-inventory.md`.
 
 ## Intentional non-goals
 - No merge to `main`, no store publish, no APK in this work.
