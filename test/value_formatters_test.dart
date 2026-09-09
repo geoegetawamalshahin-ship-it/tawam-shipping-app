@@ -165,4 +165,18 @@ void main() {
     expect(languageLabel(ar, 'French'), ar.languageFrench);
     expect(languageLabel(ar, 'English'), ar.languageEnglish);
   });
+
+  test('display numbers keep zero integers decimals and rounding', () {
+    expect(formatDisplayNumber(0), '0');
+    expect(formatDisplayNumber(0, nonPositiveAsZero: true), '0');
+    expect(formatDisplayNumber(12), '12');
+    expect(formatDisplayNumber(12.0), '12');
+    expect(formatDisplayNumber(12.5), '12.50');
+    expect(formatDisplayNumber(12.344), '12.34');
+    expect(formatDisplayNumber(12.345), '12.35');
+    expect(formatDisplayNumber(-1.5, nonPositiveAsZero: true), '0');
+    expect(formatDisplayNumber(-2, nonPositiveAsZero: true), '0');
+    expect(formatDisplayNumber(-1.5), '-1.50');
+    expect(formatDisplayNumber(-2), '-2');
+  });
 }

@@ -41,6 +41,7 @@ Callers listed below invoke the shared implementation. Remaining private methods
 | `firstKeyedValue` / `stringFromKeys` / `toLocalDateTime` / `formatOptionalLocalizedDate` / `formatOptionalLocalizedDateTime` | `lib/app/utils/value_formatters.dart` | `shipment_details_screen.dart` and `track_shipment_screen.dart` via adapters. Default string fallback `'-'`. Date empty fallbacks remain `notSpecified` and `awaitingUpdate`. Unparsed text is shown as-is. Dates use `.toLocal()` |
 | `NumberedSectionHeading` | `lib/app/widgets/numbered_section_heading.dart` | `create_booking_screen.dart` and `volume_calculator_screen.dart` via adapters. Each page still supplies its own `textDark` / `textGrey` (they differ) |
 | `languageLabel` | `lib/app/utils/value_formatters.dart` | `home_screen.dart` and `profile_screen.dart` via adapters. Stored values stay `Arabic` / `French` / default English |
+| `formatDisplayNumber` | `lib/app/utils/value_formatters.dart` | Air and parcel adapters pass `nonPositiveAsZero: true`. International omits that flag so its previous signed-integer path stays |
 | Shipment-status widgets | `lib/app/widgets/shipment_status/` | Existing barrel `shipment_status_widgets.dart` |
 
 Targeted tests for several of these units live under `test/shipping_*.dart` and `test/value_formatters_test.dart`.
@@ -62,6 +63,7 @@ These still exist as private methods but only wrap the shared unit:
 - `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime` on details and tracking (call the shared helpers; tracking/details `_formatDate` still passes `notSpecified`)
 - `_sectionHeading` on booking and volume calculator (calls `NumberedSectionHeading` with page colors)
 - `_languageLabel` on Home and Profile (calls `languageLabel`)
+- `_formatNumber` on air, parcel, and international (calls `formatDisplayNumber`; air/parcel keep `<= 0` as `'0'`)
 - `_optionLabel` (calls `LocaleController.optionLabel`)
 - `_selectReadyDate` / `_selectMovingDate` (page-owned pickers; keep bounds and `helpText` on the page)
 
@@ -73,7 +75,6 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 | --- | ---: | --- | --- |
 | `_loadCustomerProfile` | 6 | Six shipping forms | Same Firestore `users/{uid}` field order and `tawamCustomer` fallback. Booking's loader is different; do not merge with it. Prefer a small helper that returns values, not a new service layer. |
 | `_showMessage` (shipping forms) | 6 | Six shipping forms | Same floating SnackBar; error color `0xFF9E2A2A` vs `_deepBlue`. |
-| `_formatNumber` | 3 | Air, parcel, international | Same `0` / integer / two-decimal rules. Used for display, not pricing formulas. |
 | `_quantityValidator` | 2 | Land, sea | Same `int.tryParse` and `enterQuantity`. Do not merge with `request_quote_screen`'s different messages. |
 | Land `_showSuccessDialog` | 1 leftover full tree | `land_freight_screen.dart` | Chrome matches `ShippingQuoteSuccessDialog` (styled Done button, no extra letter-spacing). Candidate to switch to the existing dialog without redesign. |
 | Air `_optionSwitch` | 1 leftover full tree | `air_freight_screen.dart` | Same structure as `shippingOptionSwitch` except subtitle has no `height: 1.35`. Extract only if that difference is preserved. |
@@ -115,7 +116,7 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 1. Done: details/tracking value and local-date helpers live in `value_formatters.dart`, with fallback arguments, `.toLocal()`, and targeted empty/date-type tests.
 2. Done: booking/calculator numbered `_sectionHeading` is `NumberedSectionHeading`, with page-supplied number, icon, copy, and colors.
-3. Optional small helpers: shipping `_showMessage`, `_formatNumber`, land/sea quantity validator, shipping profile-field loading helper. Home/Profile `languageLabel` is done.
+3. Optional small helpers: shipping `_showMessage`, land/sea quantity validator, shipping profile-field loading helper. Home/Profile `languageLabel` and display `_formatNumber` are done.
 4. Switch land success dialog onto the existing shared dialog only after a side-by-side style check. Leave air and sea dialogs separate unless their differences are parameterized.
 5. Revisit air `_optionSwitch` only with the subtitle `height` difference preserved.
 6. Continue scanning inline trees (auth, lists, support, documents). Record exceptions rather than forcing one design.
@@ -124,4 +125,4 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 ## Verification status
 
-Local `flutter analyze` and `flutter test` passed after sharing Home/Profile language labels. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.
+Local `flutter analyze` and `flutter test` passed after sharing display number formatting. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.

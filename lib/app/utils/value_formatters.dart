@@ -118,6 +118,18 @@ String formatOptionalLocalizedDateTime(
   return '${formatLocalizedDate(l10n, date)} • $hour12:$minute $amPm';
 }
 
+String formatDisplayNumber(double value, {bool nonPositiveAsZero = false}) {
+  if (nonPositiveAsZero && value <= 0) {
+    return '0';
+  }
+
+  if (value == value.roundToDouble()) {
+    return value.toStringAsFixed(0);
+  }
+
+  return value.toStringAsFixed(2);
+}
+
 String languageLabel(AppLocalizations l10n, String language) {
   switch (language) {
     case 'Arabic':

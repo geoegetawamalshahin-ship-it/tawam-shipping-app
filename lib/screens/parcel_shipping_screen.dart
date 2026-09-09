@@ -2021,15 +2021,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
 
   String _formatNumber(double value) {
-    if (value <= 0) {
-      return '0';
-    }
-
-    if (value == value.roundToDouble()) {
-      return value.toStringAsFixed(0);
-    }
-
-    return value.toStringAsFixed(2);
+    return formatDisplayNumber(value, nonPositiveAsZero: true);
   }
 
 
