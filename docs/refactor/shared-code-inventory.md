@@ -30,7 +30,7 @@ Callers listed below invoke the shared implementation. Remaining private methods
 | `shippingTextField` / `shippingInputDecoration` | `form_fields.dart` | Six shipping forms; air passes `labelWeight: null` and `focusedErrorBorderEnabled: false` |
 | `shippingDropdown` | `form_controls.dart` | Six shipping forms |
 | `shippingDimensionField` | `form_controls.dart` | Air, land, parcel adapters |
-| `shippingOptionSwitch` | `form_controls.dart` | Car, land, parcel, international, sea (not air) |
+| `shippingOptionSwitch` | `form_controls.dart` | Six shipping forms. Default subtitle `height` is `1.35`. Air passes `subtitleHeight: null` |
 | `ShippingServicesSection` | `services_section.dart` | Car, air, land, parcel, sea (not international) |
 | `ShippingSubmitButton` | `submit_button.dart` | Six shipping forms |
 | `ShippingQuoteSuccessDialog` | `quote_success_dialog.dart` | Car, land, parcel, international. Air and sea stay separate |
@@ -57,7 +57,7 @@ These still exist as private methods but only wrap the shared unit:
 - `_buildCustomerSection` / `_buildNotesSection` on the five forms that use the shared widgets
 - `_premiumCard` is gone from the six shipping forms; they construct `ShippingPremiumCard` directly
 - `_textField`, `_dropdown`, `_inputDecoration`, `_dimensionField` (air/land/parcel)
-- `_optionSwitch` on car/land/parcel/international/sea
+- `_optionSwitch` on the six shipping forms (air passes `subtitleHeight: null`)
 - `_buildServicesSection` on the five chip-based forms
 - `_dateSelector` on the six shipping forms
 - `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`
@@ -79,7 +79,6 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 | Item | Copies | Locations | Notes |
 | --- | ---: | --- | --- |
-| Air `_optionSwitch` | 1 leftover full tree | `air_freight_screen.dart` | Same structure as `shippingOptionSwitch` except subtitle has no `height: 1.35`. Extract only if that difference is preserved. |
 | `_requiredValidator` | 2 | `request_quote_screen.dart`; `support_screen.dart` | Identical trim/empty check. Tiny; optional. |
 | `_emailValidator` | 2 | Same two screens | Same empty and regex checks; keep current messages. Tiny; optional. |
 
@@ -120,11 +119,11 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 2. Done: booking/calculator numbered `_sectionHeading` is `NumberedSectionHeading`, with page-supplied number, icon, copy, and colors.
 3. Optional small helpers are done for Home/Profile `languageLabel`, display `_formatNumber`, land/sea quantity validation, shipping `_showMessage`, and shipping `_loadCustomerProfile`.
 4. Done: land success dialog calls `ShippingQuoteSuccessDialog`. Air and sea stay separate unless their Done/`letterSpacing` differences are parameterized.
-5. Revisit air `_optionSwitch` only with the subtitle `height` difference preserved.
+5. Done: air `_optionSwitch` calls `shippingOptionSwitch` with `subtitleHeight: null`. Other forms keep subtitle `height: 1.35`.
 6. Continue scanning inline trees (auth, lists, support, documents). Record exceptions rather than forcing one design.
 7. After each batch: review the diff, run Flutter analysis and tests, add behavior tests where callbacks or empty values can regress.
 8. APK plus phone/tablet, English/Arabic, and core flows remain pending. Do not merge to `main` without owner approval.
 
 ## Verification status
 
-Local `flutter analyze` and `flutter test` passed after switching land quote success onto `ShippingQuoteSuccessDialog`. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.
+Local `flutter analyze` and `flutter test` passed after sharing air `_optionSwitch` onto `shippingOptionSwitch` with a null subtitle height. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.

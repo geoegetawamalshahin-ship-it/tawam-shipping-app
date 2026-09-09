@@ -76,6 +76,7 @@ Widget shippingOptionSwitch({
   required Color primaryBlue,
   required Color textDark,
   required Color textGrey,
+  double? subtitleHeight = 1.35,
 }) {
   return Row(
     children: [
@@ -111,7 +112,7 @@ Widget shippingOptionSwitch({
               style: TextStyle(
                 color: textGrey,
                 fontSize: 8.8,
-                height: 1.35,
+                height: subtitleHeight,
               ),
             ),
           ],

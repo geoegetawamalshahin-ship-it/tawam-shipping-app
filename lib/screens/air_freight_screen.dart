@@ -1934,49 +1934,17 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 20),
-        ),
-
-        const SizedBox(width: 11),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-
-              const SizedBox(height: 3),
-
-              Text(
-                subtitle,
-                style: const TextStyle(color: _textGrey, fontSize: 8.8),
-              ),
-            ],
-          ),
-        ),
-
-        Switch(
-          value: value,
-          activeThumbColor: _primaryBlue,
-          onChanged: onChanged,
-        ),
-      ],
+    return shippingOptionSwitch(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      value: value,
+      onChanged: onChanged,
+      softBlue: _softBlue,
+      primaryBlue: _primaryBlue,
+      textDark: _textDark,
+      textGrey: _textGrey,
+      subtitleHeight: null,
     );
   }
 
