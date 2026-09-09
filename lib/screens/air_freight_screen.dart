@@ -1639,52 +1639,12 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-
-    return SizedBox(
-      width: double.infinity,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: _submitting ? null : _submitQuote,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _primaryBlue,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: _primaryBlue.withValues(alpha: .55),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(17),
-          ),
-        ),
-        child: _submitting
-            ? const SizedBox(
-                width: 23,
-                height: 23,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.4,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.flight_takeoff_rounded, size: 21),
-
-                  const SizedBox(width: 10),
-
-                  Text(
-                    l10n.submitQuoteRequest,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: .35,
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  const Icon(Icons.arrow_forward_rounded, size: 20),
-                ],
-              ),
-      ),
+    return ShippingSubmitButton(
+      submitting: _submitting,
+      onSubmit: _submitQuote,
+      primaryColor: _primaryBlue,
+      label: l10n.submitQuoteRequest,
+      icon: Icons.flight_takeoff_rounded,
     );
   }
 

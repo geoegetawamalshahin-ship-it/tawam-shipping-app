@@ -1740,52 +1740,12 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-
-    return SizedBox(
-      width: double.infinity,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: _submitting ? null : _submitQuote,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _primaryBlue,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: _primaryBlue.withValues(alpha: .55),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(17),
-          ),
-        ),
-        child: _submitting
-            ? const SizedBox(
-                width: 23,
-                height: 23,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.4,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.request_quote_outlined, size: 21),
-
-                  SizedBox(width: 10),
-
-                  Text(
-                    l10n.submitQuoteRequest,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: .35,
-                    ),
-                  ),
-
-                  SizedBox(width: 10),
-
-                  Icon(Icons.arrow_forward_rounded, size: 20),
-                ],
-              ),
-      ),
+    return ShippingSubmitButton(
+      submitting: _submitting,
+      onSubmit: _submitQuote,
+      primaryColor: _primaryBlue,
+      label: l10n.submitQuoteRequest,
+      icon: Icons.request_quote_outlined,
     );
   }
 
