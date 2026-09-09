@@ -108,5 +108,23 @@ void main() {
       bar.shape,
       RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
     );
+    expect(bar.duration, const Duration(milliseconds: 4000));
+  });
+
+  testWidgets('a new floating radius message replaces the previous snackbar', (
+    tester,
+  ) async {
+    await pumpHost(tester, (context) {
+      showFloatingRadiusMessage(context, message: 'First');
+      showFloatingRadiusMessage(context, message: 'Second');
+    });
+    await tester.tap(find.text('show'));
+    await tester.pump();
+
+    expect(find.text('First'), findsNothing);
+    expect(find.text('Second'), findsOneWidget);
+    final bar = tester.widget<SnackBar>(find.byType(SnackBar));
+    expect(bar.behavior, SnackBarBehavior.floating);
+    expect(bar.backgroundColor, isNull);
   });
 }

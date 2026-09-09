@@ -1,6 +1,6 @@
 # Shared-code inventory (closing review)
 
-Re-verified on `refactor/organized-widgets-pages` after `shipmentHistoryItems` and `showFloatingRadiusMessage`. Remaining extractable track/details and track/support snackbar duplication is closed. Do not treat merge, store listing, or device walkthroughs as done.
+Re-verified on `refactor/organized-widgets-pages` after `88a49d0` (history + floating snackbars) plus widget tests for snackbar replacement. Extractable track/details leftovers and track/support snackbar duplication are **assembled and verified**. No unresolved extractable candidate remains. Do not merge to `main` or publish.
 
 Previous candidate tables at `50393fb` are historical.
 
@@ -9,7 +9,7 @@ Previous candidate tables at `50393fb` are historical.
 - Confirmed each extracted unit lives under `lib/app/widgets/` or `lib/app/utils/` and is **called** from the listed screens (not only exported).
 - Confirmed old full trees for those units are gone from the pages; **short adapters remain** (colors, l10n, `setState`, navigation).
 - Compared `origin/main...HEAD`: Dart/docs/test files only. No `lib/l10n`, `lib/locale_controller.dart`, `l10n.yaml`, Android, or iOS changes.
-- Did not merge, publish, or start APK/device work.
+- Did not merge or publish. APK/device work is the owner-ordered final step after this freeze, not extra extraction.
 
 **Limits:** not an exhaustive AST clone scan. Similar layout is not automatically duplication.
 
@@ -62,11 +62,12 @@ Private methods that only pass page values into the shared unit: `_buildHeader`,
 
 ## Unresolved candidates (not done)
 
-None of the listed two-screen leftovers remain. Do not merge to `main` or publish until the owner orders it.
+None. Do not merge to `main` or publish until the owner orders it.
 
-| Candidate | Status |
+| Candidate | Classification |
 | --- | --- |
-| — | Extractable track/details leftovers and track/support SnackBar are extracted. |
+| `_historyItems` track vs details | Assembled and verified: `shipmentHistoryItems`. Track default keys omit `statusHistory` / `changedAt`. Details adapters pass `shipmentDetailsHistoryKeys`, `shipmentDetailsHistoryTimeKeys`, `mapShipmentCreated: true`. Event order, title/description/time keys, empty/non-list skip, and fallbacks match `main`. Firestore load and history-vs-fallback choice stay on pages. |
+| Track vs support `_showMessage` | Assembled and verified: `showFloatingRadiusMessage`. Floating, radius 14, no fill, hide previous, default duration. Pages keep `mounted` and the same call sites/copy. Filled `showShippingMessage` and booking `0xFF9D2732` stay separate. |
 
 ## Reviewed and left separate
 
@@ -106,11 +107,12 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 
 **Not done**
 
-- Merge to `main`, store listing, APK, phone/tablet, English/Arabic/French walkthroughs of submit/track/documents.
+- Merge to `main`, store listing, production publish.
+- Owner device confirmation of submit/track/documents with real accounts (CI and local tests are not that proof).
 
 **Checks**
 
-- Extraction commits through `cbacdb4` had `protect-and-test` **success**. Docs commit `9a8eaa2` failed in `subosito/flutter-action@v2` (protect step passed; analyze/test skipped). Visual parity and device flows are **not** covered by CI.
+- Extraction through `88a49d0` (`protect-and-test` success on GitHub for that SHA). Local analyze/test re-run on the closing freeze. Visual parity and full device flows are **not** covered by CI.
 
 ## Suggested PR #4 description
 
@@ -121,18 +123,18 @@ Use the following body for the draft PR (title may stay or become: `Share duplic
 - Extract duplicate shipping-form UI and small helpers into `lib/app/widgets/shipping/` and `lib/app/utils/`, with page adapters for colors, copy, and callbacks.
 - Share quote success on all six shipping forms; air keeps unstyled Done and sea keeps My Quotes `letterSpacing: .35`. Close/navigation stay on each page.
 - Share tracking/details value and date helpers, booking/calculator numbered headings, Home/Profile language labels and picker sheet, and request-quote/support required-field and email validation.
-- This does **not** merge to `main` or publish. Track/details history and track/support floating snackbars are now shared. Intentionally separate chrome (auth fields, legal cards, booking snackbar, filled shipping snackbars) stays on pages.
+- This does **not** merge to `main` or publish. Track/details history and track/support floating snackbars are shared. Intentionally separate chrome (auth fields, legal cards, booking snackbar, filled shipping snackbars) stays on pages.
 
 ## Intentional non-goals
-- No merge to `main`, no store publish, no APK in this work.
+- No merge to `main`, no store publish.
 - No `locale_controller` / l10n / platform config edits.
 - Design, translation keys, navigation, validators’ messages, calculations, Firestore collections, and submit payloads were not meant to change; adapters keep page-owned values.
 
 ## Test plan
-- [x] `flutter analyze` / `flutter test` via GitHub Actions `protect-and-test`
-- [ ] English / Arabic (and French) on shipping forms, booking, quotes, tracking, support
-- [ ] Phone and tablet layouts
-- [ ] Submit quote / booking, success dialogs (including air/sea vs shared), profile autofill signed-in / signed-out
+- [x] `flutter analyze` / `flutter test` (local + GitHub `protect-and-test` on extraction SHAs)
+- [ ] English / Arabic (and French) on shipping forms, booking, quotes, tracking, support — owner device
+- [ ] Phone and tablet layouts — owner device
+- [ ] Submit quote / booking, success dialogs (including air/sea vs shared), profile autofill signed-in / signed-out — owner, test data only
 - [ ] Owner approval before merge
 ```
 
