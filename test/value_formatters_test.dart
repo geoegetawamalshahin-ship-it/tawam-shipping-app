@@ -151,4 +151,18 @@ void main() {
       '1 ${en.monthSep} 2026 • 12:00 ${en.periodPm}',
     );
   });
+
+  test('language labels keep stored names and default to English', () {
+    final en = AppLocalizationsEn();
+    final ar = AppLocalizationsAr();
+
+    expect(languageLabel(en, 'Arabic'), en.languageArabic);
+    expect(languageLabel(en, 'French'), en.languageFrench);
+    expect(languageLabel(en, 'English'), en.languageEnglish);
+    expect(languageLabel(en, ''), en.languageEnglish);
+    expect(languageLabel(en, 'Spanish'), en.languageEnglish);
+    expect(languageLabel(ar, 'Arabic'), ar.languageArabic);
+    expect(languageLabel(ar, 'French'), ar.languageFrench);
+    expect(languageLabel(ar, 'English'), ar.languageEnglish);
+  });
 }

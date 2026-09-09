@@ -16,6 +16,7 @@ import 'shipping_documents_screen.dart';
 import 'support_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_conditions_screen.dart';
+import '../app/utils/value_formatters.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
 
@@ -611,14 +612,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   String _languageLabel(AppLocalizations l10n, String language) {
-    switch (language) {
-      case 'Arabic':
-        return l10n.languageArabic;
-      case 'French':
-        return l10n.languageFrench;
-      default:
-        return l10n.languageEnglish;
-    }
+    return languageLabel(l10n, language);
   }
 
   String get _initial {

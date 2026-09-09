@@ -117,3 +117,14 @@ String formatOptionalLocalizedDateTime(
 
   return '${formatLocalizedDate(l10n, date)} • $hour12:$minute $amPm';
 }
+
+String languageLabel(AppLocalizations l10n, String language) {
+  switch (language) {
+    case 'Arabic':
+      return l10n.languageArabic;
+    case 'French':
+      return l10n.languageFrench;
+    default:
+      return l10n.languageEnglish;
+  }
+}

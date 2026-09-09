@@ -26,6 +26,7 @@ import 'parcel_shipping_screen.dart';
 import 'login_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../app/utils/value_formatters.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
 
@@ -229,14 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _languageLabel(AppLocalizations l10n, String language) {
-    switch (language) {
-      case 'Arabic':
-        return l10n.languageArabic;
-      case 'French':
-        return l10n.languageFrench;
-      default:
-        return l10n.languageEnglish;
-    }
+    return languageLabel(l10n, language);
   }
 
   // ==========================================================
