@@ -709,72 +709,17 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
   Widget _dateSelector() {
     final l10n = AppLocalizations.of(context)!;
-
-    return InkWell(
+    return ShippingDateSelector(
       onTap: _selectMovingDate,
-      borderRadius: BorderRadius.circular(15),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
-        decoration: BoxDecoration(
-          color: _softGrey,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: _border),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 39,
-              height: 39,
-              decoration: BoxDecoration(
-                color: _softBlue,
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: const Icon(
-                Icons.calendar_month_outlined,
-                color: _primaryBlue,
-                size: 19,
-              ),
-            ),
-
-            const SizedBox(width: 11),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.preferredPickupDate,
-                    style: TextStyle(
-                      color: _textGrey,
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    _movingDate == null
-                        ? l10n.selectADate
-                        : _formatDate(_movingDate!),
-                    style: TextStyle(
-                      color: _movingDate == null ? _textGrey : _textDark,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: _textGrey,
-              size: 14,
-            ),
-          ],
-        ),
-      ),
+      fillColor: _softGrey,
+      iconBackgroundColor: _softBlue,
+      borderColor: _border,
+      primaryColor: _primaryBlue,
+      labelColor: _textGrey,
+      textColor: _textDark,
+      label: l10n.preferredPickupDate,
+      isEmpty: _movingDate == null,
+      valueText: _movingDate == null ? l10n.selectADate : _formatDate(_movingDate!),
     );
   }
 
