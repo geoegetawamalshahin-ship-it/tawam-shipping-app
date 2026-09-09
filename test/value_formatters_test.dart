@@ -227,4 +227,90 @@ void main() {
     expect(requiredFieldError('George', en.pleaseEnterFullName), isNull);
     expect(requiredFieldError('Need help', en.pleaseDescribeRequest), isNull);
   });
+
+  test('email field errors keep request-quote and support messages', () {
+    final en = AppLocalizationsEn();
+    final ar = AppLocalizationsAr();
+
+    expect(
+      emailFieldError(null, en.pleaseEnterEmail, en.pleaseEnterValidEmail),
+      en.pleaseEnterEmail,
+    );
+    expect(
+      emailFieldError('', en.pleaseEnterEmail, en.pleaseEnterValidEmail),
+      en.pleaseEnterEmail,
+    );
+    expect(
+      emailFieldError('   ', en.pleaseEnterEmail, en.pleaseEnterValidEmail),
+      en.pleaseEnterEmail,
+    );
+    expect(
+      emailFieldError(null, ar.pleaseEnterEmail, ar.pleaseEnterValidEmail),
+      ar.pleaseEnterEmail,
+    );
+    expect(
+      emailFieldError('', ar.pleaseEnterEmail, ar.pleaseEnterValidEmail),
+      ar.pleaseEnterEmail,
+    );
+    expect(
+      emailFieldError('   ', ar.pleaseEnterEmail, ar.pleaseEnterValidEmail),
+      ar.pleaseEnterEmail,
+    );
+    expect(
+      emailFieldError(
+        'not-an-email',
+        en.pleaseEnterEmail,
+        en.pleaseEnterValidEmail,
+      ),
+      en.pleaseEnterValidEmail,
+    );
+    expect(
+      emailFieldError(
+        'missing.at',
+        en.pleaseEnterEmail,
+        en.pleaseEnterValidEmail,
+      ),
+      en.pleaseEnterValidEmail,
+    );
+    expect(
+      emailFieldError(
+        'user@domain',
+        en.pleaseEnterEmail,
+        en.pleaseEnterValidEmail,
+      ),
+      en.pleaseEnterValidEmail,
+    );
+    expect(
+      emailFieldError(
+        'user@ domain.com',
+        en.pleaseEnterEmail,
+        en.pleaseEnterValidEmail,
+      ),
+      en.pleaseEnterValidEmail,
+    );
+    expect(
+      emailFieldError(
+        'user@domain',
+        ar.pleaseEnterEmail,
+        ar.pleaseEnterValidEmail,
+      ),
+      ar.pleaseEnterValidEmail,
+    );
+    expect(
+      emailFieldError(
+        '  user@tawam-alshahin.ae  ',
+        en.pleaseEnterEmail,
+        en.pleaseEnterValidEmail,
+      ),
+      isNull,
+    );
+    expect(
+      emailFieldError(
+        'info@tawam-alshahin.ae',
+        ar.pleaseEnterEmail,
+        ar.pleaseEnterValidEmail,
+      ),
+      isNull,
+    );
+  });
 }

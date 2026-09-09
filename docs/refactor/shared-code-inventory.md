@@ -1,8 +1,8 @@
 # Shared-code inventory (closing review)
 
-Re-verified on `refactor/organized-widgets-pages` at `9a8eaa2` (9 Sep 2026). Agreed extraction batches run through `requiredFieldError`. Remaining-duplication candidates from the full `lib` scan were **not** implemented.
+Re-verified on `refactor/organized-widgets-pages` after `emailFieldError`. Agreed extraction batches run through request-quote/support email validation. Remaining-duplication candidates below were **not** implemented.
 
-**This topic is not complete.** Agreed batches are in shared files and called from the intended pages. Candidates recorded in the remaining-duplication review were **not implemented** (owner asked to wait). Do not treat this branch as finished duplication work.
+**This topic is not complete.** Agreed batches are in shared files and called from the intended pages. Do not treat this branch as finished duplication work.
 
 Previous candidate tables at `50393fb` are historical.
 
@@ -42,6 +42,7 @@ Previous candidate tables at `50393fb` are historical.
 | `formatDisplayNumber` | `value_formatters.dart` | Air, parcel (`nonPositiveAsZero: true`); international without that flag |
 | `positiveIntegerQuantityError` | `value_formatters.dart` | Land, sea. Request-quote quantity stays separate |
 | `requiredFieldError` | `value_formatters.dart` | Request-quote + support `_requiredValidator` |
+| `emailFieldError` | `value_formatters.dart` | Request-quote + support `_emailValidator`. Same trim + regex. Auth pages stay separate |
 | `languageLabel` | `value_formatters.dart` | Home + Profile adapters. Stored `Arabic` / `French` / default English |
 | `NumberedSectionHeading` | `lib/app/widgets/numbered_section_heading.dart` | Booking + volume calculator (page `textDark` / `textGrey`) |
 | `loadShippingCustomerProfile` / `FromAuth` | `lib/app/utils/shipping_customer_profile.dart` | Six shipping forms. Booking loader stays separate. Firestore still `users/{uid}` |
@@ -51,7 +52,7 @@ Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.da
 
 ## Adapters kept (not leftover duplication)
 
-Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (car/land/parcel/international), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator`, six-form `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
+Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (car/land/parcel/international), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
 
 ## Unresolved candidates (not done)
 
@@ -59,7 +60,6 @@ Do not announce completion while these remain. Implement only when the owner ord
 
 | Candidate | Status |
 | --- | --- |
-| Request-quote / support `_emailValidator` | Identical empty + regex; not extracted |
 | International `_buildAdditionalServicesSection` | Matches `ShippingServicesSection`; still inlined. Special items (`_deepBlue`, `fontSize: 9.3`) stay separate |
 | Get-quote `_showMessage` | Matches `showShippingMessage` (`0xFF9E2A2A`); still inlined. Booking error `0xFF9D2732` stays separate |
 | Home / Profile `_selectLanguage` sheets | Near-identical UI; different current-value source |
@@ -74,7 +74,7 @@ Air customer/notes chrome; international special-item chips; air unstyled Done a
 
 ## Diff vs `main` (scope)
 
-**In scope:** new shared widgets/helpers; six shipping screens plus booking, get-quote (date helper only), home/profile (`languageLabel`), request-quote/support (`requiredFieldError`), details/tracking (value/date helpers); tests; this inventory.
+**In scope:** new shared widgets/helpers; six shipping screens plus booking, get-quote (date helper only), home/profile (`languageLabel`), request-quote/support (`requiredFieldError`, `emailFieldError`), details/tracking (value/date helpers); tests; this inventory.
 
 **Protected files unchanged** vs `main`: `lib/l10n`, `lib/locale_controller.dart`, `l10n.yaml`, Android/iOS.
 
@@ -89,7 +89,7 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 - Shipping form chrome: header, section title, trust bar, premium card, fields, dropdowns, dimensions, option switches (air height preserved), services (five forms), date selector chrome, submit, summary badges, calculation rows.
 - Notes + customer details on five forms (air kept different).
 - Quote success dialog on car, land, parcel, international.
-- Helpers: dates/values, display numbers, land/sea quantity, required field, language labels, shipping snackbars, shipping customer profile load (`users/{uid}`).
+- Helpers: dates/values, display numbers, land/sea quantity, required field, quote/support email field, language labels, shipping snackbars, shipping customer profile load (`users/{uid}`).
 - Numbered heading for booking + calculator.
 - Tracking/details keyed values and optional local dates.
 - Inventory of leftovers after a full `lib` scan (named methods and `build` trees).
@@ -111,8 +111,8 @@ Use the following body for the draft PR (title may stay or become: `Share duplic
 ## Summary
 - Extract duplicate shipping-form UI and small helpers into `lib/app/widgets/shipping/` and `lib/app/utils/`, with page adapters for colors, copy, and callbacks.
 - Share quote success on car, land, parcel, and international; land now uses the same dialog. Air and sea stay inline (Done style / letterSpacing).
-- Share tracking/details value and date helpers, booking/calculator numbered headings, Home/Profile language labels, and request-quote/support required-field validation.
-- This does **not** finish all duplication. Leftovers (email validator, international extra services, get-quote snackbar, language sheets, track/details timeline) are listed in `docs/refactor/shared-code-inventory.md`.
+- Share tracking/details value and date helpers, booking/calculator numbered headings, Home/Profile language labels, and request-quote/support required-field and email validation.
+- This does **not** finish all duplication. Leftovers (international extra services, get-quote snackbar, language sheets, track/details timeline) are listed in `docs/refactor/shared-code-inventory.md`.
 
 ## Intentional non-goals
 - No merge to `main`, no store publish, no APK in this work.

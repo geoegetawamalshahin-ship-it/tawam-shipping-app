@@ -169,19 +169,11 @@ class _SupportScreenState extends State<SupportScreen> {
 
   String? _emailValidator(String? value) {
     final l10n = AppLocalizations.of(context)!;
-    final email = value?.trim() ?? '';
-
-    if (email.isEmpty) {
-      return l10n.pleaseEnterEmail;
-    }
-
-    final isValid = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
-
-    if (!isValid) {
-      return l10n.pleaseEnterValidEmail;
-    }
-
-    return null;
+    return emailFieldError(
+      value,
+      l10n.pleaseEnterEmail,
+      l10n.pleaseEnterValidEmail,
+    );
   }
 
   // ==========================================================

@@ -148,6 +148,26 @@ String? requiredFieldError(String? value, String message) {
   return null;
 }
 
+String? emailFieldError(
+  String? value,
+  String emptyMessage,
+  String invalidMessage,
+) {
+  final email = value?.trim() ?? '';
+
+  if (email.isEmpty) {
+    return emptyMessage;
+  }
+
+  final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+
+  if (!validEmail) {
+    return invalidMessage;
+  }
+
+  return null;
+}
+
 String languageLabel(AppLocalizations l10n, String language) {
   switch (language) {
     case 'Arabic':

@@ -371,19 +371,11 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
   String? _emailValidator(String? value) {
     final l10n = AppLocalizations.of(context)!;
-    final email = value?.trim() ?? '';
-
-    if (email.isEmpty) {
-      return l10n.pleaseEnterEmail;
-    }
-
-    final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
-
-    if (!validEmail) {
-      return l10n.pleaseEnterValidEmail;
-    }
-
-    return null;
+    return emailFieldError(
+      value,
+      l10n.pleaseEnterEmail,
+      l10n.pleaseEnterValidEmail,
+    );
   }
 
   String? _weightValidator(String? value) {
