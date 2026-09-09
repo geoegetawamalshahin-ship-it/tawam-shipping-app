@@ -1950,167 +1950,27 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) {
-        final dialogL10n = AppLocalizations.of(dialogContext)!;
-
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 23),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 27, 22, 22),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: _deepBlue.withValues(alpha: .16),
-                  blurRadius: 30,
-                  offset: const Offset(0, 12),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEAF8F0),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: _success,
-                    size: 42,
-                  ),
-                ),
-
-                const SizedBox(height: 17),
-
-                Text(
-                  dialogL10n.quoteRequestSubmitted,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  dialogL10n.quoteSentToTawam,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _textGrey,
-                    fontSize: 10.5,
-                    height: 1.45,
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: _softGrey,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: _border),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        dialogL10n.reference,
-                        style: const TextStyle(
-                          color: _textGrey,
-                          fontSize: 8,
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      Text(
-                        quoteNumber,
-                        style: const TextStyle(
-                          color: _deepBlue,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MyQuotesScreen(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: Text(
-                      dialogL10n.myQuotes,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 9),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      Navigator.pop(context);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _deepBlue,
-                      side: const BorderSide(color: _border),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: Text(
-                      dialogL10n.doneUpper,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (dialogContext) => ShippingQuoteSuccessDialog(
+        quoteNumber: quoteNumber,
+        deepBlue: _deepBlue,
+        success: _success,
+        textDark: _textDark,
+        textGrey: _textGrey,
+        softGrey: _softGrey,
+        border: _border,
+        primaryBlue: _primaryBlue,
+        onViewQuotes: () {
+          Navigator.pop(dialogContext);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MyQuotesScreen()),
+          );
+        },
+        onDone: () {
+          Navigator.pop(dialogContext);
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
