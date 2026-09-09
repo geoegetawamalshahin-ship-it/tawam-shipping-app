@@ -15,6 +15,8 @@ class ShippingQuoteSuccessDialog extends StatelessWidget {
     required this.softGrey,
     required this.border,
     required this.primaryBlue,
+    this.unstyledDoneButton = false,
+    this.myQuotesLetterSpacing,
   });
 
   final String quoteNumber;
@@ -27,6 +29,8 @@ class ShippingQuoteSuccessDialog extends StatelessWidget {
   final Color softGrey;
   final Color border;
   final Color primaryBlue;
+  final bool unstyledDoneButton;
+  final double? myQuotesLetterSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -57,11 +61,7 @@ class ShippingQuoteSuccessDialog extends StatelessWidget {
                 color: Color(0xFFEAF8F0),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.check_circle_rounded,
-                color: success,
-                size: 42,
-              ),
+              child: Icon(Icons.check_circle_rounded, color: success, size: 42),
             ),
 
             const SizedBox(height: 17),
@@ -81,11 +81,7 @@ class ShippingQuoteSuccessDialog extends StatelessWidget {
             Text(
               dialogL10n.quoteSentToTawam,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: textGrey,
-                fontSize: 10.5,
-                height: 1.45,
-              ),
+              style: TextStyle(color: textGrey, fontSize: 10.5, height: 1.45),
             ),
 
             const SizedBox(height: 18),
@@ -144,6 +140,7 @@ class ShippingQuoteSuccessDialog extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
+                    letterSpacing: myQuotesLetterSpacing,
                   ),
                 ),
               ),
@@ -156,19 +153,23 @@ class ShippingQuoteSuccessDialog extends StatelessWidget {
               height: 46,
               child: OutlinedButton(
                 onPressed: onDone,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: deepBlue,
-                  side: BorderSide(color: border),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
+                style: unstyledDoneButton
+                    ? null
+                    : OutlinedButton.styleFrom(
+                        foregroundColor: deepBlue,
+                        side: BorderSide(color: border),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
                 child: Text(
                   dialogL10n.doneUpper,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: unstyledDoneButton
+                      ? null
+                      : const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                        ),
                 ),
               ),
             ),

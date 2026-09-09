@@ -104,4 +104,82 @@ void main() {
       expect(find.text('LAND-1'), findsNothing);
     },
   );
+
+  testWidgets('air-style Done stays unstyled and independent of My Quotes', (
+    tester,
+  ) async {
+    var quotes = 0;
+    var done = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: ShippingQuoteSuccessDialog(
+            quoteNumber: 'AIR-1',
+            onViewQuotes: () => quotes++,
+            onDone: () => done++,
+            deepBlue: Colors.blue,
+            success: Colors.green,
+            textDark: Colors.black,
+            textGrey: Colors.grey,
+            softGrey: Colors.white,
+            border: Colors.grey,
+            primaryBlue: Colors.blue,
+            unstyledDoneButton: true,
+          ),
+        ),
+      ),
+    );
+
+    final doneButton = tester.widget<OutlinedButton>(
+      find.byType(OutlinedButton),
+    );
+    expect(doneButton.style, isNull);
+    expect(tester.widget<Text>(find.text('DONE')).style, isNull);
+
+    await tester.tap(find.byType(OutlinedButton));
+    expect(done, 1);
+    expect(quotes, 0);
+  });
+
+  testWidgets('sea-style My Quotes keeps letterSpacing .35', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: ShippingQuoteSuccessDialog(
+            quoteNumber: 'SEA-1',
+            onViewQuotes: () {},
+            onDone: () {},
+            deepBlue: Colors.blue,
+            success: Colors.green,
+            textDark: Colors.black,
+            textGrey: Colors.grey,
+            softGrey: Colors.white,
+            border: Colors.grey,
+            primaryBlue: Colors.blue,
+            myQuotesLetterSpacing: .35,
+          ),
+        ),
+      ),
+    );
+
+    final quotesLabel = tester.widget<Text>(
+      find.descendant(
+        of: find.byType(ElevatedButton),
+        matching: find.byType(Text),
+      ),
+    );
+    expect(quotesLabel.style?.letterSpacing, .35);
+
+    final doneButton = tester.widget<OutlinedButton>(
+      find.byType(OutlinedButton),
+    );
+    expect(doneButton.style, isNotNull);
+  });
 }
