@@ -1885,13 +1885,10 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   }
 
   String? _quantityValidator(String? value) {
-    final number = int.tryParse(value?.trim() ?? '');
-
-    if (number == null || number <= 0) {
-      return AppLocalizations.of(context)!.enterQuantity;
-    }
-
-    return null;
+    return positiveIntegerQuantityError(
+      value,
+      AppLocalizations.of(context)!.enterQuantity,
+    );
   }
 
   String _formatDate(DateTime date) {

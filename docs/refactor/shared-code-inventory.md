@@ -42,6 +42,7 @@ Callers listed below invoke the shared implementation. Remaining private methods
 | `NumberedSectionHeading` | `lib/app/widgets/numbered_section_heading.dart` | `create_booking_screen.dart` and `volume_calculator_screen.dart` via adapters. Each page still supplies its own `textDark` / `textGrey` (they differ) |
 | `languageLabel` | `lib/app/utils/value_formatters.dart` | `home_screen.dart` and `profile_screen.dart` via adapters. Stored values stay `Arabic` / `French` / default English |
 | `formatDisplayNumber` | `lib/app/utils/value_formatters.dart` | Air and parcel adapters pass `nonPositiveAsZero: true`. International omits that flag so its previous signed-integer path stays |
+| `positiveIntegerQuantityError` | `lib/app/utils/value_formatters.dart` | Land and sea `_quantityValidator` adapters pass `enterQuantity`. `request_quote_screen` stays separate |
 | Shipment-status widgets | `lib/app/widgets/shipment_status/` | Existing barrel `shipment_status_widgets.dart` |
 
 Targeted tests for several of these units live under `test/shipping_*.dart` and `test/value_formatters_test.dart`.
@@ -64,6 +65,7 @@ These still exist as private methods but only wrap the shared unit:
 - `_sectionHeading` on booking and volume calculator (calls `NumberedSectionHeading` with page colors)
 - `_languageLabel` on Home and Profile (calls `languageLabel`)
 - `_formatNumber` on air, parcel, and international (calls `formatDisplayNumber`; air/parcel keep `<= 0` as `'0'`)
+- `_quantityValidator` on land and sea (calls `positiveIntegerQuantityError` with `enterQuantity`)
 - `_optionLabel` (calls `LocaleController.optionLabel`)
 - `_selectReadyDate` / `_selectMovingDate` (page-owned pickers; keep bounds and `helpText` on the page)
 
@@ -75,7 +77,6 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 | --- | ---: | --- | --- |
 | `_loadCustomerProfile` | 6 | Six shipping forms | Same Firestore `users/{uid}` field order and `tawamCustomer` fallback. Booking's loader is different; do not merge with it. Prefer a small helper that returns values, not a new service layer. |
 | `_showMessage` (shipping forms) | 6 | Six shipping forms | Same floating SnackBar; error color `0xFF9E2A2A` vs `_deepBlue`. |
-| `_quantityValidator` | 2 | Land, sea | Same `int.tryParse` and `enterQuantity`. Do not merge with `request_quote_screen`'s different messages. |
 | Land `_showSuccessDialog` | 1 leftover full tree | `land_freight_screen.dart` | Chrome matches `ShippingQuoteSuccessDialog` (styled Done button, no extra letter-spacing). Candidate to switch to the existing dialog without redesign. |
 | Air `_optionSwitch` | 1 leftover full tree | `air_freight_screen.dart` | Same structure as `shippingOptionSwitch` except subtitle has no `height: 1.35`. Extract only if that difference is preserved. |
 | `_requiredValidator` | 2 | `request_quote_screen.dart`; `support_screen.dart` | Identical trim/empty check. Tiny; optional. |
@@ -102,7 +103,7 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 | `_refreshSummary` / `_refreshCalculations` | One-line `setState` wrappers. |
 | List date formatters | `my_bookings_screen` formats Timestamp without `toLocal()` and falls back to `'-'`. `my_quotes_screen` uses epoch-0 → `notProvided`. `shipments_screen` uses `toLocal()` and `notSpecified`. Do not merge these with each other or with details/tracking without preserving those fallbacks. |
 | Tracking/support `_showMessage` vs shipping vs profile vs notifications | Tracking/support: rounded `14`, no background color. Profile: navy, margin `14`, radius `16`, bold text. Notifications: radius `16`, no hide-current in the same way. Keep SnackBar chrome per screen. |
-| Land/sea `_quantityValidator` vs request-quote quantity validator | Different empty handling and localization keys (`enterQuantity` vs `pleaseEnterNumberOfItems` / `pleaseEnterValidQuantity`). |
+| Land/sea quantity helper vs request-quote quantity validator | Shared helper uses `int.tryParse` and one `enterQuantity` message. Request-quote still has a separate empty path (`pleaseEnterNumberOfItems`) and invalid path (`pleaseEnterValidQuantity`). |
 | `firstNonEmpty` vs `firstKeyedValue` | List of values vs map key order. Do not combine. |
 
 ## Cross-feature review status
@@ -116,7 +117,7 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 1. Done: details/tracking value and local-date helpers live in `value_formatters.dart`, with fallback arguments, `.toLocal()`, and targeted empty/date-type tests.
 2. Done: booking/calculator numbered `_sectionHeading` is `NumberedSectionHeading`, with page-supplied number, icon, copy, and colors.
-3. Optional small helpers: shipping `_showMessage`, land/sea quantity validator, shipping profile-field loading helper. Home/Profile `languageLabel` and display `_formatNumber` are done.
+3. Optional small helpers: shipping `_showMessage`, shipping profile-field loading helper. Home/Profile `languageLabel`, display `_formatNumber`, and land/sea quantity validation are done.
 4. Switch land success dialog onto the existing shared dialog only after a side-by-side style check. Leave air and sea dialogs separate unless their differences are parameterized.
 5. Revisit air `_optionSwitch` only with the subtitle `height` difference preserved.
 6. Continue scanning inline trees (auth, lists, support, documents). Record exceptions rather than forcing one design.
@@ -125,4 +126,4 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 ## Verification status
 
-Local `flutter analyze` and `flutter test` passed after sharing display number formatting. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.
+Local `flutter analyze` and `flutter test` passed after sharing land/sea quantity validation. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.

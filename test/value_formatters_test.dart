@@ -179,4 +179,28 @@ void main() {
     expect(formatDisplayNumber(-1.5), '-1.50');
     expect(formatDisplayNumber(-2), '-2');
   });
+
+  test(
+    'land and sea quantity errors keep enterQuantity for invalid values',
+    () {
+      final en = AppLocalizationsEn();
+      final ar = AppLocalizationsAr();
+      const message = 'Enter quantity';
+
+      expect(positiveIntegerQuantityError(null, message), message);
+      expect(positiveIntegerQuantityError('', message), message);
+      expect(positiveIntegerQuantityError('   ', message), message);
+      expect(positiveIntegerQuantityError('0', message), message);
+      expect(positiveIntegerQuantityError('-3', message), message);
+      expect(positiveIntegerQuantityError('1.5', message), message);
+      expect(positiveIntegerQuantityError('abc', message), message);
+      expect(positiveIntegerQuantityError('1', message), isNull);
+      expect(positiveIntegerQuantityError(' 12 ', message), isNull);
+      expect(
+        positiveIntegerQuantityError('', ar.enterQuantity),
+        ar.enterQuantity,
+      );
+      expect(en.enterQuantity, message);
+    },
+  );
 }

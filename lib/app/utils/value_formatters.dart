@@ -130,6 +130,16 @@ String formatDisplayNumber(double value, {bool nonPositiveAsZero = false}) {
   return value.toStringAsFixed(2);
 }
 
+String? positiveIntegerQuantityError(String? value, String errorMessage) {
+  final number = int.tryParse(value?.trim() ?? '');
+
+  if (number == null || number <= 0) {
+    return errorMessage;
+  }
+
+  return null;
+}
+
 String languageLabel(AppLocalizations l10n, String language) {
   switch (language) {
     case 'Arabic':
