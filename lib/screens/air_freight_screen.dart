@@ -1192,25 +1192,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   }
 
   Widget _calculationItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Color(0xFFBCD3E7), fontSize: 8.5),
-        ),
-
-        const SizedBox(height: 5),
-
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 13,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-      ],
-    );
+    return ShippingCalculationItem(label: label, value: value);
   }
 
   // =========================================================
@@ -1566,21 +1548,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   }
 
   Widget _summaryBadge(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .10),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 8.5,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
+    return ShippingSummaryBadge(text: text);
   }
 
   // =========================================================

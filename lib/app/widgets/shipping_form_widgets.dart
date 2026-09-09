@@ -12,3 +12,5 @@ export 'shipping/services_section.dart';
 export 'shipping/submit_button.dart';
 export 'shipping/quote_success_dialog.dart';
 export 'shipping/date_selector.dart';
+export 'shipping/summary_badge.dart';
+export 'shipping/calculation_item.dart';
