@@ -1,3 +1,4 @@
+import '../app/utils/shipping_customer_profile.dart';
 import '../app/utils/value_formatters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -167,53 +168,19 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       return;
     }
 
-    String name = user.displayName?.trim() ?? '';
-    String email = user.email?.trim() ?? '';
-    String phone = user.phoneNumber?.trim() ?? '';
-    String company = '';
-    String country = '';
-
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      final data = snapshot.data() ?? <String, dynamic>{};
-
-      name = firstNonEmpty([
-        data['name'],
-        data['fullName'],
-        data['displayName'],
-        name,
-      ]);
-
-      email = firstNonEmpty([data['email'], email]);
-
-      phone = firstNonEmpty([
-        data['phone'],
-        data['phoneNumber'],
-        data['mobile'],
-        phone,
-      ]);
-
-      company = firstNonEmpty([data['companyName'], data['company']]);
-
-      country = firstNonEmpty([data['country'], data['countryName']]);
-    } catch (_) {
-      // Firebase Auth fallback will still be shown.
-    }
+    final profile = await loadShippingCustomerProfileFromAuth(user);
 
     if (!mounted) return;
 
     setState(() {
-      _customerName = name.isEmpty
-          ? AppLocalizations.of(context)!.tawamCustomer
-          : name;
-      _customerEmail = email;
-      _customerPhone = phone;
-      _customerCompany = company;
-      _customerCountry = country;
+      _customerName = shippingCustomerDisplayName(
+        profile.name,
+        AppLocalizations.of(context)!.tawamCustomer,
+      );
+      _customerEmail = profile.email;
+      _customerPhone = profile.phone;
+      _customerCompany = profile.company;
+      _customerCountry = profile.country;
       _loadingProfile = false;
     });
   }
