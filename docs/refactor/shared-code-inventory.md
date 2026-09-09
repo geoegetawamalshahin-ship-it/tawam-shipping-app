@@ -43,6 +43,7 @@ Callers listed below invoke the shared implementation. Remaining private methods
 | `languageLabel` | `lib/app/utils/value_formatters.dart` | `home_screen.dart` and `profile_screen.dart` via adapters. Stored values stay `Arabic` / `French` / default English |
 | `formatDisplayNumber` | `lib/app/utils/value_formatters.dart` | Air and parcel adapters pass `nonPositiveAsZero: true`. International omits that flag so its previous signed-integer path stays |
 | `positiveIntegerQuantityError` | `lib/app/utils/value_formatters.dart` | Land and sea `_quantityValidator` adapters pass `enterQuantity`. `request_quote_screen` stays separate |
+| `requiredFieldError` | `lib/app/utils/value_formatters.dart` | `request_quote_screen.dart` and `support_screen.dart` via `_requiredValidator`. Pages still pass their own l10n messages. Email, quantity, weight, and support min-length stay on the pages |
 | `showShippingMessage` | `lib/app/widgets/shipping/show_shipping_message.dart` | Six shipping forms via `_showMessage`. Error color `0xFF9E2A2A`, success color from each page `_deepBlue`, floating, hide previous, default duration |
 | `loadShippingCustomerProfile` | `lib/app/utils/shipping_customer_profile.dart` | Six shipping forms via adapters. Unsigned-in loading flag stays on the page. Pages still apply `tawamCustomer`, `setState`, and `mounted`. Booking stays separate |
 | Shipment-status widgets | `lib/app/widgets/shipment_status/` | Existing barrel `shipment_status_widgets.dart` |
@@ -68,6 +69,7 @@ These still exist as private methods but only wrap the shared unit:
 - `_languageLabel` on Home and Profile (calls `languageLabel`)
 - `_formatNumber` on air, parcel, and international (calls `formatDisplayNumber`; air/parcel keep `<= 0` as `'0'`)
 - `_quantityValidator` on land and sea (calls `positiveIntegerQuantityError` with `enterQuantity`)
+- `_requiredValidator` on request-quote and support (calls `requiredFieldError` with page messages)
 - `_showMessage` on the six shipping forms (calls `showShippingMessage` with page `_deepBlue`)
 - `_loadCustomerProfile` on the six shipping forms (unsigned-in `setState` stays on the page before any `await`; signed-in path calls `loadShippingCustomerProfileFromAuth` then applies `tawamCustomer` after `mounted`)
 - `_optionLabel` (calls `LocaleController.optionLabel`)
@@ -79,7 +81,6 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 | Item | Copies | Locations | Notes |
 | --- | ---: | --- | --- |
-| `_requiredValidator` | 2 | `request_quote_screen.dart`; `support_screen.dart` | Identical trim/empty check. Tiny; optional. |
 | `_emailValidator` | 2 | Same two screens | Same empty and regex checks; keep current messages. Tiny; optional. |
 
 ## Keep separate (different on purpose or unsafe to merge)
@@ -117,7 +118,7 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 1. Done: details/tracking value and local-date helpers live in `value_formatters.dart`, with fallback arguments, `.toLocal()`, and targeted empty/date-type tests.
 2. Done: booking/calculator numbered `_sectionHeading` is `NumberedSectionHeading`, with page-supplied number, icon, copy, and colors.
-3. Optional small helpers are done for Home/Profile `languageLabel`, display `_formatNumber`, land/sea quantity validation, shipping `_showMessage`, and shipping `_loadCustomerProfile`.
+3. Optional small helpers are done for Home/Profile `languageLabel`, display `_formatNumber`, land/sea quantity validation, shipping `_showMessage`, shipping `_loadCustomerProfile`, and request-quote/support `_requiredValidator`.
 4. Done: land success dialog calls `ShippingQuoteSuccessDialog`. Air and sea stay separate unless their Done/`letterSpacing` differences are parameterized.
 5. Done: air `_optionSwitch` calls `shippingOptionSwitch` with `subtitleHeight: null`. Other forms keep subtitle `height: 1.35`.
 6. Continue scanning inline trees (auth, lists, support, documents). Record exceptions rather than forcing one design.
@@ -126,4 +127,4 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 ## Verification status
 
-Local `flutter analyze` and `flutter test` passed after sharing air `_optionSwitch` onto `shippingOptionSwitch` with a null subtitle height. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.
+Local `flutter analyze` and `flutter test` passed after sharing request-quote and support `_requiredValidator` as `requiredFieldError`. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.

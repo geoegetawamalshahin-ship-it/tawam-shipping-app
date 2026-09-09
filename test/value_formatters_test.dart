@@ -203,4 +203,28 @@ void main() {
       expect(en.enterQuantity, message);
     },
   );
+
+  test('required field errors keep request-quote and support messages', () {
+    final en = AppLocalizationsEn();
+
+    expect(
+      requiredFieldError(null, en.pleaseEnterPickupLocation),
+      en.pleaseEnterPickupLocation,
+    );
+    expect(
+      requiredFieldError('', en.pleaseEnterFullName),
+      en.pleaseEnterFullName,
+    );
+    expect(requiredFieldError('   ', en.pleaseEnterPhone), en.pleaseEnterPhone);
+    expect(
+      requiredFieldError(null, en.pleaseDescribeRequest),
+      en.pleaseDescribeRequest,
+    );
+    expect(
+      requiredFieldError('  Muscat  ', en.pleaseEnterPickupLocation),
+      isNull,
+    );
+    expect(requiredFieldError('George', en.pleaseEnterFullName), isNull);
+    expect(requiredFieldError('Need help', en.pleaseDescribeRequest), isNull);
+  });
 }

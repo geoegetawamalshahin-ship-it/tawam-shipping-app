@@ -140,6 +140,14 @@ String? positiveIntegerQuantityError(String? value, String errorMessage) {
   return null;
 }
 
+String? requiredFieldError(String? value, String message) {
+  if (value == null || value.trim().isEmpty) {
+    return message;
+  }
+
+  return null;
+}
+
 String languageLabel(AppLocalizations l10n, String language) {
   switch (language) {
     case 'Arabic':

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app/utils/value_formatters.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/support_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -163,11 +164,7 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   String? _requiredValidator(String? value, String message) {
-    if (value == null || value.trim().isEmpty) {
-      return message;
-    }
-
-    return null;
+    return requiredFieldError(value, message);
   }
 
   String? _emailValidator(String? value) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../app/utils/value_formatters.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 
@@ -365,11 +366,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   String? _requiredValidator(String? value, String message) {
-    if (value == null || value.trim().isEmpty) {
-      return message;
-    }
-
-    return null;
+    return requiredFieldError(value, message);
   }
 
   String? _emailValidator(String? value) {
