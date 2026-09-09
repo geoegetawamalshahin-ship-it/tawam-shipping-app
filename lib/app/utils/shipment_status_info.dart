@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../locale_controller.dart';
+import 'value_formatters.dart';
 
 const Color _statusPrimaryBlue = Color(0xFF0B4F9C);
 const Color _statusSuccess = Color(0xFF16765C);
@@ -166,4 +167,40 @@ String prettyShipmentStatus(
   }
 
   return LocaleController.optionLabel(l10n, raw);
+}
+
+const List<String> shipmentTrackLocationKeys = [
+  'currentLocation',
+  'currentArea',
+  'lastLocation',
+  'location',
+];
+
+const List<String> shipmentDetailsLocationKeys = [
+  'currentLocationName',
+  ...shipmentTrackLocationKeys,
+];
+
+String shipmentCurrentLocation({
+  required Map<String, dynamic> shipment,
+  required String status,
+  required String pickup,
+  required String delivery,
+  List<String> locationKeys = shipmentTrackLocationKeys,
+}) {
+  final liveLocation = stringFromKeys(shipment, locationKeys, fallback: '');
+
+  if (liveLocation.isNotEmpty) {
+    return liveLocation;
+  }
+
+  if (status == 'delivered' || status == 'out_for_delivery') {
+    return delivery;
+  }
+
+  if (status == 'pending' || status == 'confirmed' || status == 'prepared') {
+    return pickup;
+  }
+
+  return '';
 }

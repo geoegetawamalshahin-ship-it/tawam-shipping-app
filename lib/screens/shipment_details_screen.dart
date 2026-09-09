@@ -1413,27 +1413,13 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     required String pickup,
     required String delivery,
   }) {
-    final liveLocation = _stringValue(_shipment, [
-      'currentLocationName',
-      'currentLocation',
-      'currentArea',
-      'lastLocation',
-      'location',
-    ], fallback: '');
-
-    if (liveLocation.isNotEmpty) {
-      return liveLocation;
-    }
-
-    if (status == 'delivered' || status == 'out_for_delivery') {
-      return delivery;
-    }
-
-    if (status == 'pending' || status == 'confirmed' || status == 'prepared') {
-      return pickup;
-    }
-
-    return '';
+    return shipmentCurrentLocation(
+      shipment: _shipment,
+      status: status,
+      pickup: pickup,
+      delivery: delivery,
+      locationKeys: shipmentDetailsLocationKeys,
+    );
   }
 
   String _formatWeight(AppLocalizations l10n) {

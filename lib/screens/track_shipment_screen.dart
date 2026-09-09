@@ -1280,26 +1280,12 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     String pickup,
     String delivery,
   ) {
-    final liveLocation = _stringValue(shipment, [
-      'currentLocation',
-      'currentArea',
-      'lastLocation',
-      'location',
-    ], fallback: '');
-
-    if (liveLocation.isNotEmpty) {
-      return liveLocation;
-    }
-
-    if (status == 'delivered' || status == 'out_for_delivery') {
-      return delivery;
-    }
-
-    if (status == 'pending' || status == 'confirmed' || status == 'prepared') {
-      return pickup;
-    }
-
-    return '';
+    return shipmentCurrentLocation(
+      shipment: shipment,
+      status: status,
+      pickup: pickup,
+      delivery: delivery,
+    );
   }
 
   ShipmentStatusInfo _statusInfo(AppLocalizations l10n, String status) {
