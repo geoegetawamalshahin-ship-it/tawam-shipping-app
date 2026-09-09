@@ -17,6 +17,7 @@ import 'support_screen.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_conditions_screen.dart';
 import '../app/utils/value_formatters.dart';
+import '../app/widgets/language_picker_sheet.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
 
@@ -887,110 +888,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _selectLanguage() async {
     final l10n = AppLocalizations.of(context)!;
 
-    final selected = await showModalBottomSheet<String>(
+    final selected = await showLanguagePickerSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        return Container(
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 44,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9DEE5),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                const SizedBox(height: 21),
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    l10n.applicationLanguage,
-                    style: const TextStyle(
-                      color: _text,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                ...LocaleController.languageNames.map((language) {
-                  final isSelected = language == _selectedLanguage;
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Material(
-                      color: isSelected ? _blueLight : const Color(0xFFF7F9FC),
-                      borderRadius: BorderRadius.circular(18),
-                      child: InkWell(
-                        onTap: () => Navigator.pop(sheetContext, language),
-                        borderRadius: BorderRadius.circular(18),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 15,
-                            vertical: 15,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFFB9D8F3)
-                                  : _border,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 42,
-                                height: 42,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(13),
-                                ),
-                                child: const Icon(
-                                  Icons.language_rounded,
-                                  color: _blue,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  _languageLabel(l10n, language),
-                                  style: const TextStyle(
-                                    color: _text,
-                                    fontSize: 13.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                              if (isSelected)
-                                const Icon(
-                                  Icons.check_circle_rounded,
-                                  color: _blue,
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ],
-            ),
-          ),
-        );
-      },
+      title: l10n.applicationLanguage,
+      languages: LocaleController.languageNames,
+      currentLanguage: _selectedLanguage,
+      languageLabel: (language) => _languageLabel(l10n, language),
+      textColor: _text,
+      accentColor: _blue,
+      unselectedBorderColor: _border,
+      selectedFillColor: _blueLight,
+      unselectedFillColor: const Color(0xFFF7F9FC),
+      selectedBorderColor: const Color(0xFFB9D8F3),
     );
 
     if (selected == null || !mounted) return;
