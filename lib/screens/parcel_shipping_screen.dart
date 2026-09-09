@@ -1407,69 +1407,27 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   Widget _buildServicesSection() {
     final l10n = AppLocalizations.of(context)!;
-
-    return ShippingPremiumCard(
-
+    return ShippingServicesSection(
+      title: l10n.selectServices,
+      subtitle: l10n.youCanChooseMoreThanOne,
+      services: _availableServices,
+      selectedServices: _additionalServices,
+      serviceLabel: (service) => _optionLabel(l10n, service),
       borderColor: _border,
-
       shadowColor: _deepBlue,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.selectServices,
-            style: const TextStyle(
-              color: _textDark,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            l10n.youCanChooseMoreThanOne,
-            style: const TextStyle(color: _textGrey, fontSize: 9.5),
-          ),
-
-          const SizedBox(height: 14),
-
-          Wrap(
-            spacing: 8,
-            runSpacing: 9,
-            children: _availableServices.map((service) {
-              final selected = _additionalServices.contains(service);
-
-              return FilterChip(
-                label: Text(_optionLabel(l10n, service)),
-                selected: selected,
-                showCheckmark: true,
-                checkmarkColor: Colors.white,
-                selectedColor: _primaryBlue,
-                backgroundColor: _softGrey,
-                side: BorderSide(color: selected ? _primaryBlue : _border),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                labelStyle: TextStyle(
-                  color: selected ? Colors.white : _textDark,
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w700,
-                ),
-                onSelected: (value) {
-                  setState(() {
-                    if (value) {
-                      _additionalServices.add(service);
-                    } else {
-                      _additionalServices.remove(service);
-                    }
-                  });
-                },
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+      textColor: _textDark,
+      labelColor: _textGrey,
+      primaryColor: _primaryBlue,
+      fillColor: _softGrey,
+      onSelectionChanged: (service, value) {
+        setState(() {
+          if (value) {
+            _additionalServices.add(service);
+          } else {
+            _additionalServices.remove(service);
+          }
+        });
+      },
     );
   }
 
