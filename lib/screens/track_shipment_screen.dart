@@ -28,8 +28,6 @@ const Color _border = Color(0xFFE2EAF2);
 const Color _textDark = Color(0xFF101B2D);
 const Color _textGrey = Color(0xFF7E8A9A);
 
-const Color _danger = Color(0xFFD72638);
-
 // ==========================================================
 // SCREEN
 // ==========================================================
@@ -1196,96 +1194,12 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     required String status,
     required String lastUpdate,
   }) {
-    final stages = [
-      _TimelineStage(
-        keyName: 'pending',
-        title: l10n.timelineCreatedTitle,
-        description: l10n.timelineCreatedDesc,
-        icon: Icons.inventory_2_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'confirmed',
-        title: l10n.timelineConfirmedTitle,
-        description: l10n.timelineConfirmedDesc,
-        icon: Icons.verified_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'prepared',
-        title: l10n.timelinePreparedTitle,
-        description: l10n.timelinePreparedDesc,
-        icon: Icons.fact_check_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'in_transit',
-        title: l10n.timelineInTransitTitle,
-        description: l10n.timelineInTransitDesc,
-        icon: Icons.local_shipping_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'customs_clearance',
-        title: l10n.timelineCustomsTitle,
-        description: l10n.timelineCustomsDesc,
-        icon: Icons.gavel_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'out_for_delivery',
-        title: l10n.timelineOutForDeliveryTitle,
-        description: l10n.timelineOutForDeliveryDesc,
-        icon: Icons.route_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'delivered',
-        title: l10n.timelineDeliveredTitle,
-        description: l10n.timelineDeliveredDesc,
-        icon: Icons.check_circle_outline_rounded,
-      ),
-    ];
-
-    if (status == 'cancelled') {
-      return [
-        _TimelineRow(
-          title: l10n.timelineCancelledTitle,
-          description: l10n.timelineCancelledDesc,
-          time: l10n.latestUpdate,
-          completed: false,
-          active: true,
-          isLast: true,
-          icon: Icons.cancel_outlined,
-          activeColor: _danger,
-        ),
-      ];
-    }
-
-    final normalizedStatus = status == 'customs' ? 'customs_clearance' : status;
-
-    int currentIndex = stages.indexWhere(
-      (stage) => stage.keyName == normalizedStatus,
+    return shipmentFallbackTimeline(
+      l10n: l10n,
+      status: status,
+      lastUpdate: lastUpdate,
+      lastRowBottomPadding: 0,
     );
-
-    if (currentIndex < 0) {
-      currentIndex = 0;
-    }
-
-    return List.generate(stages.length, (index) {
-      final stage = stages[index];
-      final completed = index <= currentIndex;
-      final active = index == currentIndex;
-      final isLast = index == stages.length - 1;
-
-      return _TimelineRow(
-        title: stage.title,
-        description: stage.description,
-        time: active
-            ? lastUpdate
-            : completed
-            ? l10n.completed
-            : l10n.waiting,
-        completed: completed,
-        active: active,
-        isLast: isLast,
-        icon: stage.icon,
-      );
-    });
   }
 
   // ==========================================================
@@ -1612,7 +1526,6 @@ class _TimelineRow extends StatelessWidget {
     required this.active,
     required this.isLast,
     required this.icon,
-    this.activeColor = _primaryBlue,
   });
 
   final String title;
@@ -1622,7 +1535,6 @@ class _TimelineRow extends StatelessWidget {
   final bool active;
   final bool isLast;
   final IconData icon;
-  final Color activeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1635,7 +1547,6 @@ class _TimelineRow extends StatelessWidget {
       showLine: !isLast,
       contentBottomPadding: isLast ? 0 : 18,
       icon: icon,
-      activeColor: activeColor,
     );
   }
 }
@@ -1643,20 +1554,6 @@ class _TimelineRow extends StatelessWidget {
 // ==========================================================
 // DATA MODELS
 // ==========================================================
-
-class _TimelineStage {
-  const _TimelineStage({
-    required this.keyName,
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-
-  final String keyName;
-  final String title;
-  final String description;
-  final IconData icon;
-}
 
 class _HistoryItem {
   const _HistoryItem({

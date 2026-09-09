@@ -156,3 +156,119 @@ class ShipmentTimelineRow extends StatelessWidget {
     );
   }
 }
+
+const Color _danger = Color(0xFFD72638);
+
+class _FallbackTimelineStage {
+  const _FallbackTimelineStage({
+    required this.keyName,
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
+
+  final String keyName;
+  final String title;
+  final String description;
+  final IconData icon;
+}
+
+List<Widget> shipmentFallbackTimeline({
+  required AppLocalizations l10n,
+  required String status,
+  required String lastUpdate,
+  required double lastRowBottomPadding,
+}) {
+  final stages = [
+    _FallbackTimelineStage(
+      keyName: 'pending',
+      title: l10n.timelineCreatedTitle,
+      description: l10n.timelineCreatedDesc,
+      icon: Icons.inventory_2_outlined,
+    ),
+    _FallbackTimelineStage(
+      keyName: 'confirmed',
+      title: l10n.timelineConfirmedTitle,
+      description: l10n.timelineConfirmedDesc,
+      icon: Icons.verified_outlined,
+    ),
+    _FallbackTimelineStage(
+      keyName: 'prepared',
+      title: l10n.timelinePreparedTitle,
+      description: l10n.timelinePreparedDesc,
+      icon: Icons.fact_check_outlined,
+    ),
+    _FallbackTimelineStage(
+      keyName: 'in_transit',
+      title: l10n.timelineInTransitTitle,
+      description: l10n.timelineInTransitDesc,
+      icon: Icons.local_shipping_outlined,
+    ),
+    _FallbackTimelineStage(
+      keyName: 'customs_clearance',
+      title: l10n.timelineCustomsTitle,
+      description: l10n.timelineCustomsDesc,
+      icon: Icons.gavel_outlined,
+    ),
+    _FallbackTimelineStage(
+      keyName: 'out_for_delivery',
+      title: l10n.timelineOutForDeliveryTitle,
+      description: l10n.timelineOutForDeliveryDesc,
+      icon: Icons.route_outlined,
+    ),
+    _FallbackTimelineStage(
+      keyName: 'delivered',
+      title: l10n.timelineDeliveredTitle,
+      description: l10n.timelineDeliveredDesc,
+      icon: Icons.check_circle_outline_rounded,
+    ),
+  ];
+
+  if (status == 'cancelled') {
+    return [
+      ShipmentTimelineRow(
+        title: l10n.timelineCancelledTitle,
+        description: l10n.timelineCancelledDesc,
+        time: l10n.latestUpdate,
+        completed: false,
+        active: true,
+        showLine: false,
+        contentBottomPadding: lastRowBottomPadding,
+        icon: Icons.cancel_outlined,
+        activeColor: _danger,
+      ),
+    ];
+  }
+
+  final normalizedStatus = status == 'customs' ? 'customs_clearance' : status;
+
+  int currentIndex = stages.indexWhere(
+    (stage) => stage.keyName == normalizedStatus,
+  );
+
+  if (currentIndex < 0) {
+    currentIndex = 0;
+  }
+
+  return List.generate(stages.length, (index) {
+    final stage = stages[index];
+    final completed = index <= currentIndex;
+    final active = index == currentIndex;
+    final isLast = index == stages.length - 1;
+
+    return ShipmentTimelineRow(
+      title: stage.title,
+      description: stage.description,
+      time: active
+          ? lastUpdate
+          : completed
+          ? l10n.completed
+          : l10n.waiting,
+      completed: completed,
+      active: active,
+      showLine: !isLast,
+      contentBottomPadding: isLast ? lastRowBottomPadding : 18,
+      icon: stage.icon,
+    );
+  });
+}

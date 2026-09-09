@@ -1,6 +1,6 @@
 # Shared-code inventory (closing review)
 
-Re-verified on `refactor/organized-widgets-pages` after track/details `ShipmentTimelineRow`. Remaining track/details trees are **not** complete. Do not announce closure.
+Re-verified on `refactor/organized-widgets-pages` after track/details `shipmentFallbackTimeline`. Remaining track/details trees are **not** complete. Do not announce closure.
 
 **This topic is not complete.** Agreed batches are in shared files and called from the intended pages. Do not treat this branch as finished duplication work.
 
@@ -50,13 +50,13 @@ Previous candidate tables at `50393fb` are historical.
 | `shipmentStatusInfo` / `ShipmentStatusInfo` | `lib/app/utils/shipment_status_info.dart` | Track + details `_statusInfo`. Backend status strings unchanged. Details still uses `description` (stage fallback). Track ignores description in the badge UI |
 | `shipmentTimelineIcon` | `shipment_status_info.dart` | Track + details `_timelineIcon`. Same `normalizeStatus` then contains order (`deliver` before `custom`, etc.) |
 | `ShipmentSquareButton` / `ShipmentLiveDot` / `ShipmentHeroFeature` | `lib/app/widgets/shipment_status/` | Track, details, shipments list, support; live-dot also on my-support-requests |
-| `ShipmentTimelineRow` | `lib/app/widgets/shipment_status/timeline_row.dart` | Track + details `_TimelineRow`. `showLine` and `contentBottomPadding` are separate. Track: `showLine: !isLast`, last-row padding `0`. Details: `showLine` from caller, padding **always** `18` |
+| `ShipmentTimelineRow` / `shipmentFallbackTimeline` | `lib/app/widgets/shipment_status/timeline_row.dart` | Track + details `_TimelineRow` / `_fallbackTimeline`. `showLine` and `contentBottomPadding` stay separate. Track last-row padding `0`; details **always** `18` via `lastRowBottomPadding`. History-empty still chooses fallback on each page |
 
-Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.dart`, `test/value_formatters_test.dart`, `test/numbered_section_heading_test.dart`, `test/language_picker_sheet_test.dart`, `test/shipment_status_info_test.dart`, `test/shipment_timeline_row_test.dart`.
+Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.dart`, `test/value_formatters_test.dart`, `test/numbered_section_heading_test.dart`, `test/language_picker_sheet_test.dart`, `test/shipment_status_info_test.dart`, `test/shipment_timeline_row_test.dart`, `test/shipment_fallback_timeline_test.dart`.
 
 ## Adapters kept (not leftover duplication)
 
-Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), international `_buildAdditionalServicesSection`, `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (six shipping forms), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, details/tracking `_statusInfo` / `_timelineIcon` / `_TimelineRow`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, Home/Profile `_selectLanguage` (sheet UI shared; Home skips `setState`; Profile updates `_selectedLanguage` first), air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form and get-quote `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
+Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), international `_buildAdditionalServicesSection`, `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (six shipping forms), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, details/tracking `_statusInfo` / `_timelineIcon` / `_TimelineRow` / `_fallbackTimeline`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, Home/Profile `_selectLanguage` (sheet UI shared; Home skips `setState`; Profile updates `_selectedLanguage` first), air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form and get-quote `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
 
 ## Unresolved candidates (not done)
 
@@ -64,7 +64,6 @@ Do not announce completion while these remain.
 
 | Candidate | Status |
 | --- | --- |
-| Track / details `_fallbackTimeline` | Open. Stage list and cancelled row match; line flag mapping differs (`isLast` vs `showLine: !isLast`). Not in this batch. |
 | Track / details `_prettyStatus` | Open. Details extra `shipment_created` → `notifShipmentCreatedTitle`. Do not merge that into Track. |
 | Track / details `_currentLocation` | Open. Details live keys include `currentLocationName`; Track omits it. Details also prefers `_liveLocation` before the helper. |
 | Track / details `_historyItems` | Open. Details extra `statusHistory` key. Firestore load stays on pages. |
@@ -103,12 +102,12 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 - Quote success dialog on all six shipping forms (air unstyled Done; sea My Quotes letterSpacing `.35`).
 - Helpers: dates/values, display numbers, land/sea quantity, required field, quote/support email field, language labels, shipping snackbars (six forms + get-quote), shipping customer profile load (`users/{uid}`).
 - Numbered heading for booking + calculator. Home/Profile language picker sheet (apply/save remains on each page).
-- Tracking/details keyed values, optional local dates, status badge map (`shipmentStatusInfo`), timeline history icons (`shipmentTimelineIcon`), and timeline row chrome (`ShipmentTimelineRow`; line vs last-row padding stay separate).
+- Tracking/details keyed values, optional local dates, status badge map (`shipmentStatusInfo`), timeline history icons (`shipmentTimelineIcon`), timeline row chrome (`ShipmentTimelineRow`), and fallback stages (`shipmentFallbackTimeline`; last-row padding stays page-owned).
 - Inventory of leftovers after a full `lib` scan (named methods and `build` trees).
 
 **Not done**
 
-- Track / details `_fallbackTimeline`, `_prettyStatus`, `_currentLocation`, `_historyItems`.
+- Track / details `_prettyStatus`, `_currentLocation`, `_historyItems`.
 - Track + support SnackBar (open for later review).
 - Merge to `main`, store listing, APK, phone/tablet, English/Arabic/French walkthroughs of submit/track/documents.
 
@@ -125,7 +124,7 @@ Use the following body for the draft PR (title may stay or become: `Share duplic
 - Extract duplicate shipping-form UI and small helpers into `lib/app/widgets/shipping/` and `lib/app/utils/`, with page adapters for colors, copy, and callbacks.
 - Share quote success on all six shipping forms; air keeps unstyled Done and sea keeps My Quotes `letterSpacing: .35`. Close/navigation stay on each page.
 - Share tracking/details value and date helpers, booking/calculator numbered headings, Home/Profile language labels and picker sheet, and request-quote/support required-field and email validation.
-- This does **not** finish all duplication. Track/details `_fallbackTimeline`, `_prettyStatus`, `_currentLocation`, and `_historyItems` remain open. Track/support SnackBar is open for later review.
+- This does **not** finish all duplication. Track/details `_prettyStatus`, `_currentLocation`, and `_historyItems` remain open. Track/support SnackBar is open for later review.
 
 ## Intentional non-goals
 - No merge to `main`, no store publish, no APK in this work.
