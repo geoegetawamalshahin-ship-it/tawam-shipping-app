@@ -1,6 +1,6 @@
 # Shared-code inventory (closing review)
 
-Reviewed on `refactor/organized-widgets-pages` at HEAD after the **agreed extraction batches** (through `requiredFieldError`) plus the later remaining-duplication inspection.
+Re-verified on `refactor/organized-widgets-pages` at `9a8eaa2` (9 Sep 2026). Agreed extraction batches run through `requiredFieldError`. Remaining-duplication candidates from the full `lib` scan were **not** implemented.
 
 **This topic is not complete.** Agreed batches are in shared files and called from the intended pages. Candidates recorded in the remaining-duplication review were **not implemented** (owner asked to wait). Do not treat this branch as finished duplication work.
 
@@ -101,7 +101,7 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 
 **Checks**
 
-- CI job `protect-and-test` on this branch has been passing after extraction pushes (analyze + test + translation/platform protect). Visual parity and device flows are **not** covered by CI.
+- Extraction commits through `cbacdb4` had `protect-and-test` **success**. Docs commit `9a8eaa2` failed in `subosito/flutter-action@v2` (protect step passed; analyze/test skipped). Visual parity and device flows are **not** covered by CI.
 
 ## Suggested PR #4 description
 
@@ -129,4 +129,4 @@ Use the following body for the draft PR (title may stay or become: `Share duplic
 
 ## Verification status
 
-Closing review is documentation plus call-site checks. Application Dart was not changed in this commit. Duplication work is **open** until leftover candidates are accepted or explicitly dropped. `main` is unchanged.
+Call sites were re-checked: shared units still live in `lib/app/widgets` / `lib/app/utils` and are invoked from the pages listed above; short adapters remain. Draft PR #4 on GitHub still has the older customer-details summary; `gh` is not logged in here so the description could not be patched via API. Paste the suggested body on the PR. Duplication work is **open**. `main` is unchanged.
