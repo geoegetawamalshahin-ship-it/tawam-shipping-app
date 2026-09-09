@@ -1,4 +1,5 @@
 import '../app/utils/value_formatters.dart';
+import '../app/widgets/shipping/show_shipping_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -1226,18 +1227,12 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     return formatLocalizedDate(l10n, date);
   }
 
-
-
-
   void _showMessage(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: isError ? const Color(0xFF9E2A2A) : deepBlue,
-      ),
+    showShippingMessage(
+      context,
+      message: message,
+      error: isError,
+      successColor: deepBlue,
     );
   }
 }

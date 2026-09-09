@@ -1,6 +1,6 @@
 # Shared-code inventory (closing review)
 
-Re-verified on `refactor/organized-widgets-pages` after `emailFieldError`. Agreed extraction batches run through request-quote/support email validation. Remaining-duplication candidates below were **not** implemented.
+Re-verified on `refactor/organized-widgets-pages` after get-quote `showShippingMessage`. Remaining-duplication candidates below were **not** implemented.
 
 **This topic is not complete.** Agreed batches are in shared files and called from the intended pages. Do not treat this branch as finished duplication work.
 
@@ -36,7 +36,7 @@ Previous candidate tables at `50393fb` are historical.
 | `ShippingDateSelector` | `date_selector.dart` | Six forms; each page still owns `showDatePicker` |
 | `ShippingSummaryBadge` | `summary_badge.dart` | Six forms; sea `showBorder: true`; air omits icon |
 | `ShippingCalculationItem` | `calculation_item.dart` | Air, parcel |
-| `showShippingMessage` | `show_shipping_message.dart` | Six forms via `_showMessage`. Get-quote **not** converted |
+| `showShippingMessage` | `show_shipping_message.dart` | Six forms via `_showMessage`; get-quote `_showMessage` (`isError` → `error`, `successColor: deepBlue`). Booking stays separate (`0xFF9D2732`) |
 | `twoDigits` / `parseOptionalDouble` / `firstNonEmpty` / `formatLocalizedDate` | `lib/app/utils/value_formatters.dart` | Six forms; booking and get-quote `_formatDate`; booking/get-quote still use `firstNonEmpty` locally for profile fields |
 | `firstKeyedValue` / `stringFromKeys` / `toLocalDateTime` / `formatOptionalLocalizedDate` / `formatOptionalLocalizedDateTime` | `value_formatters.dart` | Details + tracking adapters. Fallback `'-'`; dates `notSpecified` / `awaitingUpdate`; `.toLocal()` |
 | `formatDisplayNumber` | `value_formatters.dart` | Air, parcel (`nonPositiveAsZero: true`); international without that flag |
@@ -52,7 +52,7 @@ Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.da
 
 ## Adapters kept (not leftover duplication)
 
-Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (car/land/parcel/international), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
+Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (car/land/parcel/international), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form and get-quote `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
 
 ## Unresolved candidates (not done)
 
@@ -61,7 +61,6 @@ Do not announce completion while these remain. Implement only when the owner ord
 | Candidate | Status |
 | --- | --- |
 | International `_buildAdditionalServicesSection` | Matches `ShippingServicesSection`; still inlined. Special items (`_deepBlue`, `fontSize: 9.3`) stay separate |
-| Get-quote `_showMessage` | Matches `showShippingMessage` (`0xFF9E2A2A`); still inlined. Booking error `0xFF9D2732` stays separate |
 | Home / Profile `_selectLanguage` sheets | Near-identical UI; different current-value source |
 | Track / details `_fallbackTimeline`, status map, location, `_TimelineRow`, route point, info tile | Largest leftover trees; row APIs differ (`isLast` vs `showLine`) |
 | Track + support SnackBar (radius 14, no fill) | Optional tiny helper; not merged with shipping/profile |
@@ -70,11 +69,11 @@ Do not announce completion while these remain. Implement only when the owner ord
 
 ## Kept separate on purpose
 
-Air customer/notes chrome; international special-item chips; air unstyled Done and sea `letterSpacing: .35`; booking/get-quote/request-quote/support success dialogs; booking/get-quote/calculator cards and date rows; booking profile load (`TAWAM Customer`, extra keys, phone controller); support heading vs numbered heading; field decorations across auth/support/quote/search; list date fallbacks (`-` / `notProvided` / `notSpecified`); request-quote quantity vs land/sea; SnackBars except the track/support pair; documents viewer; notifications list; Home vs Profile headers/logout.
+Air customer/notes chrome; international special-item chips; air unstyled Done and sea `letterSpacing: .35`; booking/get-quote/request-quote/support success dialogs; booking/get-quote/calculator cards and date rows; booking profile load (`TAWAM Customer`, extra keys, phone controller); support heading vs numbered heading; field decorations across auth/support/quote/search; list date fallbacks (`-` / `notProvided` / `notSpecified`); request-quote quantity vs land/sea; booking SnackBar (`0xFF9D2732`); SnackBars except the track/support pair; documents viewer; notifications list; Home vs Profile headers/logout.
 
 ## Diff vs `main` (scope)
 
-**In scope:** new shared widgets/helpers; six shipping screens plus booking, get-quote (date helper only), home/profile (`languageLabel`), request-quote/support (`requiredFieldError`, `emailFieldError`), details/tracking (value/date helpers); tests; this inventory.
+**In scope:** new shared widgets/helpers; six shipping screens plus booking, get-quote (`formatLocalizedDate`, `showShippingMessage`), home/profile (`languageLabel`), request-quote/support (`requiredFieldError`, `emailFieldError`), details/tracking (value/date helpers); tests; this inventory.
 
 **Protected files unchanged** vs `main`: `lib/l10n`, `lib/locale_controller.dart`, `l10n.yaml`, Android/iOS.
 
@@ -89,7 +88,7 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 - Shipping form chrome: header, section title, trust bar, premium card, fields, dropdowns, dimensions, option switches (air height preserved), services (five forms), date selector chrome, submit, summary badges, calculation rows.
 - Notes + customer details on five forms (air kept different).
 - Quote success dialog on car, land, parcel, international.
-- Helpers: dates/values, display numbers, land/sea quantity, required field, quote/support email field, language labels, shipping snackbars, shipping customer profile load (`users/{uid}`).
+- Helpers: dates/values, display numbers, land/sea quantity, required field, quote/support email field, language labels, shipping snackbars (six forms + get-quote), shipping customer profile load (`users/{uid}`).
 - Numbered heading for booking + calculator.
 - Tracking/details keyed values and optional local dates.
 - Inventory of leftovers after a full `lib` scan (named methods and `build` trees).
@@ -112,7 +111,7 @@ Use the following body for the draft PR (title may stay or become: `Share duplic
 - Extract duplicate shipping-form UI and small helpers into `lib/app/widgets/shipping/` and `lib/app/utils/`, with page adapters for colors, copy, and callbacks.
 - Share quote success on car, land, parcel, and international; land now uses the same dialog. Air and sea stay inline (Done style / letterSpacing).
 - Share tracking/details value and date helpers, booking/calculator numbered headings, Home/Profile language labels, and request-quote/support required-field and email validation.
-- This does **not** finish all duplication. Leftovers (international extra services, get-quote snackbar, language sheets, track/details timeline) are listed in `docs/refactor/shared-code-inventory.md`.
+- This does **not** finish all duplication. Leftovers (international extra services, language sheets, track/details timeline) are listed in `docs/refactor/shared-code-inventory.md`.
 
 ## Intentional non-goals
 - No merge to `main`, no store publish, no APK in this work.
