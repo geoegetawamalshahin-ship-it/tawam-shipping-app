@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/utils/shipment_status_info.dart';
 import '../app/utils/value_formatters.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/shipment_controller.dart';
@@ -27,8 +28,6 @@ const Color _border = Color(0xFFE2EAF2);
 const Color _textDark = Color(0xFF101B2D);
 const Color _textGrey = Color(0xFF7E8A9A);
 
-const Color _success = Color(0xFF16765C);
-const Color _warning = Color(0xFFB26A00);
 const Color _danger = Color(0xFFD72638);
 
 // ==========================================================
@@ -795,7 +794,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
   Widget _buildStatusCard({
     required String trackingNumber,
-    required _StatusInfo statusInfo,
+    required ShipmentStatusInfo statusInfo,
   }) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
@@ -947,7 +946,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   Widget _buildCurrentLocationCard({
     required String currentLocation,
     required String lastUpdate,
-    required _StatusInfo statusInfo,
+    required ShipmentStatusInfo statusInfo,
   }) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
@@ -1389,82 +1388,8 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     return '';
   }
 
-  _StatusInfo _statusInfo(AppLocalizations l10n, String status) {
-    switch (status) {
-      case 'confirmed':
-        return _StatusInfo(
-          label: l10n.confirmedUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.verified_rounded,
-          progress: .25,
-        );
-
-      case 'prepared':
-        return _StatusInfo(
-          label: l10n.preparedUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.fact_check_rounded,
-          progress: .36,
-        );
-
-      case 'in_transit':
-        return _StatusInfo(
-          label: l10n.inTransitUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.local_shipping_rounded,
-          progress: .58,
-        );
-
-      case 'customs':
-      case 'customs_clearance':
-        return _StatusInfo(
-          label: l10n.customsUpper,
-          color: _warning,
-          background: const Color(0xFFFFF4DF),
-          icon: Icons.gavel_rounded,
-          progress: .72,
-        );
-
-      case 'out_for_delivery':
-        return _StatusInfo(
-          label: l10n.outForDeliveryUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.route_rounded,
-          progress: .88,
-        );
-
-      case 'delivered':
-        return _StatusInfo(
-          label: l10n.deliveredUpper,
-          color: _success,
-          background: const Color(0xFFEAF8F0),
-          icon: Icons.check_circle_rounded,
-          progress: 1,
-        );
-
-      case 'cancelled':
-        return _StatusInfo(
-          label: l10n.cancelledUpper,
-          color: _danger,
-          background: const Color(0xFFFFECEF),
-          icon: Icons.cancel_rounded,
-          progress: 0,
-        );
-
-      case 'pending':
-      default:
-        return _StatusInfo(
-          label: l10n.pendingUpper,
-          color: _warning,
-          background: const Color(0xFFFFF4DF),
-          icon: Icons.schedule_rounded,
-          progress: .10,
-        );
-    }
+  ShipmentStatusInfo _statusInfo(AppLocalizations l10n, String status) {
+    return shipmentStatusInfo(l10n, status);
   }
 
   String _formatDate(AppLocalizations l10n, Object? value) {
@@ -1852,22 +1777,6 @@ class _TimelineRow extends StatelessWidget {
 // ==========================================================
 // DATA MODELS
 // ==========================================================
-
-class _StatusInfo {
-  const _StatusInfo({
-    required this.label,
-    required this.color,
-    required this.background,
-    required this.icon,
-    required this.progress,
-  });
-
-  final String label;
-  final Color color;
-  final Color background;
-  final IconData icon;
-  final double progress;
-}
 
 class _TimelineStage {
   const _TimelineStage({
