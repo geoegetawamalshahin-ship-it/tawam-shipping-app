@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'get_quote_screen.dart';
 
+import '../app/widgets/numbered_section_heading.dart';
 import '../l10n/app_localizations.dart';
 
 class VolumeCalculatorScreen extends StatefulWidget {
@@ -406,60 +407,15 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
     required String title,
     required String subtitle,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: deepBlue,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: Text(
-            number,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-              letterSpacing: .6,
-            ),
-          ),
-        ),
-        const SizedBox(width: 11),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, color: primaryBlue, size: 19),
-                  const SizedBox(width: 7),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: textDark,
-                      fontSize: 16.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: textGrey,
-                  fontSize: 10.5,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return NumberedSectionHeading(
+      number: number,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      badgeColor: deepBlue,
+      iconColor: primaryBlue,
+      titleColor: textDark,
+      subtitleColor: textGrey,
     );
   }
 
