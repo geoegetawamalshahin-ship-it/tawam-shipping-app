@@ -33,7 +33,7 @@ Callers listed below invoke the shared implementation. Remaining private methods
 | `shippingOptionSwitch` | `form_controls.dart` | Car, land, parcel, international, sea (not air) |
 | `ShippingServicesSection` | `services_section.dart` | Car, air, land, parcel, sea (not international) |
 | `ShippingSubmitButton` | `submit_button.dart` | Six shipping forms |
-| `ShippingQuoteSuccessDialog` | `quote_success_dialog.dart` | Car, parcel, international |
+| `ShippingQuoteSuccessDialog` | `quote_success_dialog.dart` | Car, land, parcel, international. Air and sea stay separate |
 | `ShippingDateSelector` | `date_selector.dart` | Six shipping forms; each page still owns `showDatePicker` |
 | `ShippingSummaryBadge` | `summary_badge.dart` | Six shipping forms; sea passes `showBorder: true`; air omits icon |
 | `ShippingCalculationItem` | `calculation_item.dart` | Air, parcel |
@@ -61,7 +61,7 @@ These still exist as private methods but only wrap the shared unit:
 - `_buildServicesSection` on the five chip-based forms
 - `_dateSelector` on the six shipping forms
 - `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`
-- `_showSuccessDialog` on car/parcel/international (shows `ShippingQuoteSuccessDialog`)
+- `_showSuccessDialog` on car/land/parcel/international (shows `ShippingQuoteSuccessDialog`; `barrierDismissible: false`; Done pops the form)
 - `_formatDate` on shipping forms, booking, and get-quote (calls `formatLocalizedDate`)
 - `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime` on details and tracking (call the shared helpers; tracking/details `_formatDate` still passes `notSpecified`)
 - `_sectionHeading` on booking and volume calculator (calls `NumberedSectionHeading` with page colors)
@@ -79,7 +79,6 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 | Item | Copies | Locations | Notes |
 | --- | ---: | --- | --- |
-| Land `_showSuccessDialog` | 1 leftover full tree | `land_freight_screen.dart` | Chrome matches `ShippingQuoteSuccessDialog` (styled Done button, no extra letter-spacing). Candidate to switch to the existing dialog without redesign. |
 | Air `_optionSwitch` | 1 leftover full tree | `air_freight_screen.dart` | Same structure as `shippingOptionSwitch` except subtitle has no `height: 1.35`. Extract only if that difference is preserved. |
 | `_requiredValidator` | 2 | `request_quote_screen.dart`; `support_screen.dart` | Identical trim/empty check. Tiny; optional. |
 | `_emailValidator` | 2 | Same two screens | Same empty and regex checks; keep current messages. Tiny; optional. |
@@ -120,7 +119,7 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 1. Done: details/tracking value and local-date helpers live in `value_formatters.dart`, with fallback arguments, `.toLocal()`, and targeted empty/date-type tests.
 2. Done: booking/calculator numbered `_sectionHeading` is `NumberedSectionHeading`, with page-supplied number, icon, copy, and colors.
 3. Optional small helpers are done for Home/Profile `languageLabel`, display `_formatNumber`, land/sea quantity validation, shipping `_showMessage`, and shipping `_loadCustomerProfile`.
-4. Switch land success dialog onto the existing shared dialog only after a side-by-side style check. Leave air and sea dialogs separate unless their differences are parameterized.
+4. Done: land success dialog calls `ShippingQuoteSuccessDialog`. Air and sea stay separate unless their Done/`letterSpacing` differences are parameterized.
 5. Revisit air `_optionSwitch` only with the subtitle `height` difference preserved.
 6. Continue scanning inline trees (auth, lists, support, documents). Record exceptions rather than forcing one design.
 7. After each batch: review the diff, run Flutter analysis and tests, add behavior tests where callbacks or empty values can regress.
@@ -128,4 +127,4 @@ Verify dependencies, empty-value behavior, and visual values before each extract
 
 ## Verification status
 
-Local `flutter analyze` and `flutter test` passed after sharing shipping customer profile loading. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.
+Local `flutter analyze` and `flutter test` passed after switching land quote success onto `ShippingQuoteSuccessDialog`. GitHub Actions on this branch still need to be confirmed after each push. Those checks do not cover visual parity or full device workflows. APK build and manual verification are still pending. `main` is unchanged.
