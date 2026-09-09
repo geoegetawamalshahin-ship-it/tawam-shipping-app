@@ -1,3 +1,4 @@
+import '../app/utils/value_formatters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -104,14 +105,14 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     try {
       final data = await _bookingController.loadUserProfile(user.uid);
 
-      name = _firstNonEmpty([
+      name = firstNonEmpty([
         data['name'],
         data['fullName'],
         data['customerName'],
         name,
       ]);
-      email = _firstNonEmpty([data['email'], data['customerEmail'], email]);
-      phone = _firstNonEmpty([
+      email = firstNonEmpty([data['email'], data['customerEmail'], email]);
+      phone = firstNonEmpty([
         data['phone'],
         data['phoneNumber'],
         data['customerPhone'],
@@ -1068,7 +1069,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     try {
       final now = DateTime.now();
       final bookingReference =
-          'BK-${now.year}${_two(now.month)}${_two(now.day)}-${_two(now.hour)}${_two(now.minute)}${_two(now.second)}';
+          'BK-${now.year}${twoDigits(now.month)}${twoDigits(now.day)}-${twoDigits(now.hour)}${twoDigits(now.minute)}${twoDigits(now.second)}';
       final phone = _phoneController.text.trim();
 
       final bookingData = <String, dynamic>{
@@ -1093,9 +1094,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         'cargo': _cargoController.text.trim(),
         'weightKg': double.parse(_weightController.text.trim()),
         'quantity': int.parse(_quantityController.text.trim()),
-        'lengthCm': _parseOptionalDouble(_lengthController.text),
-        'widthCm': _parseOptionalDouble(_widthController.text),
-        'heightCm': _parseOptionalDouble(_heightController.text),
+        'lengthCm': parseOptionalDouble(_lengthController.text),
+        'widthCm': parseOptionalDouble(_widthController.text),
+        'heightCm': parseOptionalDouble(_heightController.text),
         'notes': _notesController.text.trim(),
         'status': 'pending',
         'adminNote': '',
@@ -1443,25 +1444,11 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   String _formatDate(AppLocalizations l10n, DateTime date) {
-    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+    return formatLocalizedDate(l10n, date);
   }
 
-  String _two(int value) => value.toString().padLeft(2, '0');
 
-  double? _parseOptionalDouble(String value) {
-    final text = value.trim();
-    if (text.isEmpty) return null;
-    return double.tryParse(text);
-  }
 
-  String _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-      final text = value.toString().trim();
-      if (text.isNotEmpty) return text;
-    }
-    return '';
-  }
 
   String _initials(String name) {
     final parts = name

@@ -1,3 +1,4 @@
+import '../app/utils/value_formatters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -180,25 +181,25 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
 
       final data = snapshot.data() ?? <String, dynamic>{};
 
-      name = _firstNonEmpty([
+      name = firstNonEmpty([
         data['name'],
         data['fullName'],
         data['displayName'],
         name,
       ]);
 
-      email = _firstNonEmpty([data['email'], email]);
+      email = firstNonEmpty([data['email'], email]);
 
-      phone = _firstNonEmpty([
+      phone = firstNonEmpty([
         data['phone'],
         data['phoneNumber'],
         data['mobile'],
         phone,
       ]);
 
-      company = _firstNonEmpty([data['companyName'], data['company']]);
+      company = firstNonEmpty([data['companyName'], data['company']]);
 
-      country = _firstNonEmpty([data['country'], data['countryName']]);
+      country = firstNonEmpty([data['country'], data['countryName']]);
     } catch (_) {
       // Firebase Auth fallback will still be shown.
     }
@@ -1395,8 +1396,8 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       final now = DateTime.now();
 
       final quoteNumber =
-          'QR-${now.year}${_two(now.month)}${_two(now.day)}-'
-          '${_two(now.hour)}${_two(now.minute)}${_two(now.second)}';
+          'QR-${now.year}${twoDigits(now.month)}${twoDigits(now.day)}-'
+          '${twoDigits(now.hour)}${twoDigits(now.minute)}${twoDigits(now.second)}';
 
       final quantity = int.parse(_quantityController.text.trim());
 
@@ -1449,18 +1450,18 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
         'cargo': _cargoController.text.trim(),
         'weightKg': weight,
 
-        'volumeCbm': _parseOptionalDouble(_volumeController.text),
+        'volumeCbm': parseOptionalDouble(_volumeController.text),
 
         'lengthCm': _shipmentType == 'LCL'
-            ? _parseOptionalDouble(_lengthController.text)
+            ? parseOptionalDouble(_lengthController.text)
             : null,
 
         'widthCm': _shipmentType == 'LCL'
-            ? _parseOptionalDouble(_widthController.text)
+            ? parseOptionalDouble(_widthController.text)
             : null,
 
         'heightCm': _shipmentType == 'LCL'
-            ? _parseOptionalDouble(_heightController.text)
+            ? parseOptionalDouble(_heightController.text)
             : null,
 
         'dangerousGoods': _dangerousGoods,
@@ -1896,7 +1897,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   String _formatDate(DateTime date) {
     final l10n = AppLocalizations.of(context)!;
 
-    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+    return formatLocalizedDate(l10n, date);
   }
 
   // Map stored English option values to localized display labels.
@@ -1905,31 +1906,8 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   }
 
 
-  String _two(int value) {
-    return value.toString().padLeft(2, '0');
-  }
 
-  double? _parseOptionalDouble(String value) {
-    final text = value.trim();
 
-    if (text.isEmpty) return null;
-
-    return double.tryParse(text);
-  }
-
-  String _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-
-      final text = value.toString().trim();
-
-      if (text.isNotEmpty) {
-        return text;
-      }
-    }
-
-    return '';
-  }
 
   void _showMessage(String message, {required bool error}) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

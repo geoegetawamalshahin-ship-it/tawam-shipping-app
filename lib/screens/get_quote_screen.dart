@@ -1,3 +1,4 @@
+import '../app/utils/value_formatters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -857,15 +858,15 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     try {
       final userData = await _quoteController.loadUserProfile(user.uid);
 
-      final customerName = _firstNonEmpty([
+      final customerName = firstNonEmpty([
         userData['name'],
         userData['fullName'],
         user.displayName,
       ]);
 
-      final customerEmail = _firstNonEmpty([userData['email'], user.email]);
+      final customerEmail = firstNonEmpty([userData['email'], user.email]);
 
-      final customerPhone = _firstNonEmpty([
+      final customerPhone = firstNonEmpty([
         userData['phone'],
         userData['phoneNumber'],
         user.phoneNumber,
@@ -874,8 +875,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       final now = DateTime.now();
 
       final quoteNumber =
-          'QR-${now.year}${_two(now.month)}${_two(now.day)}-'
-          '${_two(now.hour)}${_two(now.minute)}${_two(now.second)}';
+          'QR-${now.year}${twoDigits(now.month)}${twoDigits(now.day)}-'
+          '${twoDigits(now.hour)}${twoDigits(now.minute)}${twoDigits(now.second)}';
 
       final quoteData = <String, dynamic>{
         'userId': user.uid,
@@ -889,13 +890,13 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         'cargoType': _cargoController.text.trim(),
         'weightKg': double.parse(_weightController.text.trim()),
         'quantity': int.parse(_quantityController.text.trim()),
-        'lengthCm': _parseOptionalDouble(_lengthController.text),
-        'widthCm': _parseOptionalDouble(_widthController.text),
-        'heightCm': _parseOptionalDouble(_heightController.text),
+        'lengthCm': parseOptionalDouble(_lengthController.text),
+        'widthCm': parseOptionalDouble(_widthController.text),
+        'heightCm': parseOptionalDouble(_heightController.text),
         'volumeCbm': () {
-          final length = _parseOptionalDouble(_lengthController.text);
-          final width = _parseOptionalDouble(_widthController.text);
-          final height = _parseOptionalDouble(_heightController.text);
+          final length = parseOptionalDouble(_lengthController.text);
+          final width = parseOptionalDouble(_widthController.text);
+          final height = parseOptionalDouble(_heightController.text);
 
           final quantity = int.tryParse(_quantityController.text.trim()) ?? 1;
 
@@ -1222,27 +1223,11 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   String _formatDate(AppLocalizations l10n, DateTime date) {
-    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+    return formatLocalizedDate(l10n, date);
   }
 
-  String _two(int value) {
-    return value.toString().padLeft(2, '0');
-  }
 
-  double? _parseOptionalDouble(String value) {
-    final text = value.trim();
-    if (text.isEmpty) return null;
-    return double.tryParse(text);
-  }
 
-  String _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-      final text = value.toString().trim();
-      if (text.isNotEmpty) return text;
-    }
-    return '';
-  }
 
   void _showMessage(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

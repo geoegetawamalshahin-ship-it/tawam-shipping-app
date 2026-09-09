@@ -1,3 +1,4 @@
+import '../app/utils/value_formatters.dart';
 import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -240,25 +241,25 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
 
       final data = snapshot.data() ?? <String, dynamic>{};
 
-      name = _firstNonEmpty([
+      name = firstNonEmpty([
         data['name'],
         data['fullName'],
         data['displayName'],
         name,
       ]);
 
-      email = _firstNonEmpty([data['email'], email]);
+      email = firstNonEmpty([data['email'], email]);
 
-      phone = _firstNonEmpty([
+      phone = firstNonEmpty([
         data['phone'],
         data['phoneNumber'],
         data['mobile'],
         phone,
       ]);
 
-      company = _firstNonEmpty([data['companyName'], data['company']]);
+      company = firstNonEmpty([data['companyName'], data['company']]);
 
-      country = _firstNonEmpty([data['country'], data['countryName']]);
+      country = firstNonEmpty([data['country'], data['countryName']]);
     } catch (_) {
       // Firebase Auth information is used as fallback.
     }
@@ -1610,8 +1611,8 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
       final now = DateTime.now();
 
       final quoteNumber =
-          'QR-${now.year}${_two(now.month)}${_two(now.day)}-'
-          '${_two(now.hour)}${_two(now.minute)}${_two(now.second)}';
+          'QR-${now.year}${twoDigits(now.month)}${twoDigits(now.day)}-'
+          '${twoDigits(now.hour)}${twoDigits(now.minute)}${twoDigits(now.second)}';
 
       final quoteData = <String, dynamic>{
         // Customer
@@ -2037,7 +2038,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   String _formatDate(DateTime date) {
     final l10n = AppLocalizations.of(context)!;
 
-    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+    return formatLocalizedDate(l10n, date);
   }
 
   // Map stored English option values to localized display labels.
@@ -2056,23 +2057,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     return value.toStringAsFixed(2);
   }
 
-  String _two(int value) {
-    return value.toString().padLeft(2, '0');
-  }
 
-  String _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-
-      final text = value.toString().trim();
-
-      if (text.isNotEmpty) {
-        return text;
-      }
-    }
-
-    return '';
-  }
 
   void _showMessage(String message, {required bool error}) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
