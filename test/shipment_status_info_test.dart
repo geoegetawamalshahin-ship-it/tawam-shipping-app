@@ -57,4 +57,45 @@ void main() {
       ar.statusDescInTransit,
     );
   });
+
+  test('timeline icons keep contains order after normalizeStatus', () {
+    expect(shipmentTimelineIcon(''), Icons.circle_outlined);
+    expect(shipmentTimelineIcon('   '), Icons.circle_outlined);
+    expect(shipmentTimelineIcon('unknown-event'), Icons.circle_outlined);
+    expect(shipmentTimelineIcon('cancelled'), Icons.circle_outlined);
+
+    expect(
+      shipmentTimelineIcon('  DELIVERED  '),
+      Icons.check_circle_outline_rounded,
+    );
+    expect(
+      shipmentTimelineIcon('out-for-delivery'),
+      Icons.check_circle_outline_rounded,
+    );
+    expect(
+      shipmentTimelineIcon('custom_delivery'),
+      Icons.check_circle_outline_rounded,
+    );
+    expect(
+      shipmentTimelineIcon('in_transit_delivered'),
+      Icons.check_circle_outline_rounded,
+    );
+
+    expect(shipmentTimelineIcon('customs'), Icons.gavel_outlined);
+    expect(shipmentTimelineIcon('customs_clearance'), Icons.gavel_outlined);
+
+    expect(shipmentTimelineIcon('in_transit'), Icons.local_shipping_outlined);
+    expect(shipmentTimelineIcon('departed'), Icons.local_shipping_outlined);
+    expect(shipmentTimelineIcon('moving'), Icons.local_shipping_outlined);
+
+    expect(shipmentTimelineIcon('confirmed'), Icons.verified_outlined);
+    expect(shipmentTimelineIcon('approved'), Icons.verified_outlined);
+    expect(
+      shipmentTimelineIcon('confirmed_warehouse'),
+      Icons.verified_outlined,
+    );
+
+    expect(shipmentTimelineIcon('prepared'), Icons.inventory_2_outlined);
+    expect(shipmentTimelineIcon('warehouse'), Icons.inventory_2_outlined);
+  });
 }

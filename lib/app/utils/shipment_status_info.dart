@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../locale_controller.dart';
 
 const Color _statusPrimaryBlue = Color(0xFF0B4F9C);
 const Color _statusSuccess = Color(0xFF16765C);
@@ -106,4 +107,32 @@ ShipmentStatusInfo shipmentStatusInfo(AppLocalizations l10n, String status) {
         description: l10n.statusDescPending,
       );
   }
+}
+
+IconData shipmentTimelineIcon(String value) {
+  final status = LocaleController.normalizeStatus(value);
+
+  if (status.contains('deliver')) {
+    return Icons.check_circle_outline_rounded;
+  }
+
+  if (status.contains('custom')) {
+    return Icons.gavel_outlined;
+  }
+
+  if (status.contains('transit') ||
+      status.contains('depart') ||
+      status.contains('moving')) {
+    return Icons.local_shipping_outlined;
+  }
+
+  if (status.contains('confirm') || status.contains('approve')) {
+    return Icons.verified_outlined;
+  }
+
+  if (status.contains('prepare') || status.contains('warehouse')) {
+    return Icons.inventory_2_outlined;
+  }
+
+  return Icons.circle_outlined;
 }

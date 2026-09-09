@@ -1,6 +1,6 @@
 # Shared-code inventory (closing review)
 
-Re-verified on `refactor/organized-widgets-pages` after track/details `shipmentStatusInfo`. Remaining track/details trees are **not** complete. Do not announce closure.
+Re-verified on `refactor/organized-widgets-pages` after track/details `shipmentTimelineIcon`. Remaining track/details trees are **not** complete. Do not announce closure.
 
 **This topic is not complete.** Agreed batches are in shared files and called from the intended pages. Do not treat this branch as finished duplication work.
 
@@ -48,13 +48,14 @@ Previous candidate tables at `50393fb` are historical.
 | `NumberedSectionHeading` | `lib/app/widgets/numbered_section_heading.dart` | Booking + volume calculator (page `textDark` / `textGrey`) |
 | `loadShippingCustomerProfile` / `FromAuth` | `lib/app/utils/shipping_customer_profile.dart` | Six shipping forms. Booking loader stays separate. Firestore still `users/{uid}` |
 | `shipmentStatusInfo` / `ShipmentStatusInfo` | `lib/app/utils/shipment_status_info.dart` | Track + details `_statusInfo`. Backend status strings unchanged. Details still uses `description` (stage fallback). Track ignores description in the badge UI |
+| `shipmentTimelineIcon` | `shipment_status_info.dart` | Track + details `_timelineIcon`. Same `normalizeStatus` then contains order (`deliver` before `custom`, etc.) |
 | `ShipmentSquareButton` / `ShipmentLiveDot` / `ShipmentHeroFeature` | `lib/app/widgets/shipment_status/` | Track, details, shipments list, support; live-dot also on my-support-requests |
 
 Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.dart`, `test/value_formatters_test.dart`, `test/numbered_section_heading_test.dart`, `test/language_picker_sheet_test.dart`, `test/shipment_status_info_test.dart`.
 
 ## Adapters kept (not leftover duplication)
 
-Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), international `_buildAdditionalServicesSection`, `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (six shipping forms), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, details/tracking `_statusInfo`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, Home/Profile `_selectLanguage` (sheet UI shared; Home skips `setState`; Profile updates `_selectedLanguage` first), air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form and get-quote `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
+Private methods that only pass page values into the shared unit: `_buildHeader`, `_buildTrustBar`, `_sectionTitle`, `_buildCustomerSection` / `_buildNotesSection` (five forms), `_textField` / `_dropdown` / `_inputDecoration` / `_dimensionField`, `_optionSwitch` (air `subtitleHeight: null`), `_buildServicesSection` (five forms), international `_buildAdditionalServicesSection`, `_dateSelector`, `_summaryBadge`, `_calculationItem`, `_buildSubmitButton`, `_showSuccessDialog` (six shipping forms), `_formatDate` (shipping/booking/get-quote), details/tracking `_firstValue` / `_stringValue` / `_formatDate` / `_formatDateTime`, details/tracking `_statusInfo` / `_timelineIcon`, booking/calculator `_sectionHeading`, Home/Profile `_languageLabel`, Home/Profile `_selectLanguage` (sheet UI shared; Home skips `setState`; Profile updates `_selectedLanguage` first), air/parcel/international `_formatNumber`, land/sea `_quantityValidator`, request-quote/support `_requiredValidator` / `_emailValidator`, six-form and get-quote `_showMessage`, six-form `_loadCustomerProfile` (unsigned-in `setState` before `await`), `_optionLabel`, `_selectReadyDate` / `_selectMovingDate`.
 
 ## Unresolved candidates (not done)
 
@@ -64,7 +65,6 @@ Do not announce completion while these remain.
 | --- | --- |
 | Track / details `_TimelineRow` | Open. Track `isLast` also zeros last-row bottom padding; details `showLine` with **always** `bottom: 18`. Do not force one API. |
 | Track / details `_fallbackTimeline` | Open. Stage list and cancelled row match; line flag mapping differs (`isLast` vs `showLine: !isLast`). Depends on row API. |
-| Track / details `_timelineIcon` | Open. Identical contains-rules; not extracted this batch. |
 | Track / details `_prettyStatus` | Open. Details extra `shipment_created` → `notifShipmentCreatedTitle`. Do not merge that into Track. |
 | Track / details `_currentLocation` | Open. Details live keys include `currentLocationName`; Track omits it. Details also prefers `_liveLocation` before the helper. |
 | Track / details `_historyItems` | Open. Details extra `statusHistory` key. Firestore load stays on pages. |
@@ -103,12 +103,12 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 - Quote success dialog on all six shipping forms (air unstyled Done; sea My Quotes letterSpacing `.35`).
 - Helpers: dates/values, display numbers, land/sea quantity, required field, quote/support email field, language labels, shipping snackbars (six forms + get-quote), shipping customer profile load (`users/{uid}`).
 - Numbered heading for booking + calculator. Home/Profile language picker sheet (apply/save remains on each page).
-- Tracking/details keyed values, optional local dates, and status badge map (`shipmentStatusInfo`).
+- Tracking/details keyed values, optional local dates, status badge map (`shipmentStatusInfo`), and timeline history icons (`shipmentTimelineIcon`).
 - Inventory of leftovers after a full `lib` scan (named methods and `build` trees).
 
 **Not done**
 
-- Track / details `_TimelineRow` / `_fallbackTimeline` (`isLast` vs `showLine` + last-row padding), `_timelineIcon`, `_prettyStatus`, `_currentLocation`, `_historyItems`.
+- Track / details `_TimelineRow` / `_fallbackTimeline` (`isLast` vs `showLine` + last-row padding), `_prettyStatus`, `_currentLocation`, `_historyItems`.
 - Track + support SnackBar (open for later review).
 - Merge to `main`, store listing, APK, phone/tablet, English/Arabic/French walkthroughs of submit/track/documents.
 

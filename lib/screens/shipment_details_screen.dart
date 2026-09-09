@@ -1683,31 +1683,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
   }
 
   IconData _timelineIcon(String value) {
-    final status = LocaleController.normalizeStatus(value);
-
-    if (status.contains('deliver')) {
-      return Icons.check_circle_outline_rounded;
-    }
-
-    if (status.contains('custom')) {
-      return Icons.gavel_outlined;
-    }
-
-    if (status.contains('transit') ||
-        status.contains('depart') ||
-        status.contains('moving')) {
-      return Icons.local_shipping_outlined;
-    }
-
-    if (status.contains('confirm') || status.contains('approve')) {
-      return Icons.verified_outlined;
-    }
-
-    if (status.contains('prepare') || status.contains('warehouse')) {
-      return Icons.inventory_2_outlined;
-    }
-
-    return Icons.circle_outlined;
+    return shipmentTimelineIcon(value);
   }
 }
 
