@@ -136,3 +136,34 @@ IconData shipmentTimelineIcon(String value) {
 
   return Icons.circle_outlined;
 }
+
+String prettyShipmentStatus(
+  AppLocalizations l10n,
+  String value, {
+  bool mapShipmentCreated = false,
+}) {
+  final raw = value.trim();
+  if (raw.isEmpty) {
+    return l10n.shipmentUpdate;
+  }
+  if (mapShipmentCreated && raw.toLowerCase() == 'shipment_created') {
+    return l10n.notifShipmentCreatedTitle;
+  }
+  final normalized = LocaleController.normalizeStatus(raw);
+  const known = {
+    'pending',
+    'confirmed',
+    'prepared',
+    'in_transit',
+    'customs_clearance',
+    'out_for_delivery',
+    'delivered',
+    'cancelled',
+  };
+
+  if (known.contains(normalized)) {
+    return LocaleController.statusLabel(l10n, raw);
+  }
+
+  return LocaleController.optionLabel(l10n, raw);
+}

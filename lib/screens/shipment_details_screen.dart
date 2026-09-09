@@ -1568,30 +1568,7 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
   }
 
   String _prettyStatus(AppLocalizations l10n, String value) {
-    final raw = value.trim();
-    if (raw.isEmpty) {
-      return l10n.shipmentUpdate;
-    }
-    if (raw.toLowerCase() == 'shipment_created') {
-      return l10n.notifShipmentCreatedTitle;
-    }
-    final normalized = LocaleController.normalizeStatus(raw);
-    const known = {
-      'pending',
-      'confirmed',
-      'prepared',
-      'in_transit',
-      'customs_clearance',
-      'out_for_delivery',
-      'delivered',
-      'cancelled',
-    };
-
-    if (known.contains(normalized)) {
-      return LocaleController.statusLabel(l10n, raw);
-    }
-
-    return LocaleController.optionLabel(l10n, raw);
+    return prettyShipmentStatus(l10n, value, mapShipmentCreated: true);
   }
 
   IconData _timelineIcon(String value) {

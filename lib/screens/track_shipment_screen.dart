@@ -1323,28 +1323,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   }
 
   String _prettyStatus(AppLocalizations l10n, String value) {
-    final raw = value.trim();
-    if (raw.isEmpty) {
-      return l10n.shipmentUpdate;
-    }
-
-    final normalized = LocaleController.normalizeStatus(raw);
-    const known = {
-      'pending',
-      'confirmed',
-      'prepared',
-      'in_transit',
-      'customs_clearance',
-      'out_for_delivery',
-      'delivered',
-      'cancelled',
-    };
-
-    if (known.contains(normalized)) {
-      return LocaleController.statusLabel(l10n, raw);
-    }
-
-    return LocaleController.optionLabel(l10n, raw);
+    return prettyShipmentStatus(l10n, value);
   }
 
   IconData _timelineIcon(String value) {
