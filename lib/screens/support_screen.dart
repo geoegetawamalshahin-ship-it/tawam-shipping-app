@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../app/utils/value_formatters.dart';
 import '../app/widgets/shipment_status_widgets.dart';
+import '../app/widgets/shipping/show_shipping_message.dart';
 import '../controllers/support_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -108,18 +109,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
   void _showMessage(String message) {
     if (!mounted) return;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+    showFloatingRadiusMessage(context, message: message);
   }
 
   // ==========================================================

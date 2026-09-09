@@ -18,3 +18,18 @@ void showShippingMessage(
     ),
   );
 }
+
+void showFloatingRadiusMessage(
+  BuildContext context, {
+  required String message,
+}) {
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+    );
+}

@@ -90,4 +90,23 @@ void main() {
       shippingMessageErrorColor,
     );
   });
+
+  testWidgets('track and support keep unfilled floating radius 14', (
+    tester,
+  ) async {
+    await pumpHost(tester, (context) {
+      showFloatingRadiusMessage(context, message: 'Could not track');
+    });
+    await tester.tap(find.text('show'));
+    await tester.pump();
+
+    expect(find.text('Could not track'), findsOneWidget);
+    final bar = tester.widget<SnackBar>(find.byType(SnackBar));
+    expect(bar.behavior, SnackBarBehavior.floating);
+    expect(bar.backgroundColor, isNull);
+    expect(
+      bar.shape,
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    );
+  });
 }

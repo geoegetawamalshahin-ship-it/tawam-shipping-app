@@ -1493,72 +1493,14 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
     );
   }
 
-  List<_HistoryItem> _historyItems(AppLocalizations l10n) {
-    final raw = _firstValue(_shipment, [
-      'statusHistory',
-      'trackingHistory',
-      'timeline',
-      'history',
-    ]);
-
-    if (raw is! List || raw.isEmpty) {
-      return [];
-    }
-
-    final items = <_HistoryItem>[];
-
-    for (final item in raw) {
-      if (item is! Map) {
-        continue;
-      }
-
-      final map = Map<String, dynamic>.from(item);
-
-      final title = _stringValue(map, [
-        'title',
-        'status',
-        'event',
-      ], fallback: l10n.shipmentUpdate);
-
-      final description = _stringValue(map, [
-        'description',
-        'note',
-        'details',
-        'location',
-      ], fallback: l10n.shipmentStatusUpdated);
-
-      final time = _formatDateTime(
-        l10n,
-        _firstValue(map, [
-          'changedAt',
-          'timestamp',
-          'updatedAt',
-          'date',
-          'time',
-        ]),
-      );
-
-      items.add(
-        _HistoryItem(
-          title: _prettyStatus(l10n, title),
-          description: title.trim().toLowerCase() == 'shipment_created'
-              ? l10n.timelineCreatedDesc
-              : description,
-          time: time,
-          icon: _timelineIcon(title),
-        ),
-      );
-    }
-
-    return items;
-  }
-
-  String _prettyStatus(AppLocalizations l10n, String value) {
-    return prettyShipmentStatus(l10n, value, mapShipmentCreated: true);
-  }
-
-  IconData _timelineIcon(String value) {
-    return shipmentTimelineIcon(value);
+  List<ShipmentHistoryItem> _historyItems(AppLocalizations l10n) {
+    return shipmentHistoryItems(
+      l10n,
+      _shipment,
+      historyKeys: shipmentDetailsHistoryKeys,
+      timeKeys: shipmentDetailsHistoryTimeKeys,
+      mapShipmentCreated: true,
+    );
   }
 }
 
@@ -1772,22 +1714,4 @@ class _TimelineRow extends StatelessWidget {
       icon: icon,
     );
   }
-}
-
-// ==========================================================
-// MODELS
-// ==========================================================
-
-class _HistoryItem {
-  const _HistoryItem({
-    required this.title,
-    required this.description,
-    required this.time,
-    required this.icon,
-  });
-
-  final String title;
-  final String description;
-  final String time;
-  final IconData icon;
 }

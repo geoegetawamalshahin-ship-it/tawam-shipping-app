@@ -204,3 +204,102 @@ String shipmentCurrentLocation({
 
   return '';
 }
+
+const List<String> shipmentTrackHistoryKeys = [
+  'trackingHistory',
+  'timeline',
+  'history',
+];
+
+const List<String> shipmentDetailsHistoryKeys = [
+  'statusHistory',
+  ...shipmentTrackHistoryKeys,
+];
+
+const List<String> shipmentTrackHistoryTimeKeys = [
+  'timestamp',
+  'updatedAt',
+  'date',
+  'time',
+];
+
+const List<String> shipmentDetailsHistoryTimeKeys = [
+  'changedAt',
+  ...shipmentTrackHistoryTimeKeys,
+];
+
+class ShipmentHistoryItem {
+  const ShipmentHistoryItem({
+    required this.title,
+    required this.description,
+    required this.time,
+    required this.icon,
+  });
+
+  final String title;
+  final String description;
+  final String time;
+  final IconData icon;
+}
+
+List<ShipmentHistoryItem> shipmentHistoryItems(
+  AppLocalizations l10n,
+  Map<String, dynamic> shipment, {
+  List<String> historyKeys = shipmentTrackHistoryKeys,
+  List<String> timeKeys = shipmentTrackHistoryTimeKeys,
+  bool mapShipmentCreated = false,
+}) {
+  final raw = firstKeyedValue(shipment, historyKeys);
+
+  if (raw is! List || raw.isEmpty) {
+    return [];
+  }
+
+  final result = <ShipmentHistoryItem>[];
+
+  for (final item in raw) {
+    if (item is! Map) {
+      continue;
+    }
+
+    final map = Map<String, dynamic>.from(item);
+
+    final title = stringFromKeys(map, [
+      'title',
+      'status',
+      'event',
+    ], fallback: l10n.shipmentUpdate);
+
+    final description = stringFromKeys(map, [
+      'description',
+      'note',
+      'details',
+      'location',
+    ], fallback: l10n.shipmentStatusUpdated);
+
+    final time = formatOptionalLocalizedDateTime(
+      l10n,
+      firstKeyedValue(map, timeKeys),
+      emptyFallback: l10n.awaitingUpdate,
+    );
+
+    result.add(
+      ShipmentHistoryItem(
+        title: prettyShipmentStatus(
+          l10n,
+          title,
+          mapShipmentCreated: mapShipmentCreated,
+        ),
+        description:
+            mapShipmentCreated &&
+                title.trim().toLowerCase() == 'shipment_created'
+            ? l10n.timelineCreatedDesc
+            : description,
+        time: time,
+        icon: shipmentTimelineIcon(title),
+      ),
+    );
+  }
+
+  return result;
+}

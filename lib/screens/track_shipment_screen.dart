@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import '../app/utils/shipment_status_info.dart';
 import '../app/utils/value_formatters.dart';
 import '../app/widgets/shipment_status_widgets.dart';
+import '../app/widgets/shipping/show_shipping_message.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -202,18 +203,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
   void _showMessage(String message) {
     if (!mounted) return;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+    showFloatingRadiusMessage(context, message: message);
   }
 
   // ==========================================================
@@ -1206,56 +1196,11 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // OPTIONAL REAL TIMELINE FROM FIRESTORE
   // ==========================================================
 
-  List<_HistoryItem> _historyItems(
+  List<ShipmentHistoryItem> _historyItems(
     AppLocalizations l10n,
     Map<String, dynamic> shipment,
   ) {
-    final raw = _firstValue(shipment, [
-      'trackingHistory',
-      'timeline',
-      'history',
-    ]);
-
-    if (raw is! List || raw.isEmpty) {
-      return [];
-    }
-
-    final result = <_HistoryItem>[];
-
-    for (final item in raw) {
-      if (item is! Map) continue;
-
-      final map = Map<String, dynamic>.from(item);
-
-      final title = _stringValue(map, [
-        'title',
-        'status',
-        'event',
-      ], fallback: l10n.shipmentUpdate);
-
-      final description = _stringValue(map, [
-        'description',
-        'note',
-        'details',
-        'location',
-      ], fallback: l10n.shipmentStatusUpdated);
-
-      final time = _formatDateTime(
-        l10n,
-        _firstValue(map, ['timestamp', 'updatedAt', 'date', 'time']),
-      );
-
-      result.add(
-        _HistoryItem(
-          title: _prettyStatus(l10n, title),
-          description: description,
-          time: time,
-          icon: _timelineIcon(title),
-        ),
-      );
-    }
-
-    return result;
+    return shipmentHistoryItems(l10n, shipment);
   }
 
   // ==========================================================
@@ -1306,14 +1251,6 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       value,
       emptyFallback: l10n.awaitingUpdate,
     );
-  }
-
-  String _prettyStatus(AppLocalizations l10n, String value) {
-    return prettyShipmentStatus(l10n, value);
-  }
-
-  IconData _timelineIcon(String value) {
-    return shipmentTimelineIcon(value);
   }
 }
 
@@ -1514,22 +1451,4 @@ class _TimelineRow extends StatelessWidget {
       icon: icon,
     );
   }
-}
-
-// ==========================================================
-// DATA MODELS
-// ==========================================================
-
-class _HistoryItem {
-  const _HistoryItem({
-    required this.title,
-    required this.description,
-    required this.time,
-    required this.icon,
-  });
-
-  final String title;
-  final String description;
-  final String time;
-  final IconData icon;
 }
