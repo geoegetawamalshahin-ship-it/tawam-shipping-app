@@ -2250,14 +2250,11 @@ class _LandFreightScreenState extends State<LandFreightScreen> {
 
 
   void _showMessage(String message, {required bool error}) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: error ? const Color(0xFF9E2A2A) : _deepBlue,
-      ),
+    showShippingMessage(
+      context,
+      message: message,
+      error: error,
+      successColor: _deepBlue,
     );
   }
 }
