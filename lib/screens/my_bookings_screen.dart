@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../app/widgets/connection_error_panel.dart';
 import '../app/widgets/list_empty_card.dart';
+import '../app/widgets/list_filter_bar.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../controllers/booking_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -395,57 +396,26 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _buildFilters() {
     final l10n = AppLocalizations.of(context)!;
-    final filters = [
-      ['all', l10n.all],
-      ['pending', l10n.statusPending],
-      ['approved', l10n.statusConfirmed],
-      ['rejected', l10n.rejected],
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: filters.map((filter) {
-          final key = filter[0];
-          final label = filter[1];
-
-          final selected = _selectedFilter == key;
-
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedFilter = key;
-                });
-              },
-              borderRadius: BorderRadius.circular(30),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 17,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: selected ? primaryBlue : Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: selected ? primaryBlue : borderColor,
-                  ),
-                ),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: selected ? Colors.white : textGrey,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
+    return ListFilterBar(
+      items: [
+        ListFilterItem(value: 'all', label: l10n.all),
+        ListFilterItem(value: 'pending', label: l10n.statusPending),
+        ListFilterItem(value: 'approved', label: l10n.statusConfirmed),
+        ListFilterItem(value: 'rejected', label: l10n.rejected),
+      ],
+      selectedValue: _selectedFilter,
+      onSelected: (value) {
+        setState(() {
+          _selectedFilter = value;
+        });
+      },
+      animationDuration: const Duration(milliseconds: 160),
+      chipPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 10),
+      selectedColor: primaryBlue,
+      unselectedBorderColor: borderColor,
+      unselectedTextColor: textGrey,
+      fontSize: 10.5,
+      fontWeight: FontWeight.w700,
     );
   }
 

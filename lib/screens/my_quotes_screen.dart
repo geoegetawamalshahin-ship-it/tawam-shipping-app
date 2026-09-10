@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../app/widgets/connection_error_panel.dart';
 import '../app/widgets/list_empty_card.dart';
+import '../app/widgets/list_filter_bar.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -344,52 +345,30 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
 
   Widget _buildFilters() {
     final l10n = AppLocalizations.of(context)!;
-    final filters = [
-      ('all', l10n.all),
-      ('waiting', l10n.waiting),
-      ('quoted', l10n.quoted),
-      ('accepted', l10n.accepted),
-      ('declined', l10n.declined),
-    ];
-
-    return SizedBox(
+    return ListFilterBar(
+      items: [
+        ListFilterItem(value: 'all', label: l10n.all),
+        ListFilterItem(value: 'waiting', label: l10n.waiting),
+        ListFilterItem(value: 'quoted', label: l10n.quoted),
+        ListFilterItem(value: 'accepted', label: l10n.accepted),
+        ListFilterItem(value: 'declined', label: l10n.declined),
+      ],
+      selectedValue: _filter,
+      onSelected: (value) {
+        setState(() {
+          _filter = value;
+        });
+      },
       height: 39,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: filters.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final item = filters[index];
-          final selected = _filter == item.$1;
-
-          return InkWell(
-            onTap: () {
-              setState(() {
-                _filter = item.$1;
-              });
-            },
-            borderRadius: BorderRadius.circular(30),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: selected ? primaryBlue : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: selected ? primaryBlue : border),
-              ),
-              child: Text(
-                item.$2,
-                style: TextStyle(
-                  color: selected ? Colors.white : textGrey,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      useSeparatedList: true,
+      animationDuration: const Duration(milliseconds: 180),
+      chipPadding: const EdgeInsets.symmetric(horizontal: 15),
+      chipAlignment: Alignment.center,
+      selectedColor: primaryBlue,
+      unselectedBorderColor: border,
+      unselectedTextColor: textGrey,
+      fontSize: 10.5,
+      fontWeight: FontWeight.w700,
     );
   }
 

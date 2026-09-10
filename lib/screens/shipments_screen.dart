@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../app/widgets/counted_section_header.dart';
+import '../app/widgets/list_filter_bar.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -475,48 +476,29 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   Widget _buildFilters() {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
+    return ListFilterBar(
+      items: [
+        for (final filter in _filters)
+          ListFilterItem(value: filter, label: _filterLabel(l10n, filter)),
+      ],
+      selectedValue: _selectedFilter,
+      onSelected: (value) => setState(() => _selectedFilter = value),
       height: 40,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final filter = _filters[index];
-          final selected = filter == _selectedFilter;
-
-          return InkWell(
-            onTap: () => setState(() => _selectedFilter = filter),
-            borderRadius: BorderRadius.circular(30),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-              decoration: BoxDecoration(
-                color: selected ? _primaryBlue : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: selected ? _primaryBlue : _border),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: _primaryBlue.withValues(alpha: .14),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Text(
-                _filterLabel(l10n, filter),
-                style: TextStyle(
-                  color: selected ? Colors.white : const Color(0xFF748090),
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      useSeparatedList: true,
+      animationDuration: const Duration(milliseconds: 200),
+      chipPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+      selectedColor: _primaryBlue,
+      unselectedBorderColor: _border,
+      unselectedTextColor: const Color(0xFF748090),
+      fontSize: 10.5,
+      fontWeight: FontWeight.w800,
+      selectedBoxShadow: [
+        BoxShadow(
+          color: _primaryBlue.withValues(alpha: .14),
+          blurRadius: 12,
+          offset: const Offset(0, 5),
+        ),
+      ],
     );
   }
 
