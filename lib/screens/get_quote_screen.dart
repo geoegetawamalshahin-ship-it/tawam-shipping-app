@@ -1,3 +1,8 @@
+import '../app/utils/value_formatters.dart';
+import '../app/widgets/action_success_dialog.dart';
+import '../app/widgets/shipping/premium_card.dart';
+import '../app/widgets/soft_back_header.dart';
+import '../app/widgets/shipping/show_shipping_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -195,83 +200,28 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.getAQuoteTitle,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.verified_outlined,
+      onBack: () => Navigator.pop(context),
       height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .07),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: deepBlue,
-                size: 23,
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.getAQuoteTitle,
-                  style: const TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: primaryBlue,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.verified_outlined,
-              color: primaryBlue,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+      shadowColor: deepBlue,
+      shadowAlpha: .07,
+      shadowBlur: 20,
+      shadowOffset: const Offset(0, 6),
+      borderColor: borderColor,
+      backIconColor: deepBlue,
+      backIconSize: 23,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w800,
+      titleLetterSpacing: -0.3,
+      subtitleColor: primaryBlue,
+      subtitleFontSize: 9.5,
+      subtitleFontWeight: FontWeight.w700,
+      trailingBackground: softBlue,
+      trailingIconColor: primaryBlue,
+      trailingIconSize: 23,
     );
   }
 
@@ -857,15 +807,15 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     try {
       final userData = await _quoteController.loadUserProfile(user.uid);
 
-      final customerName = _firstNonEmpty([
+      final customerName = firstNonEmpty([
         userData['name'],
         userData['fullName'],
         user.displayName,
       ]);
 
-      final customerEmail = _firstNonEmpty([userData['email'], user.email]);
+      final customerEmail = firstNonEmpty([userData['email'], user.email]);
 
-      final customerPhone = _firstNonEmpty([
+      final customerPhone = firstNonEmpty([
         userData['phone'],
         userData['phoneNumber'],
         user.phoneNumber,
@@ -874,8 +824,8 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       final now = DateTime.now();
 
       final quoteNumber =
-          'QR-${now.year}${_two(now.month)}${_two(now.day)}-'
-          '${_two(now.hour)}${_two(now.minute)}${_two(now.second)}';
+          'QR-${now.year}${twoDigits(now.month)}${twoDigits(now.day)}-'
+          '${twoDigits(now.hour)}${twoDigits(now.minute)}${twoDigits(now.second)}';
 
       final quoteData = <String, dynamic>{
         'userId': user.uid,
@@ -889,13 +839,13 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         'cargoType': _cargoController.text.trim(),
         'weightKg': double.parse(_weightController.text.trim()),
         'quantity': int.parse(_quantityController.text.trim()),
-        'lengthCm': _parseOptionalDouble(_lengthController.text),
-        'widthCm': _parseOptionalDouble(_widthController.text),
-        'heightCm': _parseOptionalDouble(_heightController.text),
+        'lengthCm': parseOptionalDouble(_lengthController.text),
+        'widthCm': parseOptionalDouble(_widthController.text),
+        'heightCm': parseOptionalDouble(_heightController.text),
         'volumeCbm': () {
-          final length = _parseOptionalDouble(_lengthController.text);
-          final width = _parseOptionalDouble(_widthController.text);
-          final height = _parseOptionalDouble(_heightController.text);
+          final length = parseOptionalDouble(_lengthController.text);
+          final width = parseOptionalDouble(_widthController.text);
+          final height = parseOptionalDouble(_heightController.text);
 
           final quantity = int.tryParse(_quantityController.text.trim()) ?? 1;
 
@@ -959,138 +909,82 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       barrierDismissible: false,
       builder: (dialogContext) {
         final l10n = AppLocalizations.of(dialogContext)!;
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+        return ActionSuccessDialog(
+          padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+          borderRadius: 26,
+          shadowColor: deepBlue.withValues(alpha: .18),
+          shadowBlur: 28,
+          shadowOffset: const Offset(0, 12),
+          iconCircleSize: 72,
+          iconCircleColor: softBlue,
+          icon: Icons.check_circle_rounded,
+          iconColor: primaryBlue,
+          iconSize: 42,
+          afterIconGap: 18,
+          title: l10n.quoteRequestSubmitted,
+          titleColor: textDark,
+          titleFontSize: 20,
+          titleFontWeight: FontWeight.w800,
+          afterTitleGap: 9,
+          body: l10n.quoteSentToTawam,
+          bodyColor: textGrey,
+          bodyFontSize: 12,
+          bodyHeight: 1.45,
+          bodyFontWeight: FontWeight.w500,
+          afterBodyGap: 18,
+          middle: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(26),
-              boxShadow: [
-                BoxShadow(
-                  color: deepBlue.withValues(alpha: .18),
-                  blurRadius: 28,
-                  offset: const Offset(0, 12),
-                ),
-              ],
+              color: const Color(0xFFF7F9FC),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: const BoxDecoration(
-                    color: softBlue,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: primaryBlue,
-                    size: 42,
-                  ),
-                ),
-                const SizedBox(height: 18),
                 Text(
-                  l10n.quoteRequestSubmitted,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 9),
-                Text(
-                  l10n.quoteSentToTawam,
-                  textAlign: TextAlign.center,
+                  l10n.reference,
                   style: TextStyle(
                     color: textGrey,
-                    fontSize: 12,
-                    height: 1.45,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 9,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 18),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF7F9FC),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: borderColor),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.reference,
-                        style: TextStyle(
-                          color: textGrey,
-                          fontSize: 9,
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        quoteNumber,
-                        style: const TextStyle(
-                          color: deepBlue,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: deepBlue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Text(
-                      l10n.doneUpper,
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
+                const SizedBox(height: 5),
+                Text(
+                  quoteNumber,
+                  style: const TextStyle(
+                    color: deepBlue,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
           ),
+          afterMiddleGap: 18,
+          buttonHeight: 52,
+          buttonColor: deepBlue,
+          buttonRadius: 16,
+          buttonLabel: l10n.doneUpper,
+          buttonFontWeight: FontWeight.w800,
+          onDone: () {
+            Navigator.pop(dialogContext);
+            Navigator.pop(context);
+          },
         );
       },
     );
   }
 
   Widget _card({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .035),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+    return ShippingPremiumCard(
+      borderColor: borderColor,
+      shadowColor: deepBlue,
+      borderRadius: 20,
+      shadowBlur: 12,
+      shadowOffset: const Offset(0, 5),
       child: child,
     );
   }
@@ -1222,37 +1116,15 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   String _formatDate(AppLocalizations l10n, DateTime date) {
-    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
-  }
-
-  String _two(int value) {
-    return value.toString().padLeft(2, '0');
-  }
-
-  double? _parseOptionalDouble(String value) {
-    final text = value.trim();
-    if (text.isEmpty) return null;
-    return double.tryParse(text);
-  }
-
-  String _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-      final text = value.toString().trim();
-      if (text.isNotEmpty) return text;
-    }
-    return '';
+    return formatLocalizedDate(l10n, date);
   }
 
   void _showMessage(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: isError ? const Color(0xFF9E2A2A) : deepBlue,
-      ),
+    showShippingMessage(
+      context,
+      message: message,
+      error: isError,
+      successColor: deepBlue,
     );
   }
 }

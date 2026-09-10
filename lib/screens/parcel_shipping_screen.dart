@@ -1,3 +1,5 @@
+import '../app/utils/shipping_customer_profile.dart';
+import '../app/utils/value_formatters.dart';
 import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -241,53 +243,19 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       return;
     }
 
-    String name = user.displayName?.trim() ?? '';
-    String email = user.email?.trim() ?? '';
-    String phone = user.phoneNumber?.trim() ?? '';
-    String company = '';
-    String country = '';
-
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      final data = snapshot.data() ?? <String, dynamic>{};
-
-      name = _firstNonEmpty([
-        data['name'],
-        data['fullName'],
-        data['displayName'],
-        name,
-      ]);
-
-      email = _firstNonEmpty([data['email'], email]);
-
-      phone = _firstNonEmpty([
-        data['phone'],
-        data['phoneNumber'],
-        data['mobile'],
-        phone,
-      ]);
-
-      company = _firstNonEmpty([data['companyName'], data['company']]);
-
-      country = _firstNonEmpty([data['country'], data['countryName']]);
-    } catch (_) {
-      // Keep Firebase Auth data as fallback.
-    }
+    final profile = await loadShippingCustomerProfileFromAuth(user);
 
     if (!mounted) return;
 
     setState(() {
-      _customerName = name.isEmpty
-          ? AppLocalizations.of(context)!.tawamCustomer
-          : name;
-      _customerEmail = email;
-      _customerPhone = phone;
-      _customerCompany = company;
-      _customerCountry = country;
+      _customerName = shippingCustomerDisplayName(
+        profile.name,
+        AppLocalizations.of(context)!.tawamCustomer,
+      );
+      _customerEmail = profile.email;
+      _customerPhone = profile.phone;
+      _customerCompany = profile.company;
+      _customerCountry = profile.country;
       _loadingProfile = false;
     });
   }
@@ -474,89 +442,22 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(bottom: BorderSide(color: _border)),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .035),
-            blurRadius: 18,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Navigator.pop(context),
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: _softGrey,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: _border),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_rounded,
-                  color: _deepBlue,
-                  size: 23,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 14),
-
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.parcelQuote,
-                  style: const TextStyle(
-                    color: _textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.officialRateRequest,
-                  style: const TextStyle(
-                    color: _primaryBlue,
-                    fontSize: 8.3,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.inventory_2_outlined,
-              color: _primaryBlue,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+    return ShippingFormHeader(
+      title: l10n.parcelQuote,
+      subtitle: l10n.officialRateRequest,
+      trailingIcon: Icons.inventory_2_outlined,
+      onBack: () => Navigator.pop(context),
+      borderColor: _border,
+      shadowColor: _deepBlue,
+      leadingBackgroundColor: _softGrey,
+      leadingIconColor: _deepBlue,
+      trailingBackgroundColor: _softBlue,
+      trailingIconColor: _primaryBlue,
+      titleColor: _textDark,
+      titleFontSize: 20,
+      subtitleFontSize: 8.3,
+      subtitleLetterSpacing: 1.0,
+      trailingIconSize: 23,
     );
   }
 
@@ -668,15 +569,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildTrustBar() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: _border),
-      ),
-      child: Row(
-        children: [
+    return ShippingTrustBar(
+      borderColor: _border,
+      children: [
           Expanded(
             child: ShippingTrustItem(
               icon: Icons.bolt_rounded,
@@ -709,8 +604,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
               subtitleColor: _textGrey,
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -724,68 +618,15 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required String title,
     required String subtitle,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 43,
-          height: 43,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 21),
-        ),
-
-        const SizedBox(width: 12),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    number,
-                    style: const TextStyle(
-                      color: _primaryBlue,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: .8,
-                    ),
-                  ),
-
-                  const SizedBox(width: 7),
-
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        color: _textDark,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -.2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: _textGrey,
-                  fontSize: 10,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return ShippingSectionTitle(
+      number: number,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      primaryColor: _primaryBlue,
+      softColor: _softBlue,
+      titleColor: _textDark,
+      subtitleColor: _textGrey,
     );
   }
 
@@ -796,7 +637,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildRouteSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         children: [
           _textField(
@@ -886,72 +731,17 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   Widget _dateSelector() {
     final l10n = AppLocalizations.of(context)!;
-
-    return InkWell(
+    return ShippingDateSelector(
       onTap: _selectReadyDate,
-      borderRadius: BorderRadius.circular(15),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
-        decoration: BoxDecoration(
-          color: _softGrey,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: _border),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 39,
-              height: 39,
-              decoration: BoxDecoration(
-                color: _softBlue,
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: const Icon(
-                Icons.calendar_month_outlined,
-                color: _primaryBlue,
-                size: 19,
-              ),
-            ),
-
-            const SizedBox(width: 11),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.cargoReadyDate,
-                    style: TextStyle(
-                      color: _textGrey,
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    _readyDate == null
-                        ? l10n.selectReadyDate
-                        : _formatDate(_readyDate!),
-                    style: TextStyle(
-                      color: _readyDate == null ? _textGrey : _textDark,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: _textGrey,
-              size: 14,
-            ),
-          ],
-        ),
-      ),
+      fillColor: _softGrey,
+      iconBackgroundColor: _softBlue,
+      borderColor: _border,
+      primaryColor: _primaryBlue,
+      labelColor: _textGrey,
+      textColor: _textDark,
+      label: l10n.cargoReadyDate,
+      isEmpty: _readyDate == null,
+      valueText: _readyDate == null ? l10n.selectReadyDate : _formatDate(_readyDate!),
     );
   }
 
@@ -962,7 +752,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildServiceLevelSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1095,7 +889,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildParcelInfoSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         children: [
           _dropdown(
@@ -1240,7 +1038,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildDimensionsSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1433,25 +1235,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   }
 
   Widget _calculationItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Color(0xFFBCD3E7), fontSize: 8.5),
-        ),
-
-        const SizedBox(height: 5),
-
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 13,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-      ],
-    );
+    return ShippingCalculationItem(label: label, value: value);
   }
 
   // =========================================================
@@ -1461,7 +1245,11 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildProtectionSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
       child: Column(
         children: [
           _optionSwitch(
@@ -1514,65 +1302,27 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   Widget _buildServicesSection() {
     final l10n = AppLocalizations.of(context)!;
-
-    return _premiumCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.selectServices,
-            style: const TextStyle(
-              color: _textDark,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            l10n.youCanChooseMoreThanOne,
-            style: const TextStyle(color: _textGrey, fontSize: 9.5),
-          ),
-
-          const SizedBox(height: 14),
-
-          Wrap(
-            spacing: 8,
-            runSpacing: 9,
-            children: _availableServices.map((service) {
-              final selected = _additionalServices.contains(service);
-
-              return FilterChip(
-                label: Text(_optionLabel(l10n, service)),
-                selected: selected,
-                showCheckmark: true,
-                checkmarkColor: Colors.white,
-                selectedColor: _primaryBlue,
-                backgroundColor: _softGrey,
-                side: BorderSide(color: selected ? _primaryBlue : _border),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                labelStyle: TextStyle(
-                  color: selected ? Colors.white : _textDark,
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w700,
-                ),
-                onSelected: (value) {
-                  setState(() {
-                    if (value) {
-                      _additionalServices.add(service);
-                    } else {
-                      _additionalServices.remove(service);
-                    }
-                  });
-                },
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+    return ShippingServicesSection(
+      title: l10n.selectServices,
+      subtitle: l10n.youCanChooseMoreThanOne,
+      services: _availableServices,
+      selectedServices: _additionalServices,
+      serviceLabel: (service) => _optionLabel(l10n, service),
+      borderColor: _border,
+      shadowColor: _deepBlue,
+      textColor: _textDark,
+      labelColor: _textGrey,
+      primaryColor: _primaryBlue,
+      fillColor: _softGrey,
+      onSelectionChanged: (service, value) {
+        setState(() {
+          if (value) {
+            _additionalServices.add(service);
+          } else {
+            _additionalServices.remove(service);
+          }
+        });
+      },
     );
   }
 
@@ -1583,148 +1333,32 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildCustomerSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
-      child: _loadingProfile
-          ? const Padding(
-              padding: EdgeInsets.symmetric(vertical: 25),
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: _primaryBlue,
-                  strokeWidth: 2.5,
-                ),
-              ),
-            )
-          : Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEAF8F0),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.verified_user_outlined,
-                        color: _success,
-                        size: 18,
-                      ),
+    return ShippingPremiumCard(
 
-                      SizedBox(width: 9),
+      borderColor: _border,
 
-                      Expanded(
-                        child: Text(
-                          l10n.contactFilledFromAccount,
-                          style: TextStyle(
-                            color: _success,
-                            fontSize: 9.5,
-                            height: 1.35,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                _contactRow(
-                  icon: Icons.person_outline_rounded,
-                  label: l10n.fullName,
-                  value: _customerName,
-                ),
-
-                const ShippingContactDivider(color: _border),
-
-                _contactRow(
-                  icon: Icons.phone_outlined,
-                  label: l10n.phoneNumber,
-                  value: _customerPhone.isEmpty
-                      ? l10n.notProvided
-                      : _customerPhone,
-                ),
-
-                const ShippingContactDivider(color: _border),
-
-                _contactRow(
-                  icon: Icons.email_outlined,
-                  label: l10n.emailAddress,
-                  value: _customerEmail.isEmpty
-                      ? l10n.notProvided
-                      : _customerEmail,
-                ),
-
-                if (_customerCompany.isNotEmpty) ...[
-                  const ShippingContactDivider(color: _border),
-
-                  _contactRow(
-                    icon: Icons.business_outlined,
-                    label: l10n.company,
-                    value: _customerCompany,
-                  ),
-                ],
-
-                if (_customerCountry.isNotEmpty) ...[
-                  const ShippingContactDivider(color: _border),
-
-                  _contactRow(
-                    icon: Icons.public_outlined,
-                    label: l10n.country,
-                    value: _customerCountry,
-                  ),
-                ],
-              ],
-            ),
-    );
-  }
-
-  Widget _contactRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 39,
-          height: 39,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 19),
-        ),
-
-        const SizedBox(width: 11),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  color: _textGrey,
-                  fontSize: 8.5,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(height: 3),
-
-              Text(
-                value,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      shadowColor: _deepBlue,
+      child: ShippingCustomerDetails(
+        loading: _loadingProfile,
+        verifiedMessage: l10n.contactFilledFromAccount,
+        fullNameLabel: l10n.fullName,
+        phoneLabel: l10n.phoneNumber,
+        emailLabel: l10n.emailAddress,
+        companyLabel: l10n.company,
+        countryLabel: l10n.country,
+        notProvidedLabel: l10n.notProvided,
+        customerName: _customerName,
+        customerPhone: _customerPhone,
+        customerEmail: _customerEmail,
+        customerCompany: _customerCompany,
+        customerCountry: _customerCountry,
+        primaryColor: _primaryBlue,
+        softColor: _softBlue,
+        borderColor: _border,
+        successColor: _success,
+        textColor: _textDark,
+        labelColor: _textGrey,
+      ),
     );
   }
 
@@ -1735,43 +1369,19 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   Widget _buildNotesSection() {
     final l10n = AppLocalizations.of(context)!;
 
-    return _premiumCard(
-      child: TextFormField(
+    return ShippingPremiumCard(
+
+      borderColor: _border,
+
+      shadowColor: _deepBlue,
+      child: ShippingNotesField(
         controller: _notesController,
-        minLines: 4,
-        maxLines: 7,
-        textCapitalization: TextCapitalization.sentences,
-        style: const TextStyle(
-          color: _textDark,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          hintText: l10n.specialHandlingHint,
-          hintStyle: const TextStyle(
-            color: Color(0xFFA1ACB9),
-            fontSize: 10,
-            height: 1.45,
-          ),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(bottom: 70),
-            child: Icon(Icons.edit_note_rounded, color: _primaryBlue),
-          ),
-          filled: true,
-          fillColor: _softGrey,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _border),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _primaryBlue, width: 1.4),
-          ),
-        ),
+        hintText: l10n.specialHandlingHint,
+        textColor: _textDark,
+        hintColor: const Color(0xFFA1ACB9),
+        primaryColor: _primaryBlue,
+        fillColor: _softGrey,
+        borderColor: _border,
       ),
     );
   }
@@ -1993,30 +1603,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   }
 
   Widget _summaryBadge(IconData icon, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .10),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: const Color(0xFF79BFFF), size: 13),
-
-          const SizedBox(width: 6),
-
-          Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 8.5,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
+    return ShippingSummaryBadge(text: text, icon: icon);
   }
 
   // =========================================================
@@ -2025,52 +1612,12 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-
-    return SizedBox(
-      width: double.infinity,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: _submitting ? null : _submitQuote,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _primaryBlue,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: _primaryBlue.withValues(alpha: .55),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(17),
-          ),
-        ),
-        child: _submitting
-            ? const SizedBox(
-                width: 23,
-                height: 23,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.4,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.request_quote_outlined, size: 21),
-
-                  SizedBox(width: 10),
-
-                  Text(
-                    l10n.submitQuoteRequest,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: .35,
-                    ),
-                  ),
-
-                  SizedBox(width: 10),
-
-                  Icon(Icons.arrow_forward_rounded, size: 20),
-                ],
-              ),
-      ),
+    return ShippingSubmitButton(
+      submitting: _submitting,
+      onSubmit: _submitQuote,
+      primaryColor: _primaryBlue,
+      label: l10n.submitQuoteRequest,
+      icon: Icons.request_quote_outlined,
     );
   }
 
@@ -2115,8 +1662,8 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       final now = DateTime.now();
 
       final quoteNumber =
-          'QR-${now.year}${_two(now.month)}${_two(now.day)}-'
-          '${_two(now.hour)}${_two(now.minute)}${_two(now.second)}';
+          'QR-${now.year}${twoDigits(now.month)}${twoDigits(now.day)}-'
+          '${twoDigits(now.hour)}${twoDigits(now.minute)}${twoDigits(now.second)}';
 
       final quoteData = <String, dynamic>{
         // -------------------------------------------------
@@ -2279,167 +1826,27 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) {
-        final dialogL10n = AppLocalizations.of(dialogContext)!;
-
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 23),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 27, 22, 22),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: _deepBlue.withValues(alpha: .16),
-                  blurRadius: 30,
-                  offset: const Offset(0, 12),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEAF8F0),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: _success,
-                    size: 42,
-                  ),
-                ),
-
-                const SizedBox(height: 17),
-
-                Text(
-                  dialogL10n.quoteRequestSubmitted,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  dialogL10n.quoteSentToTawam,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _textGrey,
-                    fontSize: 10.5,
-                    height: 1.45,
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: _softGrey,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: _border),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        dialogL10n.reference,
-                        style: const TextStyle(
-                          color: _textGrey,
-                          fontSize: 8,
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      Text(
-                        quoteNumber,
-                        style: const TextStyle(
-                          color: _deepBlue,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MyQuotesScreen(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: Text(
-                      dialogL10n.myQuotes,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 9),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      Navigator.pop(context);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _deepBlue,
-                      side: const BorderSide(color: _border),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: Text(
-                      dialogL10n.doneUpper,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (dialogContext) => ShippingQuoteSuccessDialog(
+        quoteNumber: quoteNumber,
+        deepBlue: _deepBlue,
+        success: _success,
+        textDark: _textDark,
+        textGrey: _textGrey,
+        softGrey: _softGrey,
+        border: _border,
+        primaryBlue: _primaryBlue,
+        onViewQuotes: () {
+          Navigator.pop(dialogContext);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MyQuotesScreen()),
+          );
+        },
+        onDone: () {
+          Navigator.pop(dialogContext);
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
@@ -2447,25 +1854,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // COMMON UI
   // =========================================================
 
-  Widget _premiumCard({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: _border),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .035),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
 
   Widget _textField({
     required TextEditingController controller,
@@ -2476,24 +1864,13 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
-    return TextFormField(
+    return shippingTextField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
-      onChanged: (_) {
-        setState(() {});
-      },
-      style: const TextStyle(
-        color: _textDark,
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
-      ),
-      decoration: _inputDecoration(
-        label: label,
-        hint: hint,
-        icon: icon,
-        suffix: suffix,
-      ),
+      onChanged: (_) => setState(() {}),
+      textColor: _textDark,
+      decoration: _inputDecoration(label: label, hint: hint, icon: icon, suffix: suffix),
     );
   }
 
@@ -2501,36 +1878,14 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required TextEditingController controller,
     required String label,
   }) {
-    return TextFormField(
+    return shippingDimensionField(
       controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        color: _textDark,
-        fontSize: 11,
-        fontWeight: FontWeight.w800,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        suffixText: 'CM',
-        labelStyle: const TextStyle(color: _textGrey, fontSize: 8.5),
-        suffixStyle: const TextStyle(
-          color: _primaryBlue,
-          fontSize: 7.5,
-          fontWeight: FontWeight.w800,
-        ),
-        filled: true,
-        fillColor: _softGrey,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: _border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(13),
-          borderSide: const BorderSide(color: _primaryBlue),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
-      ),
+      label: label,
+      textDark: _textDark,
+      textGrey: _textGrey,
+      primaryBlue: _primaryBlue,
+      softGrey: _softGrey,
+      border: _border,
     );
   }
 
@@ -2542,26 +1897,18 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required ValueChanged<String?> onChanged,
     String Function(String item)? itemLabel,
   }) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      isExpanded: true,
-      dropdownColor: Colors.white,
-      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _primaryBlue),
+    return shippingDropdown(
+      value: value,
+      items: items,
+      onChanged: onChanged,
+      itemLabel: itemLabel,
+      primaryColor: _primaryBlue,
+      decoration: _inputDecoration(label: label, hint: '', icon: icon),
       style: const TextStyle(
         color: _textDark,
         fontSize: 11.5,
         fontWeight: FontWeight.w700,
       ),
-      decoration: _inputDecoration(label: label, hint: '', icon: icon),
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String>(
-              value: item,
-              child: Text(itemLabel?.call(item) ?? item),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
     );
   }
 
@@ -2571,42 +1918,15 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required IconData icon,
     String? suffix,
   }) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      suffixText: suffix,
-      prefixIcon: Icon(icon, color: _primaryBlue, size: 19),
-      labelStyle: const TextStyle(
-        color: _textGrey,
-        fontSize: 10,
-        fontWeight: FontWeight.w600,
-      ),
-      hintStyle: const TextStyle(color: Color(0xFFA4AFBB), fontSize: 10.5),
-      suffixStyle: const TextStyle(
-        color: _primaryBlue,
-        fontSize: 9,
-        fontWeight: FontWeight.w900,
-      ),
-      filled: true,
+    return shippingInputDecoration(
+      label: label,
+      hint: hint,
+      icon: icon,
+      suffix: suffix,
+      primaryColor: _primaryBlue,
+      labelColor: _textGrey,
       fillColor: _softGrey,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: _border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: _primaryBlue, width: 1.4),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Color(0xFFC23B3B)),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Color(0xFFC23B3B), width: 1.4),
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+      borderColor: _border,
     );
   }
 
@@ -2617,53 +1937,16 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 20),
-        ),
-
-        const SizedBox(width: 11),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-
-              const SizedBox(height: 3),
-
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: _textGrey,
-                  fontSize: 8.8,
-                  height: 1.35,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        Switch(
-          value: value,
-          activeThumbColor: _primaryBlue,
-          onChanged: onChanged,
-        ),
-      ],
+    return shippingOptionSwitch(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      value: value,
+      onChanged: onChanged,
+      softBlue: _softBlue,
+      primaryBlue: _primaryBlue,
+      textDark: _textDark,
+      textGrey: _textGrey,
     );
   }
 
@@ -2695,7 +1978,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   String _formatDate(DateTime date) {
     final l10n = AppLocalizations.of(context)!;
 
-    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+    return formatLocalizedDate(l10n, date);
   }
 
   // Map stored English option values to localized display labels.
@@ -2705,44 +1988,17 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
 
   String _formatNumber(double value) {
-    if (value <= 0) {
-      return '0';
-    }
-
-    if (value == value.roundToDouble()) {
-      return value.toStringAsFixed(0);
-    }
-
-    return value.toStringAsFixed(2);
+    return formatDisplayNumber(value, nonPositiveAsZero: true);
   }
 
-  String _two(int value) {
-    return value.toString().padLeft(2, '0');
-  }
 
-  String _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-
-      final text = value.toString().trim();
-
-      if (text.isNotEmpty) {
-        return text;
-      }
-    }
-
-    return '';
-  }
 
   void _showMessage(String message, {required bool error}) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: error ? const Color(0xFF9E2A2A) : _deepBlue,
-      ),
+    showShippingMessage(
+      context,
+      message: message,
+      error: error,
+      successColor: _deepBlue,
     );
   }
 }

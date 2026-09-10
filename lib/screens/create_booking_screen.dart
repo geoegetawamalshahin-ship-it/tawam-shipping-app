@@ -1,3 +1,9 @@
+import '../app/utils/value_formatters.dart';
+import '../app/widgets/action_success_dialog.dart';
+import '../app/widgets/numbered_section_heading.dart';
+import '../app/widgets/shipping/premium_card.dart';
+import '../app/widgets/shipment_status_widgets.dart';
+import '../app/widgets/soft_back_header.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -104,14 +110,14 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     try {
       final data = await _bookingController.loadUserProfile(user.uid);
 
-      name = _firstNonEmpty([
+      name = firstNonEmpty([
         data['name'],
         data['fullName'],
         data['customerName'],
         name,
       ]);
-      email = _firstNonEmpty([data['email'], data['customerEmail'], email]);
-      phone = _firstNonEmpty([
+      email = firstNonEmpty([data['email'], data['customerEmail'], email]);
+      phone = firstNonEmpty([
         data['phone'],
         data['phoneNumber'],
         data['customerPhone'],
@@ -215,83 +221,28 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.createBookingTitle,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.calendar_month_outlined,
+      onBack: () => Navigator.pop(context),
       height: 84,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .065),
-            blurRadius: 22,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: deepBlue,
-                size: 23,
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.createBookingTitle,
-                  style: const TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: primaryBlue,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.calendar_month_outlined,
-              color: primaryBlue,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+      shadowColor: deepBlue,
+      shadowAlpha: .065,
+      shadowBlur: 22,
+      shadowOffset: const Offset(0, 7),
+      borderColor: borderColor,
+      backIconColor: deepBlue,
+      backIconSize: 23,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w800,
+      titleLetterSpacing: -0.35,
+      subtitleColor: primaryBlue,
+      subtitleFontSize: 9.5,
+      subtitleFontWeight: FontWeight.w700,
+      trailingBackground: softBlue,
+      trailingIconColor: primaryBlue,
+      trailingIconSize: 23,
     );
   }
 
@@ -394,60 +345,15 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     required String title,
     required String subtitle,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: deepBlue,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: Text(
-            number,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-              letterSpacing: .6,
-            ),
-          ),
-        ),
-        const SizedBox(width: 11),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, color: primaryBlue, size: 19),
-                  const SizedBox(width: 7),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: textDark,
-                      fontSize: 16.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: textGrey,
-                  fontSize: 10.5,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return NumberedSectionHeading(
+      number: number,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      badgeColor: deepBlue,
+      iconColor: primaryBlue,
+      titleColor: textDark,
+      subtitleColor: textGrey,
     );
   }
 
@@ -1068,7 +974,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     try {
       final now = DateTime.now();
       final bookingReference =
-          'BK-${now.year}${_two(now.month)}${_two(now.day)}-${_two(now.hour)}${_two(now.minute)}${_two(now.second)}';
+          'BK-${now.year}${twoDigits(now.month)}${twoDigits(now.day)}-${twoDigits(now.hour)}${twoDigits(now.minute)}${twoDigits(now.second)}';
       final phone = _phoneController.text.trim();
 
       final bookingData = <String, dynamic>{
@@ -1093,9 +999,9 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         'cargo': _cargoController.text.trim(),
         'weightKg': double.parse(_weightController.text.trim()),
         'quantity': int.parse(_quantityController.text.trim()),
-        'lengthCm': _parseOptionalDouble(_lengthController.text),
-        'widthCm': _parseOptionalDouble(_widthController.text),
-        'heightCm': _parseOptionalDouble(_heightController.text),
+        'lengthCm': parseOptionalDouble(_lengthController.text),
+        'widthCm': parseOptionalDouble(_widthController.text),
+        'heightCm': parseOptionalDouble(_heightController.text),
         'notes': _notesController.text.trim(),
         'status': 'pending',
         'adminNote': '',
@@ -1130,157 +1036,100 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       barrierDismissible: false,
       builder: (dialogContext) {
         final l10n = AppLocalizations.of(dialogContext)!;
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+        return ActionSuccessDialog(
+          padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+          borderRadius: 27,
+          shadowColor: deepBlue.withValues(alpha: .18),
+          shadowBlur: 30,
+          shadowOffset: const Offset(0, 12),
+          iconCircleSize: 74,
+          iconCircleColor: softBlue,
+          icon: Icons.check_circle_rounded,
+          iconColor: primaryBlue,
+          iconSize: 44,
+          afterIconGap: 18,
+          title: l10n.bookingRequestSubmitted,
+          titleColor: textDark,
+          titleFontSize: 20,
+          titleFontWeight: FontWeight.w900,
+          afterTitleGap: 9,
+          body: l10n.bookingSentToTawam,
+          bodyColor: textGrey,
+          bodyFontSize: 11.5,
+          bodyHeight: 1.45,
+          bodyFontWeight: FontWeight.w500,
+          afterBodyGap: 18,
+          middle: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(27),
-              boxShadow: [
-                BoxShadow(
-                  color: deepBlue.withValues(alpha: .18),
-                  blurRadius: 30,
-                  offset: const Offset(0, 12),
-                ),
-              ],
+              color: const Color(0xFFF7F9FC),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 74,
-                  height: 74,
-                  decoration: const BoxDecoration(
-                    color: softBlue,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: primaryBlue,
-                    size: 44,
+                Text(
+                  l10n.bookingReference,
+                  style: const TextStyle(
+                    color: textGrey,
+                    fontSize: 8.8,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 5),
                 Text(
-                  l10n.bookingRequestSubmitted,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textDark,
-                    fontSize: 20,
+                  bookingReference,
+                  style: const TextStyle(
+                    color: deepBlue,
+                    fontSize: 15.5,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 9),
-                Text(
-                  l10n.bookingSentToTawam,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textGrey,
-                    fontSize: 11.5,
-                    height: 1.45,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 7),
                 Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF7F9FC),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: borderColor),
+                    color: const Color(0xFFFFF6E5),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.bookingReference,
-                        style: const TextStyle(
-                          color: textGrey,
-                          fontSize: 8.8,
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        bookingReference,
-                        style: const TextStyle(
-                          color: deepBlue,
-                          fontSize: 15.5,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(height: 7),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF6E5),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          l10n.pendingConfirmation,
-                          style: const TextStyle(
-                            color: Color(0xFFB26A00),
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: deepBlue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Text(
-                      l10n.doneUpper,
-                      style: TextStyle(fontWeight: FontWeight.w900),
+                  child: Text(
+                    l10n.pendingConfirmation,
+                    style: const TextStyle(
+                      color: Color(0xFFB26A00),
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
               ],
             ),
           ),
+          afterMiddleGap: 18,
+          buttonHeight: 52,
+          buttonColor: deepBlue,
+          buttonRadius: 16,
+          buttonLabel: l10n.doneUpper,
+          buttonFontWeight: FontWeight.w900,
+          onDone: () {
+            Navigator.pop(dialogContext);
+            Navigator.pop(context);
+          },
         );
       },
     );
   }
 
   Widget _premiumCard({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .035),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+    return ShippingPremiumCard(
+      borderColor: borderColor,
+      shadowColor: deepBlue,
+      shadowBlur: 14,
+      shadowOffset: const Offset(0, 5),
       child: child,
     );
   }
@@ -1443,25 +1292,11 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   String _formatDate(AppLocalizations l10n, DateTime date) {
-    return '${date.day} ${LocaleController.monthAbbrev(l10n, date.month)} ${date.year}';
+    return formatLocalizedDate(l10n, date);
   }
 
-  String _two(int value) => value.toString().padLeft(2, '0');
 
-  double? _parseOptionalDouble(String value) {
-    final text = value.trim();
-    if (text.isEmpty) return null;
-    return double.tryParse(text);
-  }
 
-  String _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-      final text = value.toString().trim();
-      if (text.isNotEmpty) return text;
-    }
-    return '';
-  }
 
   String _initials(String name) {
     final parts = name
@@ -1497,20 +1332,11 @@ class _HeroFeature extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Colors.white, size: 14),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 9.5,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
+    return ShipmentHeroFeature(
+      icon: icon,
+      label: label,
+      iconSize: 14,
+      fontSize: 9.5,
     );
   }
 }

@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/connection_error_panel.dart';
+import '../app/widgets/list_empty_card.dart';
+import '../app/widgets/list_filter_bar.dart';
+import '../app/widgets/soft_back_header.dart';
 import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -114,74 +118,25 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.myQuotes,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.request_quote_outlined,
+      onBack: () => Navigator.pop(context),
       height: 84,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .06),
-            blurRadius: 22,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: border),
-              ),
-              child: const Icon(Icons.arrow_back_rounded, color: deepBlue),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.myQuotes,
-                  style: const TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: primaryBlue,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.request_quote_outlined, color: primaryBlue),
-          ),
-        ],
-      ),
+      shadowColor: deepBlue,
+      shadowAlpha: .06,
+      shadowBlur: 22,
+      shadowOffset: const Offset(0, 7),
+      borderColor: border,
+      backIconColor: deepBlue,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w800,
+      subtitleColor: primaryBlue,
+      subtitleFontSize: 9.5,
+      subtitleFontWeight: FontWeight.w700,
+      trailingBackground: softBlue,
+      trailingIconColor: primaryBlue,
     );
   }
 
@@ -390,52 +345,30 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
 
   Widget _buildFilters() {
     final l10n = AppLocalizations.of(context)!;
-    final filters = [
-      ('all', l10n.all),
-      ('waiting', l10n.waiting),
-      ('quoted', l10n.quoted),
-      ('accepted', l10n.accepted),
-      ('declined', l10n.declined),
-    ];
-
-    return SizedBox(
+    return ListFilterBar(
+      items: [
+        ListFilterItem(value: 'all', label: l10n.all),
+        ListFilterItem(value: 'waiting', label: l10n.waiting),
+        ListFilterItem(value: 'quoted', label: l10n.quoted),
+        ListFilterItem(value: 'accepted', label: l10n.accepted),
+        ListFilterItem(value: 'declined', label: l10n.declined),
+      ],
+      selectedValue: _filter,
+      onSelected: (value) {
+        setState(() {
+          _filter = value;
+        });
+      },
       height: 39,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: filters.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final item = filters[index];
-          final selected = _filter == item.$1;
-
-          return InkWell(
-            onTap: () {
-              setState(() {
-                _filter = item.$1;
-              });
-            },
-            borderRadius: BorderRadius.circular(30),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: selected ? primaryBlue : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: selected ? primaryBlue : border),
-              ),
-              child: Text(
-                item.$2,
-                style: TextStyle(
-                  color: selected ? Colors.white : textGrey,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      useSeparatedList: true,
+      animationDuration: const Duration(milliseconds: 180),
+      chipPadding: const EdgeInsets.symmetric(horizontal: 15),
+      chipAlignment: Alignment.center,
+      selectedColor: primaryBlue,
+      unselectedBorderColor: border,
+      unselectedTextColor: textGrey,
+      fontSize: 10.5,
+      fontWeight: FontWeight.w700,
     );
   }
 
@@ -1237,112 +1170,38 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
 
   Widget _buildEmpty() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return ListEmptyCard(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 38),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: border),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.request_quote_outlined,
-            color: primaryBlue,
-            size: 42,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.noQuotationsYet,
-            style: const TextStyle(
-              color: textDark,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            l10n.quotationsEmptyBody,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: textGrey, fontSize: 11, height: 1.4),
-          ),
-        ],
-      ),
+      borderColor: border,
+      icon: Icons.request_quote_outlined,
+      iconColor: primaryBlue,
+      iconSize: 42,
+      afterIconGap: 14,
+      title: l10n.noQuotationsYet,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w800,
+      afterTitleGap: 7,
+      body: l10n.quotationsEmptyBody,
+      bodyColor: textGrey,
+      bodyFontSize: 11,
+      bodyHeight: 1.4,
     );
   }
 
   Widget _buildError() {
     final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: border),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 62,
-              height: 62,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF0F6FC),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: const Icon(
-                Icons.cloud_off_rounded,
-                color: primaryBlue,
-                size: 29,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.unableToLoadQuotations,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: textDark,
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 7),
-            Text(
-              l10n.pleaseCheckConnectionTryAgain,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: textGrey,
-                fontSize: 11.5,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 18),
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {});
-              },
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: Text(l10n.tryAgain),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 13,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return ConnectionErrorPanel(
+      title: l10n.unableToLoadQuotations,
+      body: l10n.pleaseCheckConnectionTryAgain,
+      retryLabel: l10n.tryAgain,
+      onRetry: () {
+        setState(() {});
+      },
+      borderColor: border,
+      titleColor: textDark,
+      bodyColor: textGrey,
+      accentColor: primaryBlue,
     );
   }
 

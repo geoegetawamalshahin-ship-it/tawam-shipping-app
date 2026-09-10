@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/connection_error_panel.dart';
+import '../app/widgets/list_empty_card.dart';
+import '../app/widgets/list_filter_bar.dart';
+import '../app/widgets/soft_back_header.dart';
 import '../controllers/booking_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -198,80 +202,25 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.myBookings,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.calendar_month_outlined,
+      onBack: () => Navigator.pop(context),
       height: 84,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor),
-              ),
-              child: const Icon(Icons.arrow_back_rounded, color: deepBlue),
-            ),
-          ),
-
-          const SizedBox(width: 14),
-
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.myBookings,
-                  style: const TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: primaryBlue,
-                    fontSize: 9,
-                    letterSpacing: .8,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.calendar_month_outlined,
-              color: primaryBlue,
-            ),
-          ),
-        ],
-      ),
+      shadowColor: deepBlue,
+      shadowAlpha: .06,
+      shadowBlur: 20,
+      shadowOffset: const Offset(0, 6),
+      borderColor: borderColor,
+      backIconColor: deepBlue,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w900,
+      subtitleColor: primaryBlue,
+      subtitleFontSize: 9,
+      subtitleFontWeight: FontWeight.w800,
+      trailingBackground: softBlue,
+      trailingIconColor: primaryBlue,
     );
   }
 
@@ -447,57 +396,26 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _buildFilters() {
     final l10n = AppLocalizations.of(context)!;
-    final filters = [
-      ['all', l10n.all],
-      ['pending', l10n.statusPending],
-      ['approved', l10n.statusConfirmed],
-      ['rejected', l10n.rejected],
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: filters.map((filter) {
-          final key = filter[0];
-          final label = filter[1];
-
-          final selected = _selectedFilter == key;
-
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedFilter = key;
-                });
-              },
-              borderRadius: BorderRadius.circular(30),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 17,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: selected ? primaryBlue : Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: selected ? primaryBlue : borderColor,
-                  ),
-                ),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: selected ? Colors.white : textGrey,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
+    return ListFilterBar(
+      items: [
+        ListFilterItem(value: 'all', label: l10n.all),
+        ListFilterItem(value: 'pending', label: l10n.statusPending),
+        ListFilterItem(value: 'approved', label: l10n.statusConfirmed),
+        ListFilterItem(value: 'rejected', label: l10n.rejected),
+      ],
+      selectedValue: _selectedFilter,
+      onSelected: (value) {
+        setState(() {
+          _selectedFilter = value;
+        });
+      },
+      animationDuration: const Duration(milliseconds: 160),
+      chipPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 10),
+      selectedColor: primaryBlue,
+      unselectedBorderColor: borderColor,
+      unselectedTextColor: textGrey,
+      fontSize: 10.5,
+      fontWeight: FontWeight.w700,
     );
   }
 
@@ -1081,114 +999,38 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _buildEmptyState() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return ListEmptyCard(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        children: [
-          const Icon(Icons.event_note_outlined, color: primaryBlue, size: 45),
-          const SizedBox(height: 13),
-          Text(
-            l10n.noBookingsFound,
-            style: const TextStyle(
-              color: textDark,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.bookingsEmptyBody,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: textGrey, fontSize: 11),
-          ),
-        ],
-      ),
+      borderColor: borderColor,
+      icon: Icons.event_note_outlined,
+      iconColor: primaryBlue,
+      iconSize: 45,
+      afterIconGap: 13,
+      title: l10n.noBookingsFound,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w900,
+      afterTitleGap: 6,
+      body: l10n.bookingsEmptyBody,
+      bodyColor: textGrey,
+      bodyFontSize: 11,
     );
   }
 
   Widget _buildError(String error) {
     final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: borderColor),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 62,
-              height: 62,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF0F6FC),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: const Icon(
-                Icons.cloud_off_rounded,
-                color: primaryBlue,
-                size: 29,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Text(
-              l10n.unableToLoadBookings,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: textDark,
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-
-            const SizedBox(height: 7),
-
-            Text(
-              l10n.pleaseCheckConnectionTryAgain,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: textGrey,
-                fontSize: 11.5,
-                height: 1.5,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {});
-              },
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: Text(l10n.tryAgain),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 13,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return ConnectionErrorPanel(
+      title: l10n.unableToLoadBookings,
+      body: l10n.pleaseCheckConnectionTryAgain,
+      retryLabel: l10n.tryAgain,
+      onRetry: () {
+        setState(() {});
+      },
+      borderColor: borderColor,
+      titleColor: textDark,
+      bodyColor: textGrey,
+      accentColor: primaryBlue,
+      bodyFontWeight: FontWeight.w500,
     );
   }
 

@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/counted_section_header.dart';
+import '../app/widgets/list_filter_bar.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -314,69 +316,11 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   Widget _buildTopHeader() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          ShipmentSquareButton(
-            icon: Icons.arrow_back_rounded,
-            onTap: () => Navigator.pop(context),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.myShipments,
-                  style: const TextStyle(
-                    color: _textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: _primaryBlue,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: .85,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.inventory_2_outlined,
-              color: _primaryBlue,
-              size: 22,
-            ),
-          ),
-        ],
-      ),
+    return ShipmentBackHeader(
+      title: l10n.myShipments,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.inventory_2_outlined,
+      onBack: () => Navigator.pop(context),
     );
   }
 
@@ -532,91 +476,38 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   Widget _buildFilters() {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
+    return ListFilterBar(
+      items: [
+        for (final filter in _filters)
+          ListFilterItem(value: filter, label: _filterLabel(l10n, filter)),
+      ],
+      selectedValue: _selectedFilter,
+      onSelected: (value) => setState(() => _selectedFilter = value),
       height: 40,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final filter = _filters[index];
-          final selected = filter == _selectedFilter;
-
-          return InkWell(
-            onTap: () => setState(() => _selectedFilter = filter),
-            borderRadius: BorderRadius.circular(30),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-              decoration: BoxDecoration(
-                color: selected ? _primaryBlue : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: selected ? _primaryBlue : _border),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: _primaryBlue.withValues(alpha: .14),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Text(
-                _filterLabel(l10n, filter),
-                style: TextStyle(
-                  color: selected ? Colors.white : const Color(0xFF748090),
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      useSeparatedList: true,
+      animationDuration: const Duration(milliseconds: 200),
+      chipPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+      selectedColor: _primaryBlue,
+      unselectedBorderColor: _border,
+      unselectedTextColor: const Color(0xFF748090),
+      fontSize: 10.5,
+      fontWeight: FontWeight.w800,
+      selectedBoxShadow: [
+        BoxShadow(
+          color: _primaryBlue.withValues(alpha: .14),
+          blurRadius: 12,
+          offset: const Offset(0, 5),
+        ),
+      ],
     );
   }
 
   Widget _buildListHeader(int count) {
     final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.shipmentPortfolio,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                l10n.selectShipmentDetails,
-                style: const TextStyle(color: _textGrey, fontSize: 9.5),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Text(
-            '$count',
-            style: const TextStyle(
-              color: _primaryBlue,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ),
-      ],
+    return CountedSectionHeader(
+      title: l10n.shipmentPortfolio,
+      subtitle: l10n.selectShipmentDetails,
+      count: count,
     );
   }
 

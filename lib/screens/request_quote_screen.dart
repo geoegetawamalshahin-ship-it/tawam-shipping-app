@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../app/utils/value_formatters.dart';
+import '../app/widgets/action_success_dialog.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 
@@ -207,122 +209,65 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+        return ActionSuccessDialog(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          borderRadius: 28,
+          shadowColor: const Color(0x26000000),
+          shadowBlur: 35,
+          shadowOffset: const Offset(0, 16),
+          iconCircleSize: 72,
+          iconCircleColor: const Color(0xFFE8F7F1),
+          icon: Icons.check_rounded,
+          iconColor: const Color(0xFF16765C),
+          iconSize: 38,
+          afterIconGap: 20,
+          title: l10n.quoteRequestSubmitted,
+          titleColor: _darkNavy,
+          titleFontSize: 22,
+          titleFontWeight: FontWeight.w800,
+          afterTitleGap: 10,
+          body: l10n.quotePreparedSuccess,
+          bodyColor: _mutedText,
+          bodyFontSize: 13.5,
+          bodyHeight: 1.55,
+          afterBodyGap: 22,
+          middle: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x26000000),
-                  blurRadius: 35,
-                  offset: Offset(0, 16),
-                ),
-              ],
+              color: const Color(0xFFF5F8FC),
+              borderRadius: BorderRadius.circular(17),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Row(
               children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE8F7F1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: Color(0xFF16765C),
-                    size: 38,
-                  ),
+                const Icon(
+                  Icons.local_shipping_outlined,
+                  color: _primaryBlue,
                 ),
-
-                const SizedBox(height: 20),
-
-                Text(
-                  l10n.quoteRequestSubmitted,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: _darkNavy,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                Text(
-                  l10n.quotePreparedSuccess,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: _mutedText,
-                    fontSize: 13.5,
-                    height: 1.55,
-                  ),
-                ),
-
-                const SizedBox(height: 22),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F8FC),
-                    borderRadius: BorderRadius.circular(17),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.local_shipping_outlined,
-                        color: _primaryBlue,
-                      ),
-                      const SizedBox(width: 11),
-                      Expanded(
-                        child: Text(
-                          '${_pickupController.text} → ${_deliveryController.text}',
-                          style: const TextStyle(
-                            color: _darkNavy,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 22),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(17),
-                      ),
-                    ),
-                    child: Text(
-                      l10n.done,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                      ),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Text(
+                    '${_pickupController.text} → ${_deliveryController.text}',
+                    style: const TextStyle(
+                      color: _darkNavy,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
               ],
             ),
           ),
+          afterMiddleGap: 22,
+          buttonHeight: 54,
+          buttonColor: _primaryBlue,
+          buttonRadius: 17,
+          buttonLabel: l10n.done,
+          buttonFontWeight: FontWeight.w800,
+          buttonFontSize: 15,
+          onDone: () {
+            Navigator.pop(dialogContext);
+          },
         );
       },
     );
@@ -365,28 +310,16 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   String? _requiredValidator(String? value, String message) {
-    if (value == null || value.trim().isEmpty) {
-      return message;
-    }
-
-    return null;
+    return requiredFieldError(value, message);
   }
 
   String? _emailValidator(String? value) {
     final l10n = AppLocalizations.of(context)!;
-    final email = value?.trim() ?? '';
-
-    if (email.isEmpty) {
-      return l10n.pleaseEnterEmail;
-    }
-
-    final validEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
-
-    if (!validEmail) {
-      return l10n.pleaseEnterValidEmail;
-    }
-
-    return null;
+    return emailFieldError(
+      value,
+      l10n.pleaseEnterEmail,
+      l10n.pleaseEnterValidEmail,
+    );
   }
 
   String? _weightValidator(String? value) {

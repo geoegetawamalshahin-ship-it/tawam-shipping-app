@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../app/widgets/counted_section_header.dart';
+import '../app/widgets/list_empty_card.dart';
+import '../app/widgets/list_filter_bar.dart';
+import '../app/widgets/soft_back_header.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import 'package:get/get.dart';
 
@@ -161,83 +165,30 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.mySupportRequests,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.support_agent_rounded,
+      onBack: () => Navigator.pop(context),
       height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: _border),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: _deepBlue,
-                size: 22,
-              ),
-            ),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.mySupportRequests,
-                  style: const TextStyle(
-                    color: _textDark,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: _primaryBlue,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.support_agent_rounded,
-              color: _primaryBlue,
-              size: 22,
-            ),
-          ),
-        ],
-      ),
+      shadowColor: _deepBlue,
+      shadowAlpha: .06,
+      shadowBlur: 20,
+      shadowOffset: const Offset(0, 6),
+      borderColor: _border,
+      backIconColor: _deepBlue,
+      backIconSize: 22,
+      leadingGap: 13,
+      titleColor: _textDark,
+      titleFontSize: 19,
+      titleFontWeight: FontWeight.w900,
+      titleLetterSpacing: -.35,
+      subtitleColor: _primaryBlue,
+      subtitleFontSize: 9,
+      subtitleFontWeight: FontWeight.w800,
+      trailingBackground: _softBlue,
+      trailingIconColor: _primaryBlue,
+      trailingIconSize: 22,
     );
   }
 
@@ -377,86 +328,38 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   Widget _buildFilters() {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
+    return ListFilterBar(
+      items: [
+        for (final filter in _filters)
+          ListFilterItem(
+            value: filter,
+            label: _supportFilterLabel(l10n, filter),
+          ),
+      ],
+      selectedValue: _selectedFilter,
+      onSelected: (value) {
+        setState(() {
+          _selectedFilter = value;
+        });
+      },
       height: 40,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final filter = _filters[index];
-          final selected = filter == _selectedFilter;
-
-          return InkWell(
-            onTap: () {
-              setState(() {
-                _selectedFilter = filter;
-              });
-            },
-            borderRadius: BorderRadius.circular(30),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-              decoration: BoxDecoration(
-                color: selected ? _primaryBlue : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: selected ? _primaryBlue : _border),
-              ),
-              child: Text(
-                _supportFilterLabel(l10n, filter),
-                style: TextStyle(
-                  color: selected ? Colors.white : _textGrey,
-                  fontSize: 10.3,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      useSeparatedList: true,
+      animationDuration: const Duration(milliseconds: 180),
+      chipPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+      selectedColor: _primaryBlue,
+      unselectedBorderColor: _border,
+      unselectedTextColor: _textGrey,
+      fontSize: 10.3,
+      fontWeight: FontWeight.w800,
     );
   }
 
   Widget _buildSectionHeader(int count) {
     final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.supportHistory,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                l10n.tapAnyCase,
-                style: const TextStyle(color: _textGrey, fontSize: 9.5),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Text(
-            '$count',
-            style: const TextStyle(
-              color: _primaryBlue,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ),
-      ],
+    return CountedSectionHeader(
+      title: l10n.supportHistory,
+      subtitle: l10n.tapAnyCase,
+      count: count,
     );
   }
 
@@ -846,41 +749,21 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   Widget _buildEmpty() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return ListEmptyCard(
       padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 42),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: _border),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.support_agent_outlined,
-            color: Color(0xFF9BA6B4),
-            size: 45,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.noSupportRequestsFound,
-            style: const TextStyle(
-              color: _textDark,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.supportRequestsEmptyBody,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: _textGrey,
-              fontSize: 10.5,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
+      borderColor: _border,
+      icon: Icons.support_agent_outlined,
+      iconColor: const Color(0xFF9BA6B4),
+      iconSize: 45,
+      afterIconGap: 14,
+      title: l10n.noSupportRequestsFound,
+      titleColor: _textDark,
+      titleFontWeight: FontWeight.w900,
+      afterTitleGap: 6,
+      body: l10n.supportRequestsEmptyBody,
+      bodyColor: _textGrey,
+      bodyFontSize: 10.5,
+      bodyHeight: 1.4,
     );
   }
 

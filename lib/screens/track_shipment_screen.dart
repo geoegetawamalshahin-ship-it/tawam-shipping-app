@@ -4,7 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/utils/shipment_status_info.dart';
+import '../app/utils/value_formatters.dart';
 import '../app/widgets/shipment_status_widgets.dart';
+import '../app/widgets/shipping/show_shipping_message.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -25,10 +28,6 @@ const Color _border = Color(0xFFE2EAF2);
 
 const Color _textDark = Color(0xFF101B2D);
 const Color _textGrey = Color(0xFF7E8A9A);
-
-const Color _success = Color(0xFF16765C);
-const Color _warning = Color(0xFFB26A00);
-const Color _danger = Color(0xFFD72638);
 
 // ==========================================================
 // SCREEN
@@ -204,18 +203,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
   void _showMessage(String message) {
     if (!mounted) return;
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+    showFloatingRadiusMessage(context, message: message);
   }
 
   // ==========================================================
@@ -287,72 +275,12 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
   Widget _buildTopHeader() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          ShipmentSquareButton(
-            icon: Icons.arrow_back_rounded,
-            onTap: () => Navigator.pop(context),
-          ),
-
-          const SizedBox(width: 13),
-
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.shipmentTracking,
-                  style: const TextStyle(
-                    color: _textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: _primaryBlue,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: .85,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.location_searching_rounded,
-              color: _primaryBlue,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+    return ShipmentBackHeader(
+      title: l10n.shipmentTracking,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.location_searching_rounded,
+      trailingIconSize: 23,
+      onBack: () => Navigator.pop(context),
     );
   }
 
@@ -794,7 +722,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
   Widget _buildStatusCard({
     required String trackingNumber,
-    required _StatusInfo statusInfo,
+    required ShipmentStatusInfo statusInfo,
   }) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
@@ -946,7 +874,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   Widget _buildCurrentLocationCard({
     required String currentLocation,
     required String lastUpdate,
-    required _StatusInfo statusInfo,
+    required ShipmentStatusInfo statusInfo,
   }) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
@@ -1051,7 +979,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _RouteSide(
+            child: ShipmentRoutePoint(
               label: l10n.pickupUpper,
               value: pickup,
               icon: Icons.radio_button_checked_rounded,
@@ -1074,7 +1002,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
           ),
 
           Expanded(
-            child: _RouteSide(
+            child: ShipmentRoutePoint(
               label: l10n.deliveryUpper,
               value: delivery,
               icon: Icons.location_on_outlined,
@@ -1196,152 +1124,23 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     required String status,
     required String lastUpdate,
   }) {
-    final stages = [
-      _TimelineStage(
-        keyName: 'pending',
-        title: l10n.timelineCreatedTitle,
-        description: l10n.timelineCreatedDesc,
-        icon: Icons.inventory_2_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'confirmed',
-        title: l10n.timelineConfirmedTitle,
-        description: l10n.timelineConfirmedDesc,
-        icon: Icons.verified_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'prepared',
-        title: l10n.timelinePreparedTitle,
-        description: l10n.timelinePreparedDesc,
-        icon: Icons.fact_check_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'in_transit',
-        title: l10n.timelineInTransitTitle,
-        description: l10n.timelineInTransitDesc,
-        icon: Icons.local_shipping_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'customs_clearance',
-        title: l10n.timelineCustomsTitle,
-        description: l10n.timelineCustomsDesc,
-        icon: Icons.gavel_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'out_for_delivery',
-        title: l10n.timelineOutForDeliveryTitle,
-        description: l10n.timelineOutForDeliveryDesc,
-        icon: Icons.route_outlined,
-      ),
-      _TimelineStage(
-        keyName: 'delivered',
-        title: l10n.timelineDeliveredTitle,
-        description: l10n.timelineDeliveredDesc,
-        icon: Icons.check_circle_outline_rounded,
-      ),
-    ];
-
-    if (status == 'cancelled') {
-      return [
-        _TimelineRow(
-          title: l10n.timelineCancelledTitle,
-          description: l10n.timelineCancelledDesc,
-          time: l10n.latestUpdate,
-          completed: false,
-          active: true,
-          isLast: true,
-          icon: Icons.cancel_outlined,
-          activeColor: _danger,
-        ),
-      ];
-    }
-
-    final normalizedStatus = status == 'customs' ? 'customs_clearance' : status;
-
-    int currentIndex = stages.indexWhere(
-      (stage) => stage.keyName == normalizedStatus,
+    return shipmentFallbackTimeline(
+      l10n: l10n,
+      status: status,
+      lastUpdate: lastUpdate,
+      lastRowBottomPadding: 0,
     );
-
-    if (currentIndex < 0) {
-      currentIndex = 0;
-    }
-
-    return List.generate(stages.length, (index) {
-      final stage = stages[index];
-      final completed = index <= currentIndex;
-      final active = index == currentIndex;
-      final isLast = index == stages.length - 1;
-
-      return _TimelineRow(
-        title: stage.title,
-        description: stage.description,
-        time: active
-            ? lastUpdate
-            : completed
-            ? l10n.completed
-            : l10n.waiting,
-        completed: completed,
-        active: active,
-        isLast: isLast,
-        icon: stage.icon,
-      );
-    });
   }
 
   // ==========================================================
   // OPTIONAL REAL TIMELINE FROM FIRESTORE
   // ==========================================================
 
-  List<_HistoryItem> _historyItems(
+  List<ShipmentHistoryItem> _historyItems(
     AppLocalizations l10n,
     Map<String, dynamic> shipment,
   ) {
-    final raw = _firstValue(shipment, [
-      'trackingHistory',
-      'timeline',
-      'history',
-    ]);
-
-    if (raw is! List || raw.isEmpty) {
-      return [];
-    }
-
-    final result = <_HistoryItem>[];
-
-    for (final item in raw) {
-      if (item is! Map) continue;
-
-      final map = Map<String, dynamic>.from(item);
-
-      final title = _stringValue(map, [
-        'title',
-        'status',
-        'event',
-      ], fallback: l10n.shipmentUpdate);
-
-      final description = _stringValue(map, [
-        'description',
-        'note',
-        'details',
-        'location',
-      ], fallback: l10n.shipmentStatusUpdated);
-
-      final time = _formatDateTime(
-        l10n,
-        _firstValue(map, ['timestamp', 'updatedAt', 'date', 'time']),
-      );
-
-      result.add(
-        _HistoryItem(
-          title: _prettyStatus(l10n, title),
-          description: description,
-          time: time,
-          icon: _timelineIcon(title),
-        ),
-      );
-    }
-
-    return result;
+    return shipmentHistoryItems(l10n, shipment);
   }
 
   // ==========================================================
@@ -1349,25 +1148,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
   // ==========================================================
 
   Object? _firstValue(Map<String, dynamic> data, List<String> keys) {
-    for (final key in keys) {
-      if (!data.containsKey(key)) {
-        continue;
-      }
-
-      final value = data[key];
-
-      if (value == null) {
-        continue;
-      }
-
-      if (value is String && value.trim().isEmpty) {
-        continue;
-      }
-
-      return value;
-    }
-
-    return null;
+    return firstKeyedValue(data, keys);
   }
 
   String _stringValue(
@@ -1375,13 +1156,7 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     List<String> keys, {
     String fallback = '-',
   }) {
-    final value = _firstValue(data, keys);
-
-    if (value == null) {
-      return fallback;
-    }
-
-    return value.toString().trim();
+    return stringFromKeys(data, keys, fallback: fallback);
   }
 
   String _currentLocation(
@@ -1390,212 +1165,32 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
     String pickup,
     String delivery,
   ) {
-    final liveLocation = _stringValue(shipment, [
-      'currentLocation',
-      'currentArea',
-      'lastLocation',
-      'location',
-    ], fallback: '');
-
-    if (liveLocation.isNotEmpty) {
-      return liveLocation;
-    }
-
-    if (status == 'delivered' || status == 'out_for_delivery') {
-      return delivery;
-    }
-
-    if (status == 'pending' || status == 'confirmed' || status == 'prepared') {
-      return pickup;
-    }
-
-    return '';
+    return shipmentCurrentLocation(
+      shipment: shipment,
+      status: status,
+      pickup: pickup,
+      delivery: delivery,
+    );
   }
 
-  _StatusInfo _statusInfo(AppLocalizations l10n, String status) {
-    switch (status) {
-      case 'confirmed':
-        return _StatusInfo(
-          label: l10n.confirmedUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.verified_rounded,
-          progress: .25,
-        );
-
-      case 'prepared':
-        return _StatusInfo(
-          label: l10n.preparedUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.fact_check_rounded,
-          progress: .36,
-        );
-
-      case 'in_transit':
-        return _StatusInfo(
-          label: l10n.inTransitUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.local_shipping_rounded,
-          progress: .58,
-        );
-
-      case 'customs':
-      case 'customs_clearance':
-        return _StatusInfo(
-          label: l10n.customsUpper,
-          color: _warning,
-          background: const Color(0xFFFFF4DF),
-          icon: Icons.gavel_rounded,
-          progress: .72,
-        );
-
-      case 'out_for_delivery':
-        return _StatusInfo(
-          label: l10n.outForDeliveryUpper,
-          color: _primaryBlue,
-          background: const Color(0xFFEAF3FF),
-          icon: Icons.route_rounded,
-          progress: .88,
-        );
-
-      case 'delivered':
-        return _StatusInfo(
-          label: l10n.deliveredUpper,
-          color: _success,
-          background: const Color(0xFFEAF8F0),
-          icon: Icons.check_circle_rounded,
-          progress: 1,
-        );
-
-      case 'cancelled':
-        return _StatusInfo(
-          label: l10n.cancelledUpper,
-          color: _danger,
-          background: const Color(0xFFFFECEF),
-          icon: Icons.cancel_rounded,
-          progress: 0,
-        );
-
-      case 'pending':
-      default:
-        return _StatusInfo(
-          label: l10n.pendingUpper,
-          color: _warning,
-          background: const Color(0xFFFFF4DF),
-          icon: Icons.schedule_rounded,
-          progress: .10,
-        );
-    }
+  ShipmentStatusInfo _statusInfo(AppLocalizations l10n, String status) {
+    return shipmentStatusInfo(l10n, status);
   }
 
   String _formatDate(AppLocalizations l10n, Object? value) {
-    final date = _toDateTime(value);
-
-    if (date == null) {
-      final text = value?.toString().trim() ?? '';
-
-      return text.isEmpty ? l10n.notSpecified : text;
-    }
-
-    return '${date.day} '
-        '${LocaleController.monthAbbrev(l10n, date.month)} '
-        '${date.year}';
+    return formatOptionalLocalizedDate(
+      l10n,
+      value,
+      emptyFallback: l10n.notSpecified,
+    );
   }
 
   String _formatDateTime(AppLocalizations l10n, Object? value) {
-    final date = _toDateTime(value);
-
-    if (date == null) {
-      final text = value?.toString().trim() ?? '';
-
-      return text.isEmpty ? l10n.awaitingUpdate : text;
-    }
-
-    final hour12 = date.hour == 0
-        ? 12
-        : date.hour > 12
-        ? date.hour - 12
-        : date.hour;
-
-    final minute = date.minute.toString().padLeft(2, '0');
-
-    final amPm = LocaleController.timePeriod(l10n, date.hour);
-
-    return '${date.day} '
-        '${LocaleController.monthAbbrev(l10n, date.month)} '
-        '${date.year} • '
-        '$hour12:$minute $amPm';
-  }
-
-  DateTime? _toDateTime(Object? value) {
-    if (value is Timestamp) {
-      return value.toDate().toLocal();
-    }
-
-    if (value is DateTime) {
-      return value.toLocal();
-    }
-
-    if (value is String && value.trim().isNotEmpty) {
-      return DateTime.tryParse(value.trim())?.toLocal();
-    }
-
-    return null;
-  }
-
-  String _prettyStatus(AppLocalizations l10n, String value) {
-    final raw = value.trim();
-    if (raw.isEmpty) {
-      return l10n.shipmentUpdate;
-    }
-
-    final normalized = LocaleController.normalizeStatus(raw);
-    const known = {
-      'pending',
-      'confirmed',
-      'prepared',
-      'in_transit',
-      'customs_clearance',
-      'out_for_delivery',
-      'delivered',
-      'cancelled',
-    };
-
-    if (known.contains(normalized)) {
-      return LocaleController.statusLabel(l10n, raw);
-    }
-
-    return LocaleController.optionLabel(l10n, raw);
-  }
-
-  IconData _timelineIcon(String value) {
-    final status = LocaleController.normalizeStatus(value);
-
-    if (status.contains('deliver')) {
-      return Icons.check_circle_outline_rounded;
-    }
-
-    if (status.contains('custom')) {
-      return Icons.gavel_outlined;
-    }
-
-    if (status.contains('transit') ||
-        status.contains('depart') ||
-        status.contains('moving')) {
-      return Icons.local_shipping_outlined;
-    }
-
-    if (status.contains('confirm') || status.contains('approve')) {
-      return Icons.verified_outlined;
-    }
-
-    if (status.contains('prepare') || status.contains('warehouse')) {
-      return Icons.inventory_2_outlined;
-    }
-
-    return Icons.circle_outlined;
+    return formatOptionalLocalizedDateTime(
+      l10n,
+      value,
+      emptyFallback: l10n.awaitingUpdate,
+    );
   }
 }
 
@@ -1654,55 +1249,6 @@ class _FeatureBox extends StatelessWidget {
   }
 }
 
-class _RouteSide extends StatelessWidget {
-  const _RouteSide({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.alignRight,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-  final bool alignRight;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: alignRight
-          ? CrossAxisAlignment.end
-          : CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: _primaryBlue, size: 17),
-        const SizedBox(height: 7),
-        Text(
-          label,
-          style: const TextStyle(
-            color: _textGrey,
-            fontSize: 8,
-            fontWeight: FontWeight.w800,
-            letterSpacing: .55,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: alignRight ? TextAlign.end : TextAlign.start,
-          style: const TextStyle(
-            color: _textDark,
-            fontSize: 10.8,
-            height: 1.25,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _InformationCard extends StatelessWidget {
   const _InformationCard({
     required this.icon,
@@ -1716,50 +1262,16 @@ class _InformationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 106),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: _border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: Icon(icon, color: _primaryBlue, size: 19),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              color: _textGrey,
-              fontSize: 7.8,
-              fontWeight: FontWeight.w800,
-              letterSpacing: .55,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: _textDark,
-              fontSize: 10.8,
-              height: 1.25,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
+    return ShipmentInfoCard(
+      icon: icon,
+      label: label,
+      value: value,
+      minHeight: 106,
+      borderColor: _border,
+      iconBackground: _softBlue,
+      iconColor: _primaryBlue,
+      labelColor: _textGrey,
+      valueColor: _textDark,
     );
   }
 }
@@ -1773,7 +1285,6 @@ class _TimelineRow extends StatelessWidget {
     required this.active,
     required this.isLast,
     required this.icon,
-    this.activeColor = _primaryBlue,
   });
 
   final String title;
@@ -1783,178 +1294,18 @@ class _TimelineRow extends StatelessWidget {
   final bool active;
   final bool isLast;
   final IconData icon;
-  final Color activeColor;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final circleColor = active
-        ? activeColor
-        : completed
-        ? _primaryBlue
-        : const Color(0xFFC6CED8);
-
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 38,
-            child: Column(
-              children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: active
-                        ? activeColor.withValues(alpha: .10)
-                        : completed
-                        ? _softBlue
-                        : const Color(0xFFF2F4F7),
-                    shape: BoxShape.circle,
-                    border: active
-                        ? Border.all(
-                            color: activeColor.withValues(alpha: .28),
-                            width: 2,
-                          )
-                        : null,
-                  ),
-                  child: Icon(icon, color: circleColor, size: 17),
-                ),
-                if (!isLast)
-                  Expanded(
-                    child: Container(
-                      width: 2,
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      color: completed
-                          ? const Color(0xFFC7DDF1)
-                          : const Color(0xFFE3E8EE),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 18, top: 2),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            color: active || completed
-                                ? _textDark
-                                : const Color(0xFF929BA8),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                      if (active)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: activeColor.withValues(alpha: .10),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Text(
-                            l10n.currentBadge,
-                            style: TextStyle(
-                              color: activeColor,
-                              fontSize: 7.5,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: .4,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      color: _textGrey,
-                      fontSize: 9.7,
-                      height: 1.35,
-                    ),
-                  ),
-
-                  const SizedBox(height: 5),
-
-                  Text(
-                    time,
-                    style: TextStyle(
-                      color: active ? activeColor : const Color(0xFFA6AFBA),
-                      fontSize: 8.7,
-                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+    return ShipmentTimelineRow(
+      title: title,
+      description: description,
+      time: time,
+      completed: completed,
+      active: active,
+      showLine: !isLast,
+      contentBottomPadding: isLast ? 0 : 18,
+      icon: icon,
     );
   }
-}
-
-// ==========================================================
-// DATA MODELS
-// ==========================================================
-
-class _StatusInfo {
-  const _StatusInfo({
-    required this.label,
-    required this.color,
-    required this.background,
-    required this.icon,
-    required this.progress,
-  });
-
-  final String label;
-  final Color color;
-  final Color background;
-  final IconData icon;
-  final double progress;
-}
-
-class _TimelineStage {
-  const _TimelineStage({
-    required this.keyName,
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-
-  final String keyName;
-  final String title;
-  final String description;
-  final IconData icon;
-}
-
-class _HistoryItem {
-  const _HistoryItem({
-    required this.title,
-    required this.description,
-    required this.time,
-    required this.icon,
-  });
-
-  final String title;
-  final String description;
-  final String time;
-  final IconData icon;
 }
