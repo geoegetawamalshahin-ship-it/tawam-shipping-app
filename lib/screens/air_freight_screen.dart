@@ -1237,35 +1237,19 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
-
       shadowColor: _deepBlue,
-      child: TextFormField(
+      child: ShippingNotesField(
         controller: _notesController,
-        minLines: 4,
-        maxLines: 7,
-        textCapitalization: TextCapitalization.sentences,
-        style: const TextStyle(
-          color: _textDark,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          hintText: l10n.specialHandlingHint,
-          hintStyle: const TextStyle(color: Color(0xFFA1ACB9), fontSize: 10),
-          filled: true,
-          fillColor: _softGrey,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: _primaryBlue, width: 1.4),
-          ),
-        ),
+        hintText: l10n.specialHandlingHint,
+        textColor: _textDark,
+        hintColor: const Color(0xFFA1ACB9),
+        primaryColor: _primaryBlue,
+        fillColor: _softGrey,
+        borderColor: _border,
+        showPrefixIcon: false,
+        hintHeight: null,
+        includeIdleBorderSide: false,
       ),
     );
   }

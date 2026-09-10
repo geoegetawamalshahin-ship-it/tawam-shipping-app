@@ -10,6 +10,9 @@ class ShippingNotesField extends StatelessWidget {
     required this.primaryColor,
     required this.fillColor,
     required this.borderColor,
+    this.showPrefixIcon = true,
+    this.hintHeight = 1.45,
+    this.includeIdleBorderSide = true,
   });
 
   final TextEditingController controller;
@@ -19,9 +22,14 @@ class ShippingNotesField extends StatelessWidget {
   final Color primaryColor;
   final Color fillColor;
   final Color borderColor;
+  final bool showPrefixIcon;
+  final double? hintHeight;
+  final bool includeIdleBorderSide;
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(15);
+
     return TextFormField(
       controller: controller,
       minLines: 4,
@@ -37,24 +45,28 @@ class ShippingNotesField extends StatelessWidget {
         hintStyle: TextStyle(
           color: hintColor,
           fontSize: 10,
-          height: 1.45,
+          height: hintHeight,
         ),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(bottom: 70),
-          child: Icon(Icons.edit_note_rounded, color: primaryColor),
-        ),
+        prefixIcon: showPrefixIcon
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 70),
+                child: Icon(Icons.edit_note_rounded, color: primaryColor),
+              )
+            : null,
         filled: true,
         fillColor: fillColor,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: borderColor),
-        ),
+        border: includeIdleBorderSide
+            ? OutlineInputBorder(
+                borderRadius: radius,
+                borderSide: BorderSide(color: borderColor),
+              )
+            : OutlineInputBorder(borderRadius: radius),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: radius,
           borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: radius,
           borderSide: BorderSide(color: primaryColor, width: 1.4),
         ),
       ),
