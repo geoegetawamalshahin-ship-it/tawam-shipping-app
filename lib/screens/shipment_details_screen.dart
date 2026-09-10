@@ -1460,50 +1460,16 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 107),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: _border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: Icon(icon, color: _primaryBlue, size: 19),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              color: _textGrey,
-              fontSize: 7.8,
-              fontWeight: FontWeight.w800,
-              letterSpacing: .55,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: _textDark,
-              fontSize: 10.8,
-              height: 1.25,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
+    return ShipmentInfoCard(
+      icon: icon,
+      label: label,
+      value: value,
+      minHeight: 107,
+      borderColor: _border,
+      iconBackground: _softBlue,
+      iconColor: _primaryBlue,
+      labelColor: _textGrey,
+      valueColor: _textDark,
     );
   }
 }
