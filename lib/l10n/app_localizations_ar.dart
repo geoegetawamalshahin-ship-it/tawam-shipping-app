@@ -1540,6 +1540,12 @@ class AppLocalizationsAr extends AppLocalizations {
       'ستظهر فواتيرك ومستندات الشحن وملفات التسليم هنا.';
 
   @override
+  String get shipmentDocuments => 'مستندات الشحنة';
+
+  @override
+  String get shipmentDocumentsSubtitle => 'الملفات المرفوعة لهذه الشحنة.';
+
+  @override
   String get couldNotLoadImage => 'تعذر تحميل الصورة';
 
   @override

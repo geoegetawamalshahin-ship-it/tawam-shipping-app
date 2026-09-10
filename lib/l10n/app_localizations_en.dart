@@ -1569,6 +1569,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your invoices, shipment documents and delivery files will appear here.';
 
   @override
+  String get shipmentDocuments => 'Shipment Documents';
+
+  @override
+  String get shipmentDocumentsSubtitle => 'Files uploaded for this shipment.';
+
+  @override
   String get couldNotLoadImage => 'Could not load image';
 
   @override

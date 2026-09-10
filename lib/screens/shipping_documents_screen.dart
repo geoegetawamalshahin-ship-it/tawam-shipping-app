@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:pdfrx/pdfrx.dart';
 
+import '../app/utils/shipment_documents.dart';
+import '../app/widgets/shipping_document_viewer.dart';
 import '../l10n/app_localizations.dart';
 
 class ShippingDocumentsScreen extends StatefulWidget {
@@ -45,21 +45,16 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
     for (final shipmentDoc in shipments.docs) {
       final shipment = shipmentDoc.data();
 
-      final rawDocuments = shipment['documents'];
-
-      if (rawDocuments is List) {
-        for (final rawDocument in rawDocuments) {
-          if (rawDocument is Map) {
-            documents.add({
-              'name': (rawDocument['name'] ?? '').toString(),
-              'path': (rawDocument['path'] ?? '').toString(),
-              'contentType': (rawDocument['contentType'] ?? '').toString(),
-              'size': rawDocument['size'] ?? 0,
-              'uploadedAt': rawDocument['uploadedAt'],
-              'trackingNumber': (shipment['trackingNumber'] ?? '').toString(),
-            });
-          }
-        }
+      for (final document in shipmentDocumentsOf(shipment)) {
+        documents.add({
+          'item': document,
+          'name': document.name,
+          'path': document.path,
+          'contentType': document.contentType,
+          'size': document.size ?? 0,
+          'uploadedAt': document.uploadedAt,
+          'trackingNumber': (shipment['trackingNumber'] ?? '').toString(),
+        });
       }
     }
 
@@ -78,39 +73,12 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
   }
 
   Future<void> _openDocument(Map<String, dynamic> document) async {
-    final l10n = AppLocalizations.of(context)!;
-    try {
-      final path = document['path']?.toString() ?? '';
-      final name = document['name']?.toString() ?? '';
-      final contentType = document['contentType']?.toString() ?? '';
-
-      if (path.isEmpty) {
-        throw Exception(l10n.documentPathMissing);
-      }
-
-      final signedUrl = await Supabase.instance.client.storage
-          .from('shipping-documents')
-          .createSignedUrl(path, 600);
-
-      if (!mounted) return;
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => _DocumentViewerScreen(
-            url: signedUrl,
-            name: name.isEmpty ? l10n.document : name,
-            contentType: contentType,
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.couldNotOpenDocument(e.toString()))));
+    final item = document['item'];
+    if (item is! ShipmentDocumentItem) {
+      return;
     }
+
+    await openShippingDocument(context: context, document: item);
   }
 
   Future<void> _refresh() async {
@@ -119,32 +87,6 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
     });
 
     await _documentsFuture;
-  }
-
-  String _formatSize(dynamic value) {
-    final bytes = value is int ? value : int.tryParse(value.toString()) ?? 0;
-
-    if (bytes >= 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-
-    if (bytes >= 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    }
-
-    return '$bytes B';
-  }
-
-  IconData _documentIcon(String contentType) {
-    if (contentType.contains('pdf')) {
-      return Icons.picture_as_pdf_rounded;
-    }
-
-    if (contentType.contains('image')) {
-      return Icons.image_outlined;
-    }
-
-    return Icons.insert_drive_file_outlined;
   }
 
   @override
@@ -263,7 +205,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Icon(
-                            _documentIcon(contentType),
+                            shippingDocumentIcon(contentType),
                             color: _primaryBlue,
                             size: 27,
                           ),
@@ -293,7 +235,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                _formatSize(document['size']),
+                                formatDocumentSize(document['size']),
                                 style: const TextStyle(
                                   color: _mutedText,
                                   fontSize: 11,
@@ -330,7 +272,11 @@ class _EmptyDocuments extends StatelessWidget {
       padding: const EdgeInsets.all(28),
       child: Column(
         children: [
-          const Icon(Icons.folder_copy_outlined, color: Color(0xFF07569E), size: 70),
+          const Icon(
+            Icons.folder_copy_outlined,
+            color: Color(0xFF07569E),
+            size: 70,
+          ),
           const SizedBox(height: 24),
           Text(
             l10n.noDocumentsYet,
@@ -352,67 +298,6 @@ class _EmptyDocuments extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DocumentViewerScreen extends StatelessWidget {
-  final String url;
-  final String name;
-  final String contentType;
-
-  const _DocumentViewerScreen({
-    required this.url,
-    required this.name,
-    required this.contentType,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isPdf = contentType.toLowerCase().contains('pdf');
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF10233F)),
-        ),
-        title: Text(
-          name,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Color(0xFF10233F),
-            fontSize: 17,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-      body: isPdf
-          ? PdfViewer.uri(Uri.parse(url))
-          : Center(
-              child: InteractiveViewer(
-                minScale: 1,
-                maxScale: 5,
-                child: Image.network(
-                  url,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Center(
-                      child: Text(AppLocalizations.of(context)!.couldNotLoadImage),
-                    );
-                  },
-                ),
-              ),
-            ),
     );
   }
 }

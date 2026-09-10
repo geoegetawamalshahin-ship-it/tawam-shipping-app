@@ -589,6 +589,8 @@
   "couldNotLoadDocuments": "Could not load documents",
   "noDocumentsYet": "No documents yet",
   "documentsEmptyBody": "Your invoices, shipment documents and delivery files will appear here.",
+  "shipmentDocuments": "Shipment Documents",
+  "shipmentDocumentsSubtitle": "Files uploaded for this shipment.",
   "couldNotLoadImage": "Could not load image",
   "customerSupport": "Customer Support",
   "logisticsSupportCenter": "LOGISTICS SUPPORT CENTER",

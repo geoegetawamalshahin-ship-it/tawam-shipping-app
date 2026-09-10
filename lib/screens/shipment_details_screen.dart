@@ -4,9 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/utils/shipment_documents.dart';
 import '../app/utils/shipment_status_info.dart';
 import '../app/utils/value_formatters.dart';
 import '../app/widgets/shipment_status_widgets.dart';
+import '../app/widgets/shipping_document_viewer.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -96,7 +98,9 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
       return;
     }
 
-    _shipmentSubscription = _shipmentController.watchShipment(documentId).listen(
+    _shipmentSubscription = _shipmentController
+        .watchShipment(documentId)
+        .listen(
           (document) {
             if (!mounted || !document.exists || document.data() == null) {
               return;
@@ -352,6 +356,8 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
                     quantity: quantity,
                     dimensions: dimensions,
                   ),
+
+                  ..._buildDocumentsSection(l10n),
 
                   const SizedBox(height: 18),
 
@@ -1253,6 +1259,38 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
   }
 
   // ==========================================================
+  // DOCUMENTS
+  // ==========================================================
+
+  List<Widget> _buildDocumentsSection(AppLocalizations l10n) {
+    final documents = shipmentDocumentsOf(_shipment);
+    if (documents.isEmpty) {
+      return const [];
+    }
+
+    return [
+      const SizedBox(height: 18),
+      _sectionTitle(
+        title: l10n.shipmentDocuments,
+        subtitle: l10n.shipmentDocumentsSubtitle,
+        icon: Icons.folder_copy_outlined,
+      ),
+      const SizedBox(height: 11),
+      for (var index = 0; index < documents.length; index++) ...[
+        if (index > 0) const SizedBox(height: 10),
+        _ShipmentDocumentRow(
+          document: documents[index],
+          fallbackName: l10n.document,
+          onOpen: () => openShippingDocument(
+            context: context,
+            document: documents[index],
+          ),
+        ),
+      ],
+    ];
+  }
+
+  // ==========================================================
   // SUPPORT
   // ==========================================================
 
@@ -1568,6 +1606,81 @@ class _TimelineRow extends StatelessWidget {
       showLine: showLine,
       contentBottomPadding: 18,
       icon: icon,
+    );
+  }
+}
+
+class _ShipmentDocumentRow extends StatelessWidget {
+  const _ShipmentDocumentRow({
+    required this.document,
+    required this.fallbackName,
+    required this.onOpen,
+  });
+
+  final ShipmentDocumentItem document;
+  final String fallbackName;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = document.name.trim().isEmpty ? fallbackName : document.name;
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(19),
+      child: InkWell(
+        onTap: onOpen,
+        borderRadius: BorderRadius.circular(19),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(19),
+            border: Border.all(color: _border),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 39,
+                height: 39,
+                decoration: BoxDecoration(
+                  color: _softBlue,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(
+                  shippingDocumentIcon(document.contentType),
+                  color: _primaryBlue,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: _textDark,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      formatDocumentSize(document.size),
+                      style: const TextStyle(color: _textGrey, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: _primaryBlue),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

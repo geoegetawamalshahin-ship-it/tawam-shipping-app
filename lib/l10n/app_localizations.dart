@@ -3044,6 +3044,18 @@ abstract class AppLocalizations {
   /// **'Your invoices, shipment documents and delivery files will appear here.'**
   String get documentsEmptyBody;
 
+  /// No description provided for @shipmentDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipment Documents'**
+  String get shipmentDocuments;
+
+  /// No description provided for @shipmentDocumentsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Files uploaded for this shipment.'**
+  String get shipmentDocumentsSubtitle;
+
   /// No description provided for @couldNotLoadImage.
   ///
   /// In en, this message translates to:

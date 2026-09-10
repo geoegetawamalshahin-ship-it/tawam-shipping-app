@@ -589,6 +589,8 @@
   "couldNotLoadDocuments": "تعذر تحميل المستندات",
   "noDocumentsYet": "لا توجد مستندات بعد",
   "documentsEmptyBody": "ستظهر فواتيرك ومستندات الشحن وملفات التسليم هنا.",
+  "shipmentDocuments": "مستندات الشحنة",
+  "shipmentDocumentsSubtitle": "الملفات المرفوعة لهذه الشحنة.",
   "couldNotLoadImage": "تعذر تحميل الصورة",
   "customerSupport": "دعم العملاء",
   "logisticsSupportCenter": "مركز الدعم اللوجستي",
