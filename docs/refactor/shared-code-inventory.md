@@ -52,11 +52,12 @@ Previous candidate tables at `50393fb` are historical.
 | `shipmentHistoryItems` / `ShipmentHistoryItem` | `shipment_status_info.dart` | Track + details `_historyItems`. Details `historyKeys` include `statusHistory`, `timeKeys` include `changedAt`, `mapShipmentCreated: true` (title + `timelineCreatedDesc`). Firestore load stays on pages |
 | `showFloatingRadiusMessage` | `show_shipping_message.dart` | Track + support `_showMessage`. Floating, radius 14, no fill. `mounted` stays on pages. Filled `showShippingMessage` and booking SnackBar stay separate |
 | `ShipmentBackHeader` | `lib/app/widgets/shipment_status/back_header.dart` | Track, details, shipments list, support `_buildTopHeader`. Page title + trailing icon. Track/support trailing size **23**; details/shipments **22**. `ShipmentSquareButton` back stays inside the shared header. Home/Profile and booking/quote/calculator headers stay on those pages. |
-| `ShipmentRoutePoint` | `lib/app/widgets/shipment_status/route_point.dart` | Track `_buildRouteCard` and details route row (was `_RouteSide` / `_RoutePoint`). Pickup start / delivery end alignment unchanged. Route **cards** stay page-owned. |
+| `ShipmentRoutePoint` | `lib/app/widgets/shipment_status/route_point.dart` | Track `_buildRouteCard` and details route row. Pickup start / delivery end alignment unchanged. Route **cards** stay page-owned. |
+| `LegalDocumentHeader` / `LegalIntroBanner` / `LegalSectionCard` | `lib/app/widgets/legal/document_chrome.dart` | Privacy + terms. Pages keep l10n copy. Privacy section cards still pass `bullets`; terms omit them. |
 | `ShipmentSquareButton` / `ShipmentLiveDot` / `ShipmentHeroFeature` | `lib/app/widgets/shipment_status/` | Track, details, shipments list, support; live-dot also on my-support-requests |
 | `ShipmentTimelineRow` / `shipmentFallbackTimeline` | `lib/app/widgets/shipment_status/timeline_row.dart` | Track + details `_TimelineRow` / `_fallbackTimeline`. `showLine` and `contentBottomPadding` stay separate. Track last-row padding `0`; details **always** `18` via `lastRowBottomPadding`. History-empty still chooses fallback on each page |
 
-Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.dart`, `test/value_formatters_test.dart`, `test/numbered_section_heading_test.dart`, `test/language_picker_sheet_test.dart`, `test/shipment_status_info_test.dart`, `test/pretty_shipment_status_test.dart`, `test/shipment_current_location_test.dart`, `test/shipment_history_items_test.dart`, `test/shipment_timeline_row_test.dart`, `test/shipment_fallback_timeline_test.dart`, `test/shipment_back_header_test.dart`, `test/shipment_route_point_test.dart`.
+Barrel: `lib/app/widgets/shipping_form_widgets.dart`. Tests: `test/shipping_*.dart`, `test/value_formatters_test.dart`, `test/numbered_section_heading_test.dart`, `test/language_picker_sheet_test.dart`, `test/shipment_status_info_test.dart`, `test/pretty_shipment_status_test.dart`, `test/shipment_current_location_test.dart`, `test/shipment_history_items_test.dart`, `test/shipment_timeline_row_test.dart`, `test/shipment_fallback_timeline_test.dart`, `test/shipment_back_header_test.dart`, `test/shipment_route_point_test.dart`, `test/legal_document_chrome_test.dart`.
 
 ## Adapters kept (not leftover duplication)
 
@@ -76,7 +77,7 @@ None. Do not merge to `main` or publish until the owner orders it.
 | Candidate | Files | Why not extracted |
 | --- | --- | --- |
 | Auth field decoration | `login_screen.dart` inline `InputDecoration`; `register_screen.dart` `_fieldDecoration`; `forgot_password_screen.dart` inline | Shared chrome (radius 17, fill `0xFFF7F8FA`, focus `0xFF07569E` 1.7) but padding **20 vs 19**, login **omits error borders**, register has them, forgot has them + email icon vs login person icon. Email **rules stay different** (`contains('@')` vs `'@'`+`'.'` vs quote/support regex). Not unified. |
-| Legal section cards | `privacy_policy_screen.dart` `_PrivacySectionCard`; `terms_conditions_screen.dart` `_TermsCard` | Header chrome is similar (46 icon tile, number chip). Privacy has **bullets** and bullet `margin: EdgeInsets.only(top: 6, right: 10)`. Terms is body text only. Copy/translation stay on each page. Not extracted this batch (would be a later chrome-only widget, not legal text). |
+| Legal section cards | — | Extracted as `LegalSectionCard` with optional bullets. |
 | Details `_InfoCard` | `shipment_details_screen.dart` | Details-only. Track `_InformationCard` is similar but minHeight **106 vs 107**. Not extracted. |
 
 Booking / get-quote / request-quote / support success dialogs remain separate (different chrome). Booking SnackBar `0xFF9D2732` remains separate.
