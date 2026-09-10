@@ -3,6 +3,7 @@ import 'get_quote_screen.dart';
 
 import '../app/widgets/numbered_section_heading.dart';
 import '../app/widgets/shipping/premium_card.dart';
+import '../app/widgets/shipment_status_widgets.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../l10n/app_localizations.dart';
 
@@ -786,20 +787,11 @@ class _HeroFeature extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Colors.white, size: 14),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 9.3,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
+    return ShipmentHeroFeature(
+      icon: icon,
+      label: label,
+      iconSize: 14,
+      fontSize: 9.3,
     );
   }
 }
