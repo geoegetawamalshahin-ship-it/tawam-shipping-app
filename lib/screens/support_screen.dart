@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app/utils/value_formatters.dart';
+import '../app/widgets/action_success_dialog.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import '../app/widgets/shipping/show_shipping_message.dart';
 import '../controllers/support_controller.dart';
@@ -233,150 +234,91 @@ class _SupportScreenState extends State<SupportScreen> {
       builder: (dialogContext) {
         final dialogL10n = AppLocalizations.of(dialogContext)!;
 
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 27, 24, 23),
+        return ActionSuccessDialog(
+          padding: const EdgeInsets.fromLTRB(24, 27, 24, 23),
+          borderRadius: 28,
+          shadowColor: const Color(0x26000000),
+          shadowBlur: 38,
+          shadowOffset: const Offset(0, 18),
+          iconCircleSize: 74,
+          iconCircleColor: const Color(0xFFEAF8F0),
+          icon: Icons.check_rounded,
+          iconColor: _success,
+          iconSize: 39,
+          afterIconGap: 19,
+          title: dialogL10n.requestSuccessfullySent,
+          titleColor: _textDark,
+          titleFontSize: 21,
+          titleFontWeight: FontWeight.w900,
+          afterTitleGap: 9,
+          body: dialogL10n.supportCaseSubmitted,
+          bodyColor: _textGrey,
+          bodyFontSize: 12,
+          bodyHeight: 1.5,
+          afterBodyGap: 18,
+          middle: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x26000000),
-                  blurRadius: 38,
-                  offset: Offset(0, 18),
-                ),
-              ],
+              color: const Color(0xFFF7F9FC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: _border),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Row(
               children: [
                 Container(
-                  width: 74,
-                  height: 74,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEAF8F0),
-                    shape: BoxShape.circle,
+                  width: 41,
+                  height: 41,
+                  decoration: BoxDecoration(
+                    color: _softBlue,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
-                    Icons.check_rounded,
-                    color: _success,
-                    size: 39,
+                    Icons.support_agent_rounded,
+                    color: _primaryBlue,
+                    size: 21,
                   ),
                 ),
-
-                const SizedBox(height: 19),
-
-                Text(
-                  dialogL10n.requestSuccessfullySent,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: _textDark,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-
-                const SizedBox(height: 9),
-
-                Text(
-                  dialogL10n.supportCaseSubmitted,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: _textGrey,
-                    fontSize: 12,
-                    height: 1.5,
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF7F9FC),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: _border),
-                  ),
-                  child: Row(
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 41,
-                        height: 41,
-                        decoration: BoxDecoration(
-                          color: _softBlue,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.support_agent_rounded,
-                          color: _primaryBlue,
-                          size: 21,
+                      Text(
+                        dialogL10n.requestCategory,
+                        style: const TextStyle(
+                          color: _textGrey,
+                          fontSize: 8,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: .55,
                         ),
                       ),
-
-                      const SizedBox(width: 11),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              dialogL10n.requestCategory,
-                              style: const TextStyle(
-                                color: _textGrey,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: .55,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _categoryLabel(dialogL10n, _selectedCategory),
-                              style: const TextStyle(
-                                color: _textDark,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 4),
+                      Text(
+                        _categoryLabel(dialogL10n, _selectedCategory),
+                        style: const TextStyle(
+                          color: _textDark,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: _primaryBlue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: Text(
-                      dialogL10n.doneUpper,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: .5,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
+          afterMiddleGap: 20,
+          buttonHeight: 52,
+          buttonColor: _primaryBlue,
+          buttonRadius: 15,
+          buttonLabel: dialogL10n.doneUpper,
+          buttonFontWeight: FontWeight.w900,
+          buttonFontSize: 11,
+          buttonLetterSpacing: .5,
+          onDone: () {
+            Navigator.pop(dialogContext);
+          },
         );
       },
     );

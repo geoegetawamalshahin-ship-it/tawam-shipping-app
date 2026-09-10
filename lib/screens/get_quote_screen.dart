@@ -1,4 +1,5 @@
 import '../app/utils/value_formatters.dart';
+import '../app/widgets/action_success_dialog.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../app/widgets/shipping/show_shipping_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -907,117 +908,70 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       barrierDismissible: false,
       builder: (dialogContext) {
         final l10n = AppLocalizations.of(dialogContext)!;
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+        return ActionSuccessDialog(
+          padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+          borderRadius: 26,
+          shadowColor: deepBlue.withValues(alpha: .18),
+          shadowBlur: 28,
+          shadowOffset: const Offset(0, 12),
+          iconCircleSize: 72,
+          iconCircleColor: softBlue,
+          icon: Icons.check_circle_rounded,
+          iconColor: primaryBlue,
+          iconSize: 42,
+          afterIconGap: 18,
+          title: l10n.quoteRequestSubmitted,
+          titleColor: textDark,
+          titleFontSize: 20,
+          titleFontWeight: FontWeight.w800,
+          afterTitleGap: 9,
+          body: l10n.quoteSentToTawam,
+          bodyColor: textGrey,
+          bodyFontSize: 12,
+          bodyHeight: 1.45,
+          bodyFontWeight: FontWeight.w500,
+          afterBodyGap: 18,
+          middle: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(26),
-              boxShadow: [
-                BoxShadow(
-                  color: deepBlue.withValues(alpha: .18),
-                  blurRadius: 28,
-                  offset: const Offset(0, 12),
-                ),
-              ],
+              color: const Color(0xFFF7F9FC),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: const BoxDecoration(
-                    color: softBlue,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: primaryBlue,
-                    size: 42,
-                  ),
-                ),
-                const SizedBox(height: 18),
                 Text(
-                  l10n.quoteRequestSubmitted,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 9),
-                Text(
-                  l10n.quoteSentToTawam,
-                  textAlign: TextAlign.center,
+                  l10n.reference,
                   style: TextStyle(
                     color: textGrey,
-                    fontSize: 12,
-                    height: 1.45,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 9,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 18),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF7F9FC),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: borderColor),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.reference,
-                        style: TextStyle(
-                          color: textGrey,
-                          fontSize: 9,
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        quoteNumber,
-                        style: const TextStyle(
-                          color: deepBlue,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: deepBlue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Text(
-                      l10n.doneUpper,
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
+                const SizedBox(height: 5),
+                Text(
+                  quoteNumber,
+                  style: const TextStyle(
+                    color: deepBlue,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
           ),
+          afterMiddleGap: 18,
+          buttonHeight: 52,
+          buttonColor: deepBlue,
+          buttonRadius: 16,
+          buttonLabel: l10n.doneUpper,
+          buttonFontWeight: FontWeight.w800,
+          onDone: () {
+            Navigator.pop(dialogContext);
+            Navigator.pop(context);
+          },
         );
       },
     );
