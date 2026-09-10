@@ -1,5 +1,6 @@
 import '../app/utils/value_formatters.dart';
 import '../app/widgets/action_success_dialog.dart';
+import '../app/widgets/shipping/premium_card.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../app/widgets/shipping/show_shipping_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -978,21 +979,12 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Widget _card({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .035),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+    return ShippingPremiumCard(
+      borderColor: borderColor,
+      shadowColor: deepBlue,
+      borderRadius: 20,
+      shadowBlur: 12,
+      shadowOffset: const Offset(0, 5),
       child: child,
     );
   }

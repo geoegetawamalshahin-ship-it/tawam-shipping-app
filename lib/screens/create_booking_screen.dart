@@ -1,7 +1,8 @@
 import '../app/utils/value_formatters.dart';
 import '../app/widgets/action_success_dialog.dart';
-import '../app/widgets/soft_back_header.dart';
 import '../app/widgets/numbered_section_heading.dart';
+import '../app/widgets/shipping/premium_card.dart';
+import '../app/widgets/soft_back_header.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -1123,21 +1124,11 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   }
 
   Widget _premiumCard({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .035),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+    return ShippingPremiumCard(
+      borderColor: borderColor,
+      shadowColor: deepBlue,
+      shadowBlur: 14,
+      shadowOffset: const Offset(0, 5),
       child: child,
     );
   }

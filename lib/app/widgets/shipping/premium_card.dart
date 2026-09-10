@@ -6,11 +6,17 @@ class ShippingPremiumCard extends StatelessWidget {
     required this.child,
     required this.borderColor,
     required this.shadowColor,
+    this.borderRadius = 21,
+    this.shadowBlur = 18,
+    this.shadowOffset = const Offset(0, 7),
   });
 
   final Widget child;
   final Color borderColor;
   final Color shadowColor;
+  final double borderRadius;
+  final double shadowBlur;
+  final Offset shadowOffset;
 
   @override
   Widget build(BuildContext context) {
@@ -19,13 +25,13 @@ class ShippingPremiumCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
             color: shadowColor.withValues(alpha: .035),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
+            blurRadius: shadowBlur,
+            offset: shadowOffset,
           ),
         ],
       ),

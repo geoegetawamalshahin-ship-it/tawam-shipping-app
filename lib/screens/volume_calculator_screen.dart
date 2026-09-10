@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'get_quote_screen.dart';
 
 import '../app/widgets/numbered_section_heading.dart';
+import '../app/widgets/shipping/premium_card.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../l10n/app_localizations.dart';
 
@@ -367,21 +368,12 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
 
   Widget _buildDimensionsCard() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .035),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+    return ShippingPremiumCard(
+      borderColor: borderColor,
+      shadowColor: deepBlue,
+      borderRadius: 22,
+      shadowBlur: 14,
+      shadowOffset: const Offset(0, 5),
       child: Column(
         children: [
           Row(
