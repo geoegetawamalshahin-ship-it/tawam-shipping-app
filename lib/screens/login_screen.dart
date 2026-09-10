@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/auth_field_decoration.dart';
 import '../controllers/auth_controller.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
@@ -189,38 +190,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         return null;
                       },
-                      decoration: InputDecoration(
+                      decoration: authInputDecoration(
                         hintText: 'you@business.com',
-                        hintStyle: const TextStyle(color: Color(0xFFA5ABB5)),
-                        prefixIcon: const Icon(
-                          Icons.person_outline_rounded,
-                          color: Color(0xFF87909D),
-                        ),
-                        filled: true,
-                        fillColor: const Color(0xFFF7F8FA),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 18,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE0E4E9),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE0E4E9),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF07569E),
-                            width: 1.7,
-                          ),
-                        ),
+                        icon: Icons.person_outline_rounded,
                       ),
                     ),
 
@@ -253,13 +225,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         return null;
                       },
-                      decoration: InputDecoration(
+                      decoration: authInputDecoration(
                         hintText: l10n.password,
-                        hintStyle: const TextStyle(color: Color(0xFFA5ABB5)),
-                        prefixIcon: const Icon(
-                          Icons.lock_outline_rounded,
-                          color: Color(0xFF87909D),
-                        ),
+                        icon: Icons.lock_outline_rounded,
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -271,31 +239,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                             color: const Color(0xFF07569E),
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: const Color(0xFFF7F8FA),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 18,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE0E4E9),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE0E4E9),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(17),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF07569E),
-                            width: 1.7,
                           ),
                         ),
                       ),

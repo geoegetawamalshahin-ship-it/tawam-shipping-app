@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/auth_field_decoration.dart';
 import '../controllers/auth_controller.dart';
 import '../l10n/app_localizations.dart';
 
@@ -78,34 +79,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required IconData icon,
     Widget? suffixIcon,
   }) {
-    return InputDecoration(
+    return authInputDecoration(
       hintText: hintText,
-      hintStyle: const TextStyle(color: Color(0xFFA5ABB5)),
-      prefixIcon: Icon(icon, color: const Color(0xFF87909D)),
+      icon: icon,
       suffixIcon: suffixIcon,
-      filled: true,
-      fillColor: const Color(0xFFF7F8FA),
-      contentPadding: const EdgeInsets.symmetric(vertical: 19, horizontal: 18),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: Color(0xFFE0E4E9)),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: Color(0xFFE0E4E9)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: Color(0xFF07569E), width: 1.7),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: Color(0xFFD72638)),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(17),
-        borderSide: const BorderSide(color: Color(0xFFD72638), width: 1.7),
-      ),
+      contentPaddingVertical: 19,
+      errorBorderEnabled: true,
+      focusedErrorBorderEnabled: true,
     );
   }
 
