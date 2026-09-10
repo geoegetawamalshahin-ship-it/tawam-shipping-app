@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../app/widgets/connection_error_panel.dart';
+import '../app/widgets/list_empty_card.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../controllers/booking_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -1028,34 +1029,21 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _buildEmptyState() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return ListEmptyCard(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        children: [
-          const Icon(Icons.event_note_outlined, color: primaryBlue, size: 45),
-          const SizedBox(height: 13),
-          Text(
-            l10n.noBookingsFound,
-            style: const TextStyle(
-              color: textDark,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.bookingsEmptyBody,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: textGrey, fontSize: 11),
-          ),
-        ],
-      ),
+      borderColor: borderColor,
+      icon: Icons.event_note_outlined,
+      iconColor: primaryBlue,
+      iconSize: 45,
+      afterIconGap: 13,
+      title: l10n.noBookingsFound,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w900,
+      afterTitleGap: 6,
+      body: l10n.bookingsEmptyBody,
+      bodyColor: textGrey,
+      bodyFontSize: 11,
     );
   }
 

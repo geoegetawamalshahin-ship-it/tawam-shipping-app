@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../app/widgets/connection_error_panel.dart';
+import '../app/widgets/list_empty_card.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -1190,38 +1191,22 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
 
   Widget _buildEmpty() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return ListEmptyCard(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 38),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: border),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.request_quote_outlined,
-            color: primaryBlue,
-            size: 42,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.noQuotationsYet,
-            style: const TextStyle(
-              color: textDark,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            l10n.quotationsEmptyBody,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: textGrey, fontSize: 11, height: 1.4),
-          ),
-        ],
-      ),
+      borderColor: border,
+      icon: Icons.request_quote_outlined,
+      iconColor: primaryBlue,
+      iconSize: 42,
+      afterIconGap: 14,
+      title: l10n.noQuotationsYet,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w800,
+      afterTitleGap: 7,
+      body: l10n.quotationsEmptyBody,
+      bodyColor: textGrey,
+      bodyFontSize: 11,
+      bodyHeight: 1.4,
     );
   }
 

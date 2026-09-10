@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../app/widgets/counted_section_header.dart';
+import '../app/widgets/list_empty_card.dart';
 import '../app/widgets/soft_back_header.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import 'package:get/get.dart';
@@ -761,41 +762,21 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   Widget _buildEmpty() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return ListEmptyCard(
       padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 42),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: _border),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.support_agent_outlined,
-            color: Color(0xFF9BA6B4),
-            size: 45,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.noSupportRequestsFound,
-            style: const TextStyle(
-              color: _textDark,
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.supportRequestsEmptyBody,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: _textGrey,
-              fontSize: 10.5,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
+      borderColor: _border,
+      icon: Icons.support_agent_outlined,
+      iconColor: const Color(0xFF9BA6B4),
+      iconSize: 45,
+      afterIconGap: 14,
+      title: l10n.noSupportRequestsFound,
+      titleColor: _textDark,
+      titleFontWeight: FontWeight.w900,
+      afterTitleGap: 6,
+      body: l10n.supportRequestsEmptyBody,
+      bodyColor: _textGrey,
+      bodyFontSize: 10.5,
+      bodyHeight: 1.4,
     );
   }
 
