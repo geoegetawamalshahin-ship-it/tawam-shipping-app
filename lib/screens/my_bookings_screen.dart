@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/connection_error_panel.dart';
 import '../controllers/booking_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
@@ -1114,81 +1115,18 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _buildError(String error) {
     final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: borderColor),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 62,
-              height: 62,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF0F6FC),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: const Icon(
-                Icons.cloud_off_rounded,
-                color: primaryBlue,
-                size: 29,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Text(
-              l10n.unableToLoadBookings,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: textDark,
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-
-            const SizedBox(height: 7),
-
-            Text(
-              l10n.pleaseCheckConnectionTryAgain,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: textGrey,
-                fontSize: 11.5,
-                height: 1.5,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {});
-              },
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: Text(l10n.tryAgain),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 13,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return ConnectionErrorPanel(
+      title: l10n.unableToLoadBookings,
+      body: l10n.pleaseCheckConnectionTryAgain,
+      retryLabel: l10n.tryAgain,
+      onRetry: () {
+        setState(() {});
+      },
+      borderColor: borderColor,
+      titleColor: textDark,
+      bodyColor: textGrey,
+      accentColor: primaryBlue,
+      bodyFontWeight: FontWeight.w500,
     );
   }
 
