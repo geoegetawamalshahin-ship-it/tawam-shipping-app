@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'get_quote_screen.dart';
 
 import '../app/widgets/numbered_section_heading.dart';
+import '../app/widgets/soft_back_header.dart';
 import '../l10n/app_localizations.dart';
 
 class VolumeCalculatorScreen extends StatefulWidget {
@@ -224,83 +225,28 @@ class _VolumeCalculatorScreenState extends State<VolumeCalculatorScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.volumeCalculator,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.calculate_outlined,
+      onBack: () => Navigator.pop(context),
       height: 84,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: deepBlue,
-                size: 23,
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.volumeCalculator,
-                  style: const TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: primaryBlue,
-                    fontSize: 9.3,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.calculate_outlined,
-              color: primaryBlue,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+      shadowColor: deepBlue,
+      shadowAlpha: .06,
+      shadowBlur: 20,
+      shadowOffset: const Offset(0, 6),
+      borderColor: borderColor,
+      backIconColor: deepBlue,
+      backIconSize: 23,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w900,
+      titleLetterSpacing: -.35,
+      subtitleColor: primaryBlue,
+      subtitleFontSize: 9.3,
+      subtitleFontWeight: FontWeight.w800,
+      trailingBackground: softBlue,
+      trailingIconColor: primaryBlue,
+      trailingIconSize: 23,
     );
   }
 

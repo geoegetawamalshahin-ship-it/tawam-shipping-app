@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../app/widgets/counted_section_header.dart';
+import '../app/widgets/soft_back_header.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import 'package:get/get.dart';
 
@@ -162,83 +163,30 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.mySupportRequests,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.support_agent_rounded,
+      onBack: () => Navigator.pop(context),
       height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: _deepBlue.withValues(alpha: .06),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: _border),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: _deepBlue,
-                size: 22,
-              ),
-            ),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.mySupportRequests,
-                  style: const TextStyle(
-                    color: _textDark,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -.35,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: _primaryBlue,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: _softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.support_agent_rounded,
-              color: _primaryBlue,
-              size: 22,
-            ),
-          ),
-        ],
-      ),
+      shadowColor: _deepBlue,
+      shadowAlpha: .06,
+      shadowBlur: 20,
+      shadowOffset: const Offset(0, 6),
+      borderColor: _border,
+      backIconColor: _deepBlue,
+      backIconSize: 22,
+      leadingGap: 13,
+      titleColor: _textDark,
+      titleFontSize: 19,
+      titleFontWeight: FontWeight.w900,
+      titleLetterSpacing: -.35,
+      subtitleColor: _primaryBlue,
+      subtitleFontSize: 9,
+      subtitleFontWeight: FontWeight.w800,
+      trailingBackground: _softBlue,
+      trailingIconColor: _primaryBlue,
+      trailingIconSize: 22,
     );
   }
 

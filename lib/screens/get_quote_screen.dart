@@ -1,4 +1,5 @@
 import '../app/utils/value_formatters.dart';
+import '../app/widgets/soft_back_header.dart';
 import '../app/widgets/shipping/show_shipping_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -197,83 +198,28 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    return SoftBackHeader(
+      title: l10n.getAQuoteTitle,
+      subtitle: l10n.tawamAlShahinTransport,
+      trailingIcon: Icons.verified_outlined,
+      onBack: () => Navigator.pop(context),
       height: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: deepBlue.withValues(alpha: .07),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF7F9FC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: deepBlue,
-                size: 23,
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.getAQuoteTitle,
-                  style: const TextStyle(
-                    color: textDark,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.tawamAlShahinTransport,
-                  style: const TextStyle(
-                    color: primaryBlue,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: softBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.verified_outlined,
-              color: primaryBlue,
-              size: 23,
-            ),
-          ),
-        ],
-      ),
+      shadowColor: deepBlue,
+      shadowAlpha: .07,
+      shadowBlur: 20,
+      shadowOffset: const Offset(0, 6),
+      borderColor: borderColor,
+      backIconColor: deepBlue,
+      backIconSize: 23,
+      titleColor: textDark,
+      titleFontWeight: FontWeight.w800,
+      titleLetterSpacing: -0.3,
+      subtitleColor: primaryBlue,
+      subtitleFontSize: 9.5,
+      subtitleFontWeight: FontWeight.w700,
+      trailingBackground: softBlue,
+      trailingIconColor: primaryBlue,
+      trailingIconSize: 23,
     );
   }
 
