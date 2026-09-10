@@ -1575,6 +1575,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shipmentDocumentsSubtitle => 'Files uploaded for this shipment.';
 
   @override
+  String get shipmentDocumentsEmpty =>
+      'No files have been uploaded for this shipment yet.';
+
+  @override
   String get couldNotLoadImage => 'Could not load image';
 
   @override

@@ -591,6 +591,7 @@
   "documentsEmptyBody": "Your invoices, shipment documents and delivery files will appear here.",
   "shipmentDocuments": "Shipment Documents",
   "shipmentDocumentsSubtitle": "Files uploaded for this shipment.",
+  "shipmentDocumentsEmpty": "No files have been uploaded for this shipment yet.",
   "couldNotLoadImage": "Could not load image",
   "customerSupport": "Customer Support",
   "logisticsSupportCenter": "LOGISTICS SUPPORT CENTER",

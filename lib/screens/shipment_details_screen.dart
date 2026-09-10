@@ -1264,9 +1264,6 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
 
   List<Widget> _buildDocumentsSection(AppLocalizations l10n) {
     final documents = shipmentDocumentsOf(_shipment);
-    if (documents.isEmpty) {
-      return const [];
-    }
 
     return [
       const SizedBox(height: 18),
@@ -1276,17 +1273,36 @@ class _ShipmentDetailsScreenState extends State<ShipmentDetailsScreen> {
         icon: Icons.folder_copy_outlined,
       ),
       const SizedBox(height: 11),
-      for (var index = 0; index < documents.length; index++) ...[
-        if (index > 0) const SizedBox(height: 10),
-        _ShipmentDocumentRow(
-          document: documents[index],
-          fallbackName: l10n.document,
-          onOpen: () => openShippingDocument(
-            context: context,
-            document: documents[index],
+      if (documents.isEmpty)
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(19),
+            border: Border.all(color: _border),
           ),
-        ),
-      ],
+          child: Text(
+            l10n.shipmentDocumentsEmpty,
+            style: const TextStyle(
+              color: _textGrey,
+              fontSize: 12.5,
+              height: 1.4,
+            ),
+          ),
+        )
+      else
+        for (var index = 0; index < documents.length; index++) ...[
+          if (index > 0) const SizedBox(height: 10),
+          _ShipmentDocumentRow(
+            document: documents[index],
+            fallbackName: l10n.document,
+            onOpen: () => openShippingDocument(
+              context: context,
+              document: documents[index],
+            ),
+          ),
+        ],
     ];
   }
 

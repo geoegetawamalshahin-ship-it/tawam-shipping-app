@@ -3056,6 +3056,12 @@ abstract class AppLocalizations {
   /// **'Files uploaded for this shipment.'**
   String get shipmentDocumentsSubtitle;
 
+  /// No description provided for @shipmentDocumentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No files have been uploaded for this shipment yet.'**
+  String get shipmentDocumentsEmpty;
+
   /// No description provided for @couldNotLoadImage.
   ///
   /// In en, this message translates to:

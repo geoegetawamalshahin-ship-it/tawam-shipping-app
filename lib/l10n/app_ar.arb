@@ -591,6 +591,7 @@
   "documentsEmptyBody": "ستظهر فواتيرك ومستندات الشحن وملفات التسليم هنا.",
   "shipmentDocuments": "مستندات الشحنة",
   "shipmentDocumentsSubtitle": "الملفات المرفوعة لهذه الشحنة.",
+  "shipmentDocumentsEmpty": "لم يُرفع أي ملف لهذه الشحنة بعد.",
   "couldNotLoadImage": "تعذر تحميل الصورة",
   "customerSupport": "دعم العملاء",
   "logisticsSupportCenter": "مركز الدعم اللوجستي",

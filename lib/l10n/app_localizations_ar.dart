@@ -1546,6 +1546,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shipmentDocumentsSubtitle => 'الملفات المرفوعة لهذه الشحنة.';
 
   @override
+  String get shipmentDocumentsEmpty => 'لم يُرفع أي ملف لهذه الشحنة بعد.';
+
+  @override
   String get couldNotLoadImage => 'تعذر تحميل الصورة';
 
   @override
