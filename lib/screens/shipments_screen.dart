@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/widgets/counted_section_header.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
@@ -521,44 +522,10 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   Widget _buildListHeader(int count) {
     final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.shipmentPortfolio,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                l10n.selectShipmentDetails,
-                style: const TextStyle(color: _textGrey, fontSize: 9.5),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Text(
-            '$count',
-            style: const TextStyle(
-              color: _primaryBlue,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ),
-      ],
+    return CountedSectionHeader(
+      title: l10n.shipmentPortfolio,
+      subtitle: l10n.selectShipmentDetails,
+      count: count,
     );
   }
 

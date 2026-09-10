@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../app/widgets/counted_section_header.dart';
 import '../app/widgets/shipment_status_widgets.dart';
 import 'package:get/get.dart';
 
@@ -419,44 +420,10 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
 
   Widget _buildSectionHeader(int count) {
     final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.supportHistory,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                l10n.tapAnyCase,
-                style: const TextStyle(color: _textGrey, fontSize: 9.5),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Text(
-            '$count',
-            style: const TextStyle(
-              color: _primaryBlue,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ),
-      ],
+    return CountedSectionHeader(
+      title: l10n.supportHistory,
+      subtitle: l10n.tapAnyCase,
+      count: count,
     );
   }
 
