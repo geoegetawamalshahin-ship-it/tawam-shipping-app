@@ -22,7 +22,7 @@ Previous candidate tables at `50393fb` are historical.
 | `ShippingTrustBar` / `ShippingTrustItem` / `ShippingTrustDivider` | `trust_bar.dart`, `trust_item.dart`, `dividers.dart` | Same six forms |
 | `ShippingContactDivider` | `dividers.dart` | Forms that show contact rows, including air |
 | `ShippingNotesField` | `notes_field.dart` | Car, land, parcel, international, sea (**not air**) |
-| `ShippingCustomerDetails` | `customer_details.dart` | Car, land, parcel, international, sea (**not air**) |
+| `ShippingCustomerDetails` | `customer_details.dart` | Car, land, parcel, international, sea, **air**. Air `verifiedMessageHeight: null` and `labelFontWeight: null`. |
 | `ShippingPremiumCard` | `premium_card.dart` | Six forms (section cards) |
 | `shippingTextField` / `shippingInputDecoration` | `form_fields.dart` | Six forms; air: `labelWeight: null`, `focusedErrorBorderEnabled: false` |
 | `shippingDropdown` | `form_controls.dart` | Six forms |
@@ -86,7 +86,7 @@ Booking / get-quote / request-quote / support success dialogs remain separate (d
 
 ## Kept separate on purpose
 
-Air customer/notes chrome; international special-item chips; air unstyled Done and sea `letterSpacing: .35` **via dialog parameters**; booking/get-quote/request-quote/support success dialogs; booking/get-quote/calculator cards and date rows; booking profile load (`TAWAM Customer`, extra keys, phone controller); support heading vs numbered heading; field decorations across auth/support/quote/search; list date fallbacks (`-` / `notProvided` / `notSpecified`); request-quote quantity vs land/sea; booking SnackBar (`0xFF9D2732`); filled shipping snackbars vs unfilled track/support snackbars; documents viewer; notifications list; Home vs Profile headers/logout; details `_InfoCard` vs track `_InformationCard` (minHeight 107 vs 106).
+Air notes chrome (not `ShippingNotesField`; air omits prefix icon); international special-item chips; air unstyled Done and sea `letterSpacing: .35` **via dialog parameters**; booking/get-quote/request-quote/support success dialogs; booking/get-quote/calculator cards and date rows; booking profile load (`TAWAM Customer`, extra keys, phone controller); support heading vs numbered heading; field decorations across auth/support/quote/search; list date fallbacks (`-` / `notProvided` / `notSpecified`); request-quote quantity vs land/sea; booking SnackBar (`0xFF9D2732`); filled shipping snackbars vs unfilled track/support snackbars; documents viewer; notifications list; Home vs Profile headers/logout; details `_InfoCard` vs track `_InformationCard` (minHeight 107 vs 106).
 
 ## Diff vs `main` (scope)
 
@@ -103,7 +103,7 @@ No evidence in the file list of submit/navigation/validator-message/formula/Fire
 **Done (agreed batches)**
 
 - Shipping form chrome: header, section title, trust bar, premium card, fields, dropdowns, dimensions, option switches (air height preserved), services (six forms; international additional only), date selector chrome, submit, summary badges, calculation rows.
-- Notes + customer details on five forms (air kept different).
+- Notes + customer details on five forms; air now also calls `ShippingCustomerDetails` with `verifiedMessageHeight: null` and `labelFontWeight: null` so air type stays as before.
 - Quote success dialog on all six shipping forms (air unstyled Done; sea My Quotes letterSpacing `.35`).
 - Helpers: dates/values, display numbers, land/sea quantity, required field, quote/support email field, language labels, shipping snackbars (six forms + get-quote), shipping customer profile load (`users/{uid}`).
 - Numbered heading for booking + calculator. Home/Profile language picker sheet (apply/save remains on each page).

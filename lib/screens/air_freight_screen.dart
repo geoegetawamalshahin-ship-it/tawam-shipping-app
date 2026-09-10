@@ -1201,140 +1201,31 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
-
       shadowColor: _deepBlue,
-      child: _loadingProfile
-          ? const Padding(
-              padding: EdgeInsets.symmetric(vertical: 25),
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: _primaryBlue,
-                  strokeWidth: 2.5,
-                ),
-              ),
-            )
-          : Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEAF8F0),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.verified_user_outlined,
-                        color: _success,
-                        size: 18,
-                      ),
-
-                      const SizedBox(width: 9),
-
-                      Expanded(
-                        child: Text(
-                          l10n.contactFilledFromAccount,
-                          style: const TextStyle(
-                            color: _success,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                _contactRow(
-                  Icons.person_outline_rounded,
-                  l10n.fullName,
-                  _customerName,
-                ),
-
-                const ShippingContactDivider(color: _border),
-
-                _contactRow(
-                  Icons.phone_outlined,
-                  l10n.phoneNumber,
-                  _customerPhone.isEmpty
-                      ? l10n.notProvided
-                      : _customerPhone,
-                ),
-
-                const ShippingContactDivider(color: _border),
-
-                _contactRow(
-                  Icons.email_outlined,
-                  l10n.emailAddress,
-                  _customerEmail.isEmpty
-                      ? l10n.notProvided
-                      : _customerEmail,
-                ),
-
-                if (_customerCompany.isNotEmpty) ...[
-                  const ShippingContactDivider(color: _border),
-                  _contactRow(
-                    Icons.business_outlined,
-                    l10n.company,
-                    _customerCompany,
-                  ),
-                ],
-
-                if (_customerCountry.isNotEmpty) ...[
-                  const ShippingContactDivider(color: _border),
-                  _contactRow(
-                    Icons.public_outlined,
-                    l10n.country,
-                    _customerCountry,
-                  ),
-                ],
-              ],
-            ),
-    );
-  }
-
-  Widget _contactRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Container(
-          width: 39,
-          height: 39,
-          decoration: BoxDecoration(
-            color: _softBlue,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: _primaryBlue, size: 19),
-        ),
-
-        const SizedBox(width: 11),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(color: _textGrey, fontSize: 8.5),
-              ),
-
-              const SizedBox(height: 3),
-
-              Text(
-                value,
-                style: const TextStyle(
-                  color: _textDark,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      child: ShippingCustomerDetails(
+        loading: _loadingProfile,
+        verifiedMessage: l10n.contactFilledFromAccount,
+        fullNameLabel: l10n.fullName,
+        phoneLabel: l10n.phoneNumber,
+        emailLabel: l10n.emailAddress,
+        companyLabel: l10n.company,
+        countryLabel: l10n.country,
+        notProvidedLabel: l10n.notProvided,
+        customerName: _customerName,
+        customerPhone: _customerPhone,
+        customerEmail: _customerEmail,
+        customerCompany: _customerCompany,
+        customerCountry: _customerCountry,
+        primaryColor: _primaryBlue,
+        softColor: _softBlue,
+        borderColor: _border,
+        successColor: _success,
+        textColor: _textDark,
+        labelColor: _textGrey,
+        verifiedMessageHeight: null,
+        labelFontWeight: null,
+      ),
     );
   }
 
