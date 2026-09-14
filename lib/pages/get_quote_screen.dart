@@ -714,12 +714,15 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
                   children: [
                     const Icon(Icons.send_rounded, size: 20),
                     const SizedBox(width: 10),
-                    Text(
-                      l10n.submitQuoteRequest,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: .4,
+                    Flexible(
+                      child: Text(
+                        l10n.submitQuoteRequest,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: .4,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 9),

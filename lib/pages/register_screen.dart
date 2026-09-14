@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../widgets/auth_field_decoration.dart';
 import '../widgets/auth_password_field.dart';
+import '../widgets/auth_submit_button.dart';
 import '../controllers/auth_form_controllers.dart';
 import '../l10n/app_localizations.dart';
 
@@ -313,7 +314,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 30),
 
-                    _authSubmitButton(
+                    AuthSubmitButton(
                       label: l10n.createAccount,
                       submitting: _c.isSubmitting,
                       onPressed: _createAccount,
@@ -344,55 +345,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
-  }
-
-  Widget _authSubmitButton({
-    required String label,
-    required RxBool submitting,
-    required VoidCallback onPressed,
-  }) {
-    return Obx(() {
-      final busy = submitting.value;
-      return SizedBox(
-        width: double.infinity,
-        height: 59,
-        child: ElevatedButton(
-          onPressed: busy ? null : onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF07569E),
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: const Color(0xFF07569E),
-            disabledForegroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-          ),
-          child: busy
-              ? const SizedBox(
-                  width: 23,
-                  height: 23,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.4,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.arrow_forward_rounded, size: 23),
-                  ],
-                ),
-        ),
-      );
-    });
   }
 }

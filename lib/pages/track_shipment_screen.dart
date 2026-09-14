@@ -254,23 +254,27 @@ class _TrackShipmentScreenState extends State<TrackShipmentScreen> {
 
               const SizedBox(height: 18),
 
-              Row(
-                children: [
-                  ShipmentHeroFeature(
-                    icon: Icons.lock_outline_rounded,
-                    label: l10n.private,
-                  ),
-                  const SizedBox(width: 18),
-                  ShipmentHeroFeature(
-                    icon: Icons.sync_rounded,
-                    label: l10n.liveUpdates,
-                  ),
-                  const SizedBox(width: 18),
-                  ShipmentHeroFeature(
-                    icon: Icons.verified_outlined,
-                    label: l10n.secure,
-                  ),
-                ],
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Row(
+                  children: [
+                    ShipmentHeroFeature(
+                      icon: Icons.lock_outline_rounded,
+                      label: l10n.private,
+                    ),
+                    const SizedBox(width: 18),
+                    ShipmentHeroFeature(
+                      icon: Icons.sync_rounded,
+                      label: l10n.liveUpdates,
+                    ),
+                    const SizedBox(width: 18),
+                    ShipmentHeroFeature(
+                      icon: Icons.verified_outlined,
+                      label: l10n.secure,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

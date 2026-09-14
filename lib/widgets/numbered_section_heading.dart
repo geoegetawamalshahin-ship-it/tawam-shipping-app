@@ -54,12 +54,15 @@ class NumberedSectionHeading extends StatelessWidget {
                 children: [
                   Icon(icon, color: iconColor, size: 19),
                   const SizedBox(width: 7),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: titleColor,
-                      fontSize: 16.5,
-                      fontWeight: FontWeight.w800,
+                  Expanded(
+                    child: Text(
+                      title,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: titleColor,
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ],

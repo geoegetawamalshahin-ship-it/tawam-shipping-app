@@ -48,19 +48,10 @@ void main() {
   testWidgets(
     'GetMaterialApp bindings pass quote dimensions, booking type, and tracking number',
     (tester) async {
-      tester.view.physicalSize = const Size(800, 2000);
+      tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-
-      final previousOnError = FlutterError.onError;
-      FlutterError.onError = (details) {
-        if (details.exceptionAsString().contains('A RenderFlex overflowed')) {
-          return;
-        }
-        previousOnError?.call(details);
-      };
-      addTearDown(() => FlutterError.onError = previousOnError);
 
       await tester.pumpWidget(
         GetMaterialApp(

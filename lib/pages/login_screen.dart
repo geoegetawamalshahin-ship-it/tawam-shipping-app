@@ -6,6 +6,7 @@ import '../controllers/auth_form_controllers.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/auth_field_decoration.dart';
 import '../widgets/auth_password_field.dart';
+import '../widgets/auth_submit_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -225,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 16),
 
-                    _authSubmitButton(
+                    AuthSubmitButton(
                       label: l10n.signIn,
                       submitting: _c.isSubmitting,
                       onPressed: _signIn,
@@ -233,8 +234,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 24),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           l10n.dontHaveAccount,
@@ -276,55 +278,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-
-  Widget _authSubmitButton({
-    required String label,
-    required RxBool submitting,
-    required VoidCallback onPressed,
-  }) {
-    return Obx(() {
-      final busy = submitting.value;
-      return SizedBox(
-        width: double.infinity,
-        height: 59,
-        child: ElevatedButton(
-          onPressed: busy ? null : onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF07569E),
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: const Color(0xFF07569E),
-            disabledForegroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-          ),
-          child: busy
-              ? const SizedBox(
-                  width: 23,
-                  height: 23,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.4,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.arrow_forward_rounded, size: 23),
-                  ],
-                ),
-        ),
-      );
-    });
   }
 }

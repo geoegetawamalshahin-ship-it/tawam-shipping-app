@@ -70,19 +70,11 @@ void main() {
   testWidgets(
     'repeated login taps do not show a false credential error or extra request',
     (tester) async {
-      tester.view.physicalSize = const Size(400, 1400);
+      tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-
-      final previousOnError = FlutterError.onError;
-      FlutterError.onError = (details) {
-        if (details.exceptionAsString().contains('A RenderFlex overflowed')) {
-          return;
-        }
-        previousOnError?.call(details);
-      };
-      addTearDown(() => FlutterError.onError = previousOnError);
+      addTearDown(tester.view.resetViewInsets);
 
       final auth = _HangingAuthController();
       Get.put<AuthController>(auth);
@@ -113,7 +105,7 @@ void main() {
 
       final submit = find.byType(ElevatedButton);
       await tester.ensureVisible(submit);
-      await tester.tap(submit, warnIfMissed: false);
+      await tester.tap(submit);
       await tester.pump();
 
       expect(auth.signInCalls, 1);
