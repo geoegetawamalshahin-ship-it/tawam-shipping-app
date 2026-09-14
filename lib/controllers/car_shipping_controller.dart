@@ -35,7 +35,6 @@ class CarShippingController extends GetxController
   final insuranceRequested = false.obs;
   final priorityHandling = false.obs;
   final additionalServices = <String>{}.obs;
-  final revision = 0.obs;
 
   final serviceModes = const [
     'Door to Door',
@@ -73,23 +72,19 @@ class CarShippingController extends GetxController
 
   QuoteController get quotes => _quoteController;
 
+  List<Listenable> get summaryListenables => [
+    originController,
+    destinationController,
+    vehicleCountController,
+    makeController,
+    modelController,
+    yearController,
+  ];
+
   int get vehicleCount {
     final value = int.tryParse(vehicleCountController.text.trim());
     if (value == null || value <= 0) return 1;
     return value;
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-    for (final controller in [
-      vehicleCountController,
-      makeController,
-      modelController,
-      yearController,
-    ]) {
-      controller.addListener(() => revision.value++);
-    }
   }
 
   void observeForm() {
@@ -101,7 +96,6 @@ class CarShippingController extends GetxController
     readyDate.value;
     insuranceRequested.value;
     priorityHandling.value;
-    revision.value;
     additionalServices.length;
     loadingProfile.value;
     customerName.value;

@@ -40,7 +40,6 @@ class LandFreightController extends GetxController
   final insuranceRequested = false.obs;
   final oversizedCargo = false.obs;
   final additionalServices = <String>{}.obs;
-  final revision = 0.obs;
 
   final weightUnits = const ['KG', 'TON'];
   final serviceModes = const [
@@ -74,6 +73,18 @@ class LandFreightController extends GetxController
 
   QuoteController get quotes => _quoteController;
 
+  List<Listenable> get summaryListenables => [
+    originController,
+    destinationController,
+    quantityController,
+    weightController,
+    volumeController,
+    lengthController,
+    widthController,
+    heightController,
+    temperatureController,
+  ];
+
   double currentVolume() {
     return double.tryParse(volumeController.text.trim()) ?? 0;
   }
@@ -87,7 +98,7 @@ class LandFreightController extends GetxController
       heightController,
       quantityController,
     ]) {
-      controller.addListener(calculateVolume);
+      addManagedListener(controller, calculateVolume);
     }
   }
 
@@ -102,7 +113,6 @@ class LandFreightController extends GetxController
         .toStringAsFixed(3);
     if (volumeController.text != value) {
       volumeController.text = value;
-      revision.value++;
     }
   }
 
@@ -116,7 +126,6 @@ class LandFreightController extends GetxController
     dangerousGoods.value;
     insuranceRequested.value;
     oversizedCargo.value;
-    revision.value;
     additionalServices.length;
     loadingProfile.value;
     customerName.value;

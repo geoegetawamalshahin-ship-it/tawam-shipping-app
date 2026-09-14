@@ -1097,10 +1097,10 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   Widget _buildSummary() {
     final l10n = AppLocalizations.of(context)!;
 
-    return Obx(() {
-      _c.revision.value;
-      return _buildSummaryBody(l10n);
-    });
+    return FormSummaryListener(
+      listenables: _c.summaryListenables,
+      builder: (context) => _buildSummaryBody(l10n),
+    );
   }
 
   Widget _buildSummaryBody(AppLocalizations l10n) {

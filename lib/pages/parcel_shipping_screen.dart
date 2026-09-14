@@ -1233,10 +1233,10 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   Widget _buildSummary() {
-    return Obx(() {
-      _c.revision.value;
-      return _buildSummaryBody(AppLocalizations.of(context)!);
-    });
+    return FormSummaryListener(
+      listenables: _c.summaryListenables,
+      builder: (context) => _buildSummaryBody(AppLocalizations.of(context)!),
+    );
   }
 
   Widget _buildSummaryBody(AppLocalizations l10n) {

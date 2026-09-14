@@ -685,7 +685,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
     return Obx(() {
-      final submitting = _c.quotes.isSubmitting.value;
+      final submitting = _c.isSubmitting.value;
       return SizedBox(
         width: double.infinity,
         height: 60,
@@ -735,6 +735,7 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
   }
 
   Future<void> _submitQuote() async {
+    if (_c.isSubmitting.value) return;
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
 

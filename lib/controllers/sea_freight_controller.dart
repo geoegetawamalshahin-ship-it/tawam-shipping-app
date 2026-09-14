@@ -35,7 +35,6 @@ class SeaFreightController extends GetxController
   final dangerousGoods = false.obs;
   final insuranceRequested = false.obs;
   final additionalServices = <String>{}.obs;
-  final revision = 0.obs;
 
   final serviceModes = const [
     'Door to Door',
@@ -63,6 +62,17 @@ class SeaFreightController extends GetxController
 
   QuoteController get quotes => _quoteController;
 
+  List<Listenable> get summaryListenables => [
+    originController,
+    destinationController,
+    quantityController,
+    weightController,
+    volumeController,
+    lengthController,
+    widthController,
+    heightController,
+  ];
+
   @override
   void onInit() {
     super.onInit();
@@ -72,7 +82,7 @@ class SeaFreightController extends GetxController
       heightController,
       quantityController,
     ]) {
-      controller.addListener(calculateVolume);
+      addManagedListener(controller, calculateVolume);
     }
   }
 
@@ -87,7 +97,6 @@ class SeaFreightController extends GetxController
         .toStringAsFixed(3);
     if (volumeController.text != newValue) {
       volumeController.text = newValue;
-      revision.value++;
     }
   }
 
@@ -98,7 +107,6 @@ class SeaFreightController extends GetxController
     readyDate.value;
     dangerousGoods.value;
     insuranceRequested.value;
-    revision.value;
     additionalServices.length;
     loadingProfile.value;
     customerName.value;

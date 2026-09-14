@@ -37,7 +37,6 @@ class AirFreightController extends GetxController
   final dangerousGoods = false.obs;
   final insuranceRequested = false.obs;
   final additionalServices = <String>{}.obs;
-  final revision = 0.obs;
 
   final serviceModes = const [
     'Door to Door',
@@ -57,6 +56,16 @@ class AirFreightController extends GetxController
   ];
 
   QuoteController get quotes => _quoteController;
+
+  List<Listenable> get summaryListenables => [
+    originController,
+    destinationController,
+    weightController,
+    piecesController,
+    lengthController,
+    widthController,
+    heightController,
+  ];
 
   double get grossWeight => double.tryParse(weightController.text.trim()) ?? 0;
 
@@ -85,22 +94,6 @@ class AirFreightController extends GetxController
 
   double get chargeableWeight => math.max(grossWeight, volumetricWeight);
 
-  @override
-  void onInit() {
-    super.onInit();
-    for (final controller in [
-      weightController,
-      piecesController,
-      lengthController,
-      widthController,
-      heightController,
-    ]) {
-      controller.addListener(_bump);
-    }
-  }
-
-  void _bump() => revision.value++;
-
   void observeForm() {
     serviceMode.value;
     airServiceType.value;
@@ -108,7 +101,6 @@ class AirFreightController extends GetxController
     readyDate.value;
     dangerousGoods.value;
     insuranceRequested.value;
-    revision.value;
     additionalServices.length;
     loadingProfile.value;
     customerName.value;

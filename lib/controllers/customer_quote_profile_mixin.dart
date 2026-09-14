@@ -27,6 +27,19 @@ mixin CustomerQuoteProfileMixin on GetxController {
   }
 
   bool _profileLoadStarted = false;
+  final _managedListeners = <Listenable, VoidCallback>{};
+
+  void addManagedListener(Listenable listenable, VoidCallback listener) {
+    listenable.addListener(listener);
+    _managedListeners[listenable] = listener;
+  }
+
+  void removeManagedListeners() {
+    for (final entry in _managedListeners.entries) {
+      entry.key.removeListener(entry.value);
+    }
+    _managedListeners.clear();
+  }
 
   Future<void> loadCustomerProfile({
     required Future<Map<String, dynamic>?> Function(String uid)
@@ -64,6 +77,7 @@ mixin CustomerQuoteProfileMixin on GetxController {
   }
 
   void disposeTextControllers(Iterable<TextEditingController> controllers) {
+    removeManagedListeners();
     for (final controller in controllers) {
       controller.dispose();
     }

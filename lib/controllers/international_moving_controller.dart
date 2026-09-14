@@ -40,7 +40,6 @@ class InternationalMovingController extends GetxController
   final insuranceRequested = false.obs;
   final specialItems = <String>{}.obs;
   final additionalServices = <String>{}.obs;
-  final revision = 0.obs;
 
   final propertyTypes = const [
     'Apartment',
@@ -72,6 +71,15 @@ class InternationalMovingController extends GetxController
 
   QuoteController get quotes => _quoteController;
 
+  List<Listenable> get summaryListenables => [
+    originController,
+    destinationController,
+    roomsController,
+    boxesController,
+    largeItemsController,
+    volumeController,
+  ];
+
   int get roomsCount {
     final value = int.tryParse(roomsController.text.trim());
     if (value == null || value <= 0) return 1;
@@ -102,19 +110,6 @@ class InternationalMovingController extends GetxController
     additionalServices: additionalServices,
   );
 
-  @override
-  void onInit() {
-    super.onInit();
-    for (final controller in [
-      roomsController,
-      boxesController,
-      largeItemsController,
-      volumeController,
-    ]) {
-      controller.addListener(() => revision.value++);
-    }
-  }
-
   void observeForm() {
     moveType.value;
     propertyType.value;
@@ -127,7 +122,6 @@ class InternationalMovingController extends GetxController
     furnitureDisassembly.value;
     storageRequired.value;
     insuranceRequested.value;
-    revision.value;
     specialItems.length;
     additionalServices.length;
     loadingProfile.value;

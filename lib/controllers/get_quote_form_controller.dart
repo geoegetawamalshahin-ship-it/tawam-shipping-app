@@ -53,6 +53,7 @@ class GetQuoteFormController extends GetxController {
 
   final selectedService = 'Land Freight'.obs;
   final pickupDate = Rxn<DateTime>();
+  final isSubmitting = false.obs;
 
   QuoteController get quotes => _quoteController;
 
@@ -78,14 +79,18 @@ class GetQuoteFormController extends GetxController {
   }
 
   Future<FormSubmitOutcome> submit({required bool formValid}) async {
+    if (isSubmitting.value) {
+      return const FormSubmitOutcome.failure(FormSubmitError.submitting);
+    }
     final blocked = formSubmitPrecheck(
-      alreadySubmitting: _quoteController.isSubmitting.value,
+      alreadySubmitting: false,
       formValid: formValid,
       signedIn: _quoteController.currentUser != null,
     );
     if (blocked != null) return blocked;
     final user = _quoteController.currentUser!;
 
+    isSubmitting.value = true;
     try {
       final userData = await _quoteService.loadUserProfile(user.uid);
       final customerName = firstNonEmpty([
@@ -149,6 +154,8 @@ class GetQuoteFormController extends GetxController {
       );
     } catch (_) {
       return const FormSubmitOutcome.failure(FormSubmitError.generic);
+    } finally {
+      isSubmitting.value = false;
     }
   }
 

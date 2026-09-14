@@ -39,7 +39,6 @@ class ParcelShippingController extends GetxController
   final insuranceRequested = false.obs;
   final signatureRequired = false.obs;
   final additionalServices = <String>{}.obs;
-  final revision = 0.obs;
 
   final pickupMethods = const ['Door Pickup', 'Drop-off'];
   final packageTypes = const [
@@ -59,6 +58,16 @@ class ParcelShippingController extends GetxController
   ];
 
   QuoteController get quotes => _quoteController;
+
+  List<Listenable> get summaryListenables => [
+    originController,
+    destinationController,
+    parcelCountController,
+    weightController,
+    lengthController,
+    widthController,
+    heightController,
+  ];
 
   int get parcelCount {
     final value = int.tryParse(parcelCountController.text.trim());
@@ -103,20 +112,6 @@ class ParcelShippingController extends GetxController
     return double.tryParse(text);
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    for (final controller in [
-      parcelCountController,
-      weightController,
-      lengthController,
-      widthController,
-      heightController,
-    ]) {
-      controller.addListener(() => revision.value++);
-    }
-  }
-
   void observeForm() {
     serviceLevel.value;
     pickupMethod.value;
@@ -126,7 +121,6 @@ class ParcelShippingController extends GetxController
     fragile.value;
     insuranceRequested.value;
     signatureRequired.value;
-    revision.value;
     additionalServices.length;
     loadingProfile.value;
     customerName.value;

@@ -290,228 +290,219 @@ class _ProfileScreenState extends State<ProfileScreen> {
       text: _address == 'Not provided' ? '' : _address,
     );
 
-    final result = await showModalBottomSheet<Map<String, String>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(sheetContext).size.height * .92,
-          ),
-          padding: EdgeInsets.fromLTRB(
-            20,
-            14,
-            20,
-            MediaQuery.of(sheetContext).viewInsets.bottom + 24,
-          ),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Form(
-              key: formKey,
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD9DEE5),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
+    try {
+      final result = await showModalBottomSheet<Map<String, String>>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (sheetContext) {
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(sheetContext).size.height * .92,
+            ),
+            padding: EdgeInsets.fromLTRB(
+              20,
+              14,
+              20,
+              MediaQuery.of(sheetContext).viewInsets.bottom + 24,
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Form(
+                key: formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 44,
+                        height: 5,
                         decoration: BoxDecoration(
-                          color: _blueLight,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: const Icon(
-                          Icons.manage_accounts_outlined,
-                          color: _blue,
-                          size: 24,
+                          color: const Color(0xFFD9DEE5),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.editProfile,
-                              style: const TextStyle(
-                                color: _text,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              l10n.customerDetails,
-                              style: const TextStyle(
-                                color: _muted,
-                                fontSize: 10.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(sheetContext),
-                        icon: const Icon(Icons.close_rounded, color: _text),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 22),
-
-                  TextFormField(
-                    controller: nameController,
-                    textCapitalization: TextCapitalization.words,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return l10n.pleaseEnterFullName;
-                      }
-                      return null;
-                    },
-                    decoration: _fieldDecoration(
-                      hint: l10n.fullName,
-                      icon: Icons.person_outline_rounded,
                     ),
-                  ),
-                  const SizedBox(height: 13),
-
-                  TextFormField(
-                    controller: emailController,
-                    enabled: false,
-                    decoration:
-                        _fieldDecoration(
-                          hint: l10n.emailAddress,
-                          icon: Icons.email_outlined,
-                        ).copyWith(
-                          helperText: l10n.signedInCustomer,
-                          helperStyle: const TextStyle(
-                            color: _muted,
-                            fontSize: 9,
+                    const SizedBox(height: 22),
+                    Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: _blueLight,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Icon(
+                            Icons.manage_accounts_outlined,
+                            color: _blue,
+                            size: 24,
                           ),
                         ),
-                  ),
-                  const SizedBox(height: 13),
-
-                  TextFormField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return l10n.pleaseEnterPhone;
-                      }
-                      return null;
-                    },
-                    decoration: _fieldDecoration(
-                      hint: l10n.phoneNumber,
-                      icon: Icons.phone_outlined,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.editProfile,
+                                style: const TextStyle(
+                                  color: _text,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                l10n.customerDetails,
+                                style: const TextStyle(
+                                  color: _muted,
+                                  fontSize: 10.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          icon: const Icon(Icons.close_rounded, color: _text),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 13),
+                    const SizedBox(height: 22),
 
-                  TextFormField(
-                    controller: companyController,
-                    textCapitalization: TextCapitalization.words,
-                    decoration: _fieldDecoration(
-                      hint: l10n.company,
-                      icon: Icons.apartment_outlined,
-                    ),
-                  ),
-                  const SizedBox(height: 13),
-
-                  TextFormField(
-                    controller: addressController,
-                    textCapitalization: TextCapitalization.words,
-                    maxLines: 2,
-                    decoration: _fieldDecoration(
-                      hint: l10n.defaultAddress,
-                      icon: Icons.location_on_outlined,
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-
-                  SizedBox(
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (!formKey.currentState!.validate()) return;
-
-                        Navigator.pop(sheetContext, {
-                          'name': nameController.text.trim(),
-                          'phone': phoneController.text.trim(),
-                          'company': companyController.text.trim(),
-                          'address': addressController.text.trim(),
-                        });
+                    TextFormField(
+                      controller: nameController,
+                      textCapitalization: TextCapitalization.words,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return l10n.pleaseEnterFullName;
+                        }
+                        return null;
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _blue,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(17),
-                        ),
+                      decoration: _fieldDecoration(
+                        hint: l10n.fullName,
+                        icon: Icons.person_outline_rounded,
                       ),
-                      child: Text(
-                        l10n.save,
-                        style: const TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w900,
+                    ),
+                    const SizedBox(height: 13),
+
+                    TextFormField(
+                      controller: emailController,
+                      enabled: false,
+                      decoration:
+                          _fieldDecoration(
+                            hint: l10n.emailAddress,
+                            icon: Icons.email_outlined,
+                          ).copyWith(
+                            helperText: l10n.signedInCustomer,
+                            helperStyle: const TextStyle(
+                              color: _muted,
+                              fontSize: 9,
+                            ),
+                          ),
+                    ),
+                    const SizedBox(height: 13),
+
+                    TextFormField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return l10n.pleaseEnterPhone;
+                        }
+                        return null;
+                      },
+                      decoration: _fieldDecoration(
+                        hint: l10n.phoneNumber,
+                        icon: Icons.phone_outlined,
+                      ),
+                    ),
+                    const SizedBox(height: 13),
+
+                    TextFormField(
+                      controller: companyController,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: _fieldDecoration(
+                        hint: l10n.company,
+                        icon: Icons.apartment_outlined,
+                      ),
+                    ),
+                    const SizedBox(height: 13),
+
+                    TextFormField(
+                      controller: addressController,
+                      textCapitalization: TextCapitalization.words,
+                      maxLines: 2,
+                      decoration: _fieldDecoration(
+                        hint: l10n.defaultAddress,
+                        icon: Icons.location_on_outlined,
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+
+                    SizedBox(
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (!formKey.currentState!.validate()) return;
+
+                          Navigator.pop(sheetContext, {
+                            'name': nameController.text.trim(),
+                            'phone': phoneController.text.trim(),
+                            'company': companyController.text.trim(),
+                            'address': addressController.text.trim(),
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _blue,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.save,
+                          style: const TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
 
-    if (result == null || !mounted) return;
+      if (result == null || !mounted) return;
 
-    if (_c.auth.currentUser == null) return;
-
-    try {
-      final company = (result['company'] ?? '').trim();
-      final address = (result['address'] ?? '').trim();
-      final name = result['name'] ?? _fullName;
-      final phone = result['phone'] ?? _phone;
-
-      await _c.mergeProfileFields({
-        'name': name,
-        'phone': phone,
-        'company': company.isEmpty ? 'Not provided' : company,
-        'address': address.isEmpty ? 'Not provided' : address,
-      });
-
-      await _c.auth.updateDisplayName(name);
-
+      final code = await _c.saveEditedProfile(
+        name: result['name'] ?? _fullName,
+        phone: result['phone'] ?? _phone,
+        company: result['company'] ?? '',
+        address: result['address'] ?? '',
+      );
       if (!mounted) return;
-
-      _c.fullName.value = name;
-      _c.phone.value = phone;
-      _c.company.value = company.isEmpty ? 'Not provided' : company;
-      _c.address.value = address.isEmpty ? 'Not provided' : address;
-
-      _showMessage(l10n.profileUpdated);
-    } catch (_) {
-      if (!mounted) return;
-      _showMessage(l10n.couldNotUpdateProfile);
+      if (code == 'updated') {
+        _showMessage(l10n.profileUpdated);
+      } else if (code != 'unsigned') {
+        _showMessage(l10n.couldNotUpdateProfile);
+      }
+    } finally {
+      nameController.dispose();
+      emailController.dispose();
+      phoneController.dispose();
+      companyController.dispose();
+      addressController.dispose();
     }
   }
 

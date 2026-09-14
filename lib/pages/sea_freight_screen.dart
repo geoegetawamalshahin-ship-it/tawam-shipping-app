@@ -1040,10 +1040,10 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   // =========================================================
 
   Widget _buildReviewCard() {
-    return Obx(() {
-      _c.revision.value;
-      return _buildReviewCardBody(AppLocalizations.of(context)!);
-    });
+    return FormSummaryListener(
+      listenables: _c.summaryListenables,
+      builder: (context) => _buildReviewCardBody(AppLocalizations.of(context)!),
+    );
   }
 
   Widget _buildReviewCardBody(AppLocalizations l10n) {

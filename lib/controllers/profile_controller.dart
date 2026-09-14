@@ -34,12 +34,29 @@ class ProfileController extends GetxController {
 
   bool _profileRequested = false;
   bool _statsRequested = false;
+  bool _closed = false;
+  var _profileRequestId = 0;
+  var _statsRequestId = 0;
 
   @override
   void onInit() {
     super.onInit();
     loadProfile();
     loadStats();
+  }
+
+  @override
+  void onClose() {
+    _closed = true;
+    _profileRequestId++;
+    _statsRequestId++;
+    super.onClose();
+  }
+
+  bool _isCurrentUser(int requestId, int currentId, String userId) {
+    return !_closed &&
+        requestId == currentId &&
+        _authController.currentUser?.uid == userId;
   }
 
   Future<void> loadProfile({bool force = false}) async {
@@ -52,15 +69,17 @@ class ProfileController extends GetxController {
       return;
     }
 
+    final userId = user.uid;
+    final requestId = ++_profileRequestId;
     isLoading.value = true;
     loadError.value = null;
 
     try {
-      final data = await _authController.loadUserDocument(user.uid);
-      final profile = UserProfile.fromMap(user.uid, data);
-      final shortUid = user.uid.length >= 8
-          ? user.uid.substring(0, 8)
-          : user.uid;
+      final data = await _authController.loadUserDocument(userId);
+      if (!_isCurrentUser(requestId, _profileRequestId, userId)) return;
+
+      final profile = UserProfile.fromMap(userId, data);
+      final shortUid = userId.length >= 8 ? userId.substring(0, 8) : userId;
 
       final photoBytes = _authController.bytesFromProfilePhoto(
         profile.profilePhoto,
@@ -68,6 +87,7 @@ class ProfileController extends GetxController {
       final downloadedBytes =
           photoBytes ??
           await _authController.downloadProfilePhoto(profile.profilePhotoPath);
+      if (!_isCurrentUser(requestId, _profileRequestId, userId)) return;
 
       fullName.value = profile.name.isEmpty
           ? (user.displayName ?? '')
@@ -90,9 +110,11 @@ class ProfileController extends GetxController {
       profilePhotoBytes.value = downloadedBytes;
       isLoading.value = false;
 
+      if (!_isCurrentUser(requestId, _profileRequestId, userId)) return;
       LocaleController.setLanguage(selectedLanguage.value);
       await Get.updateLocale(LocaleController.locale.value);
     } catch (_) {
+      if (!_isCurrentUser(requestId, _profileRequestId, userId)) return;
       _profileRequested = false;
       isLoading.value = false;
       loadError.value = 'unable_to_load';
@@ -104,13 +126,56 @@ class ProfileController extends GetxController {
     _statsRequested = true;
     final user = _authController.currentUser;
     if (user == null) return;
+    final userId = user.uid;
+    final requestId = ++_statsRequestId;
     try {
-      final stats = await _authController.loadProfileStats(user.uid);
+      final stats = await _authController.loadProfileStats(userId);
+      if (!_isCurrentUser(requestId, _statsRequestId, userId)) return;
       shipmentsCount.value = stats['shipmentsCount'] ?? 0;
       inTransitCount.value = stats['inTransitCount'] ?? 0;
       quotesCount.value = stats['quotesCount'] ?? 0;
     } catch (_) {
+      if (!_isCurrentUser(requestId, _statsRequestId, userId)) return;
       messageCode.value = 'generic';
+    }
+  }
+
+  Future<String> saveEditedProfile({
+    required String name,
+    required String phone,
+    required String company,
+    required String address,
+  }) async {
+    final user = _authController.currentUser;
+    if (user == null) return 'unsigned';
+
+    final trimmedName = name.trim();
+    final trimmedPhone = phone.trim();
+    final trimmedCompany = company.trim();
+    final trimmedAddress = address.trim();
+    final companyValue = trimmedCompany.isEmpty
+        ? 'Not provided'
+        : trimmedCompany;
+    final addressValue = trimmedAddress.isEmpty
+        ? 'Not provided'
+        : trimmedAddress;
+
+    try {
+      await _authController.mergeUserFields(user.uid, {
+        'name': trimmedName,
+        'phone': trimmedPhone,
+        'company': companyValue,
+        'address': addressValue,
+      });
+      await _authController.updateDisplayName(trimmedName);
+      if (_closed) return 'unsigned';
+      fullName.value = trimmedName;
+      this.phone.value = trimmedPhone;
+      this.company.value = companyValue;
+      this.address.value = addressValue;
+      return 'updated';
+    } catch (_) {
+      return 'failed';
     }
   }
 
