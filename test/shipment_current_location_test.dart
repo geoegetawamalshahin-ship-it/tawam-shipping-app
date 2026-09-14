@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/utils/shipment_status_info.dart';
+import 'package:tawam_shipping_app/data/utils/shipment_status_info.dart';
 
 String _detailsDisplayedLocation({
   required Map<String, dynamic> shipment,

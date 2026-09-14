@@ -3,9 +3,10 @@ import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../services/auth_service.dart';
+import '../data/services/auth_service.dart';
 import 'booking_controller.dart';
 import 'notification_controller.dart';
+import 'profile_controller.dart';
 import 'quote_controller.dart';
 import 'shipment_controller.dart';
 import 'support_controller.dart';
@@ -82,19 +83,47 @@ class AuthController extends GetxController {
     return _authService.disablePushToken(uid);
   }
 
-  Future<void> changePassword({
+  Future<String?> changePassword({
     required String currentPassword,
     required String newPassword,
-  }) {
-    return _authService.changePassword(
-      currentPassword: currentPassword,
-      newPassword: newPassword,
-    );
+  }) async {
+    try {
+      await _authService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return credentialErrorCode(e.code);
+    } catch (_) {
+      return 'generic';
+    }
   }
 
-  Future<void> requestAccountDeletion({required String password}) async {
-    await _authService.requestAccountDeletion(password: password);
-    _stopListListeners();
+  Future<String?> requestAccountDeletion({required String password}) async {
+    try {
+      await _authService.requestAccountDeletion(password: password);
+      _stopListListeners();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return credentialErrorCode(e.code);
+    } catch (_) {
+      return 'generic';
+    }
+  }
+
+  static String credentialErrorCode(String code) {
+    switch (code) {
+      case 'wrong-password':
+      case 'invalid-credential':
+        return 'wrong-password';
+      case 'weak-password':
+        return 'weak-password';
+      case 'requires-recent-login':
+        return 'requires-recent-login';
+      default:
+        return 'generic';
+    }
   }
 
   Future<void> signOut() async {
@@ -117,6 +146,9 @@ class AuthController extends GetxController {
     }
     if (Get.isRegistered<SupportController>()) {
       Get.find<SupportController>().stopListening();
+    }
+    if (Get.isRegistered<ProfileController>()) {
+      Get.delete<ProfileController>(force: true);
     }
   }
 }

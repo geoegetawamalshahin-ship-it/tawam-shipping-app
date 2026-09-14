@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/auth_field_decoration.dart';
+import 'package:tawam_shipping_app/widgets/auth_field_decoration.dart';
 
 void main() {
   test('login decoration keeps padding 20 and omits error borders', () {

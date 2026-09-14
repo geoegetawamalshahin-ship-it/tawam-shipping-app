@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/form_fields.dart';
+import 'package:tawam_shipping_app/widgets/shipping/form_fields.dart';
 
 void main() {
   testWidgets('shared field retains editing and validation callbacks', (tester) async {

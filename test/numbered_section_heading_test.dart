@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/numbered_section_heading.dart';
+import 'package:tawam_shipping_app/widgets/numbered_section_heading.dart';
 
 void main() {
   testWidgets('numbered heading keeps caller texts sizes and colors', (

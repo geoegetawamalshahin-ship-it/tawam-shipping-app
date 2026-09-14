@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/form_controls.dart';
+import 'package:tawam_shipping_app/widgets/shipping/form_controls.dart';
 
 void main() {
   testWidgets('dropdown shows translated labels and returns original values', (

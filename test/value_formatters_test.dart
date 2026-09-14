@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/utils/value_formatters.dart';
+import 'package:tawam_shipping_app/data/utils/value_formatters.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations_ar.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations_en.dart';
 

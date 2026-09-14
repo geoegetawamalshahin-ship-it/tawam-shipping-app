@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/utils/shipping_customer_profile.dart';
-import 'package:tawam_shipping_app/core/firestore_collections.dart';
+import 'package:tawam_shipping_app/data/utils/shipping_customer_profile.dart';
+import 'package:tawam_shipping_app/constant/firestore_collections.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations_en.dart';
 
 void main() {

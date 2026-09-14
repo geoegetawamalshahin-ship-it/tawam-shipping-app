@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipment_status/info_card.dart';
+import 'package:tawam_shipping_app/widgets/shipment_status/info_card.dart';
 
 void main() {
   const border = Color(0xFFE2EAF2);

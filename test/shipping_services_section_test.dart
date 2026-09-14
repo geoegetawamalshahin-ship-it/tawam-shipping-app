@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/services_section.dart';
+import 'package:tawam_shipping_app/widgets/shipping/services_section.dart';
 
 void main() {
   testWidgets(

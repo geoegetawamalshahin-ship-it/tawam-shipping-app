@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipment_status/hero_feature.dart';
+import 'package:tawam_shipping_app/widgets/shipment_status/hero_feature.dart';
 
 void main() {
   testWidgets('track defaults keep icon 13 and text 9', (tester) async {

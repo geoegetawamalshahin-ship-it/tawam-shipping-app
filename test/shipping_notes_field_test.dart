@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/notes_field.dart';
+import 'package:tawam_shipping_app/widgets/shipping/notes_field.dart';
 
 void main() {
   late TextEditingController controller;

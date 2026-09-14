@@ -1,0 +1,256 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../widgets/auth_field_decoration.dart';
+import '../controllers/auth_form_controllers.dart';
+import '../l10n/app_localizations.dart';
+
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
+  late final ForgotPasswordController _c;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = Get.find<ForgotPasswordController>();
+  }
+
+  Future<void> _sendResetLink() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    FocusScope.of(context).unfocus();
+
+    final l10n = AppLocalizations.of(context)!;
+    final code = await _c.sendResetLink();
+    if (code == 'submitting') return;
+    if (!mounted) return;
+
+    if (code == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.resetLinkSent),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    String message = l10n.unableToSendReset;
+
+    if (code == 'invalid-email') {
+      message = l10n.pleaseEnterValidEmail;
+    } else if (code == 'too-many-requests') {
+      message = l10n.tooManyAttempts;
+    } else if (code == 'network-request-failed') {
+      message = l10n.pleaseCheckConnection;
+    } else if (code == 'user-not-found') {
+      // Do not reveal whether the email is registered, for security.
+      message = l10n.resetLinkIfExists;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 25),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 470),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.arrow_back_rounded,
+                        color: Color(0xFF172033),
+                      ),
+                    ),
+
+                    Center(
+                      child: SizedBox(
+                        height: 125,
+                        child: Transform.scale(
+                          scale: 1.4,
+                          child: Image.asset(
+                            'assets/images/tawam_logo.png',
+                            width: 260,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 13,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEAF3FC),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Text(
+                        l10n.resetPassword,
+                        style: const TextStyle(
+                          color: Color(0xFF07569E),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Text(
+                      l10n.forgotYourPassword,
+                      style: const TextStyle(
+                        color: Color(0xFF172033),
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        height: 1.15,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Text(
+                      l10n.forgotPasswordSubtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF7B8493),
+                        fontSize: 15.5,
+                        height: 1.55,
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    Text(
+                      l10n.emailAddress,
+                      style: const TextStyle(
+                        color: Color(0xFF202938),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+
+                    const SizedBox(height: 9),
+
+                    TextFormField(
+                      controller: _c.emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _sendResetLink(),
+                      validator: (value) {
+                        final email = value?.trim() ?? '';
+
+                        if (email.isEmpty) {
+                          return l10n.pleaseEnterEmail;
+                        }
+
+                        if (!email.contains('@') || !email.contains('.')) {
+                          return l10n.pleaseEnterValidEmail;
+                        }
+
+                        return null;
+                      },
+                      decoration: authInputDecoration(
+                        hintText: 'you@business.com',
+                        icon: Icons.email_outlined,
+                        errorBorderEnabled: true,
+                      ),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 59,
+                      child: Obx(
+                        () => ElevatedButton(
+                          onPressed: _c.isSending.value ? null : _sendResetLink,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF07569E),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                          child: _c.isSending.value
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      l10n.sendResetLink,
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Icon(Icons.send_rounded, size: 21),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 23),
+
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          l10n.backToSignIn,
+                          style: const TextStyle(
+                            color: Color(0xFFD72638),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

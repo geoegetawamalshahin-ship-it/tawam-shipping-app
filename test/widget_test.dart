@@ -2,29 +2,25 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/responsive_app_frame.dart';
-import 'package:tawam_shipping_app/core/firestore_collections.dart';
+import 'package:tawam_shipping_app/widgets/responsive_app_frame.dart';
+import 'package:tawam_shipping_app/constant/firestore_collections.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations.dart';
-import 'package:tawam_shipping_app/locale_controller.dart';
+import 'package:tawam_shipping_app/controllers/locale_controller.dart';
 
 void main() {
   testWidgets('Material smoke test does not require Firebase', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: Text('Tawam'),
-        ),
-      ),
+      const MaterialApp(home: Scaffold(body: Text('Tawam'))),
     );
 
     expect(find.text('Tawam'), findsOneWidget);
   });
 
   test('Arabic and English remain the supported application locales', () {
-    expect(
-      AppLocalizations.supportedLocales,
-      const <Locale>[Locale('ar'), Locale('en')],
-    );
+    expect(AppLocalizations.supportedLocales, const <Locale>[
+      Locale('ar'),
+      Locale('en'),
+    ]);
   });
 
   test('a new application session defaults to English', () {
@@ -64,8 +60,10 @@ void main() {
 
     for (final collection in remainingCollections) {
       expect(
-        source,
-        contains(".collection('$collection')"),
+        source.contains(".collection('$collection')") ||
+            source.contains("'$collection'") &&
+                source.contains('FirestoreCollections'),
+        isTrue,
         reason: 'Firestore collection $collection must remain compatible.',
       );
     }
@@ -84,9 +82,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: ResponsiveAppFrame(
-            child: SizedBox.expand(key: childKey),
-          ),
+          body: ResponsiveAppFrame(child: SizedBox.expand(key: childKey)),
         ),
       ),
     );
@@ -106,9 +102,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: ResponsiveAppFrame(
-            child: SizedBox.expand(key: childKey),
-          ),
+          body: ResponsiveAppFrame(child: SizedBox.expand(key: childKey)),
         ),
       ),
     );
@@ -116,5 +110,4 @@ void main() {
     final box = childKey.currentContext!.findRenderObject()! as RenderBox;
     expect(box.size.width, ResponsiveAppFrame.maxContentWidth);
   });
-
 }

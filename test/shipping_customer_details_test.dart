@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/customer_details.dart';
+import 'package:tawam_shipping_app/widgets/shipping/customer_details.dart';
 
 const _primary = Color(0xFF0B4F9C);
 const _soft = Color(0xFFEAF3FF);

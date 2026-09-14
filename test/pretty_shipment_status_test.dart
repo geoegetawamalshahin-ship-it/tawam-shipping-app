@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/utils/shipment_status_info.dart';
+import 'package:tawam_shipping_app/data/utils/shipment_status_info.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations_ar.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations_en.dart';
-import 'package:tawam_shipping_app/locale_controller.dart';
+import 'package:tawam_shipping_app/controllers/locale_controller.dart';
 
 void main() {
   final en = AppLocalizationsEn();

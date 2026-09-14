@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/submit_button.dart';
+import 'package:tawam_shipping_app/widgets/shipping/submit_button.dart';
 
 void main() {
   testWidgets('submit callback is blocked while loading and restored afterwards', (tester) async {

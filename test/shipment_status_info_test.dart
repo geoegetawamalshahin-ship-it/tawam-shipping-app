@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/utils/shipment_status_info.dart';
+import 'package:tawam_shipping_app/data/utils/shipment_status_info.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations_ar.dart';
 import 'package:tawam_shipping_app/l10n/app_localizations_en.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipment_status/route_point.dart';
+import 'package:tawam_shipping_app/widgets/shipment_status/route_point.dart';
 
 void main() {
   testWidgets('pickup stays start-aligned and delivery stays end-aligned', (

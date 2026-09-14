@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../services/quote_service.dart';
+import '../data/services/quote_service.dart';
 
 class QuoteController extends GetxController {
   QuoteController(this._quoteService);
@@ -46,6 +46,9 @@ class QuoteController extends GetxController {
   }
 
   Future<T> _runSubmit<T>(Future<T> Function() action) async {
+    if (isSubmitting.value) {
+      throw StateError('already_submitting');
+    }
     isSubmitting.value = true;
     try {
       return await action();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/show_shipping_message.dart';
+import 'package:tawam_shipping_app/widgets/shipping/show_shipping_message.dart';
 
 void main() {
   // Matches get-quote `deepBlue` and the six shipping forms.

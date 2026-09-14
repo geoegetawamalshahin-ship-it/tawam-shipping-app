@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/utils/shipment_documents.dart';
+import 'package:tawam_shipping_app/data/utils/shipment_documents.dart';
 
 void main() {
   test('documents stay on the shipment that owns them', () {

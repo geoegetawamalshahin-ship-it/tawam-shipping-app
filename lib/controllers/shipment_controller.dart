@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../app/utils/shipment_documents.dart';
-import '../locale_controller.dart';
-import '../services/shipment_service.dart';
+import '../data/utils/shipment_documents.dart';
+import '../data/services/shipment_service.dart';
+import 'locale_controller.dart';
 
 class ShipmentController extends GetxController {
   ShipmentController(this._shipmentService);

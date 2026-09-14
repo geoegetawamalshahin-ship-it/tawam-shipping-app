@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../services/booking_service.dart';
+import '../data/services/booking_service.dart';
 
 class BookingController extends GetxController {
   BookingController(this._bookingService);
@@ -36,6 +36,9 @@ class BookingController extends GetxController {
   Future<DocumentReference<Map<String, dynamic>>> submitBookingRequest(
     Map<String, dynamic> data,
   ) async {
+    if (isSubmitting.value) {
+      throw StateError('already_submitting');
+    }
     isSubmitting.value = true;
     try {
       return await _bookingService.createBookingRequest(data);

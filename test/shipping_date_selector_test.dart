@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tawam_shipping_app/app/widgets/shipping/date_selector.dart';
+import 'package:tawam_shipping_app/widgets/shipping/date_selector.dart';
 
 void main() {
   testWidgets('date selector forwards taps and reflects owner updates', (tester) async {

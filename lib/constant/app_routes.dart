@@ -1,0 +1,30 @@
+abstract final class AppRoutes {
+  static const splash = '/';
+  static const login = '/login';
+  static const register = '/register';
+  static const forgotPassword = '/forgot-password';
+  static const home = '/home';
+  static const airFreight = '/air-freight';
+  static const seaFreight = '/sea-freight';
+  static const landFreight = '/land-freight';
+  static const carShipping = '/car-shipping';
+  static const parcelShipping = '/parcel-shipping';
+  static const internationalMoving = '/international-moving';
+  static const getQuote = '/get-quote';
+  static const requestQuote = '/request-quote';
+  static const createBooking = '/create-booking';
+  static const myQuotes = '/my-quotes';
+  static const myBookings = '/my-bookings';
+  static const support = '/support';
+  static const mySupportRequests = '/my-support-requests';
+  static const trackShipment = '/track-shipment';
+  static const shipmentDetails = '/shipment-details';
+  static const shipments = '/shipments';
+  static const shippingDocuments = '/shipping-documents';
+  static const volumeCalculator = '/volume-calculator';
+  static const profile = '/profile';
+  static const notifications = '/notifications';
+  static const privacyPolicy = '/privacy-policy';
+  static const termsConditions = '/terms-conditions';
+  static const shipmentRequest = '/shipment-request';
+}
