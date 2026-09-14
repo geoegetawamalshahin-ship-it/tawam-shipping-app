@@ -25,11 +25,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signIn() async {
+    if (_c.isSubmitting.value) return;
     if (!_formKey.currentState!.validate()) return;
 
     final l10n = AppLocalizations.of(context)!;
     final code = await _c.signIn();
-    if (!mounted) return;
+    if (!mounted || code == 'submitting') return;
     if (code == null) {
       Get.offAllNamed(AppRoutes.home);
       return;
@@ -224,34 +225,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 16),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 59,
-                      child: ElevatedButton(
-                        onPressed: _signIn,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF07569E),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              l10n.signIn,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Icon(Icons.arrow_forward_rounded, size: 23),
-                          ],
-                        ),
-                      ),
+                    _authSubmitButton(
+                      label: l10n.signIn,
+                      submitting: _c.isSubmitting,
+                      onPressed: _signIn,
                     ),
 
                     const SizedBox(height: 24),
@@ -299,5 +276,55 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Widget _authSubmitButton({
+    required String label,
+    required RxBool submitting,
+    required VoidCallback onPressed,
+  }) {
+    return Obx(() {
+      final busy = submitting.value;
+      return SizedBox(
+        width: double.infinity,
+        height: 59,
+        child: ElevatedButton(
+          onPressed: busy ? null : onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF07569E),
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: const Color(0xFF07569E),
+            disabledForegroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+          child: busy
+              ? const SizedBox(
+                  width: 23,
+                  height: 23,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.4,
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.arrow_forward_rounded, size: 23),
+                  ],
+                ),
+        ),
+      );
+    });
   }
 }
