@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'login_screen.dart';
 import 'shipping_documents_screen.dart';
@@ -20,6 +15,7 @@ import '../app/utils/value_formatters.dart';
 import '../app/widgets/language_picker_sheet.dart';
 import '../locale_controller.dart';
 import '../l10n/app_localizations.dart';
+import '../controllers/auth_controller.dart';
 
 // ==========================================================
 // TAWAM AL-SHAHIN — PREMIUM CUSTOMER PROFILE
@@ -61,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Uint8List? _profilePhotoBytes;
   bool _isUpdatingPhoto = false;
   final ImagePicker _imagePicker = ImagePicker();
+  final AuthController _authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -74,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ==========================================================
 
   Future<void> _loadProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
     if (user == null) return;
     if (mounted) {
       setState(() {
@@ -84,22 +81,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+      final data = await _authController.loadUserDocument(user.uid);
 
       if (!mounted) return;
 
-      final data = doc.data();
       final shortUid = user.uid.length >= 8
           ? user.uid.substring(0, 8)
           : user.uid;
 
-      final photoBytes = _bytesFromProfilePhoto(data?['profilePhoto']);
+      final photoBytes = _authController.bytesFromProfilePhoto(
+        data?['profilePhoto'],
+      );
       final storedPath = data?['profilePhotoPath']?.toString();
       final downloadedBytes =
-          photoBytes ?? await _downloadProfilePhoto(storedPath);
+          photoBytes ?? await _authController.downloadProfilePhoto(storedPath);
 
       if (!mounted) return;
 
@@ -132,35 +127,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadStats() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
     if (user == null) return;
 
     try {
-      final shipments = await FirebaseFirestore.instance
-          .collection('shipments')
-          .where('userId', isEqualTo: user.uid)
-          .get();
-
-      final quotes = await FirebaseFirestore.instance
-          .collection('quotes')
-          .where('userId', isEqualTo: user.uid)
-          .get();
-
-      final inTransit = shipments.docs.where((doc) {
-        final status =
-            doc.data()['status']?.toString().trim().toLowerCase() ?? '';
-
-        return status == 'in transit' ||
-            status == 'in_transit' ||
-            status == 'in-transit';
-      }).length;
+      final stats = await _authController.loadProfileStats(user.uid);
 
       if (!mounted) return;
 
       setState(() {
-        _shipmentsCount = shipments.docs.length;
-        _inTransitCount = inTransit;
-        _quotesCount = quotes.docs.length;
+        _shipmentsCount = stats['shipmentsCount'] ?? 0;
+        _inTransitCount = stats['inTransitCount'] ?? 0;
+        _quotesCount = stats['quotesCount'] ?? 0;
       });
     } catch (_) {
       if (!mounted) return;
@@ -169,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _saveNotificationPreference(bool value) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
     if (user == null) return;
 
     setState(() {
@@ -177,14 +155,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      await _authController.mergeUserFields(user.uid, {
         'notificationsEnabled': value,
-      }, SetOptions(merge: true));
+      });
 
       if (value) {
-        await _enablePushToken(user.uid);
+        await _authController.enablePushToken(user.uid);
       } else {
-        await _disablePushToken(user.uid);
+        await _authController.disablePushToken(user.uid);
       }
     } catch (_) {
       if (!mounted) return;
@@ -292,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _pickAndSavePhoto(ImageSource source) async {
     final l10n = AppLocalizations.of(context)!;
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
     if (user == null) return;
 
     Uint8List? previousBytes;
@@ -333,7 +311,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       didPreview = true;
 
-      await _persistProfilePhoto(user.uid, bytes);
+      await _authController.persistProfilePhoto(user.uid, bytes);
 
       if (!mounted) return;
 
@@ -376,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _removeProfilePhoto() async {
     final l10n = AppLocalizations.of(context)!;
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
     if (user == null) return;
 
     final previousBytes = _profilePhotoBytes;
@@ -387,7 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      await _deleteStoredProfilePhoto(user.uid);
+      await _authController.deleteStoredProfilePhoto(user.uid);
 
       if (!mounted) return;
 
@@ -439,114 +417,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (_) {
       return null;
     }
-  }
-
-  // Save the photo in Firestore. Use storage only if the document write fails.
-  Future<void> _persistProfilePhoto(String uid, Uint8List bytes) async {
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'profilePhoto': Blob(bytes),
-        'profilePhotoPath': FieldValue.delete(),
-      }, SetOptions(merge: true));
-      return;
-    } catch (_) {
-      // Some rules or clients reject Blob; store a compact base64 string.
-    }
-
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'profilePhoto': base64Encode(bytes),
-        'profilePhotoPath': FieldValue.delete(),
-      }, SetOptions(merge: true));
-      return;
-    } catch (_) {
-      // Fall through to the existing documents bucket.
-    }
-
-    const bucket = 'shipping-documents';
-    final isPng =
-        bytes.length >= 8 &&
-        bytes[0] == 0x89 &&
-        bytes[1] == 0x50 &&
-        bytes[2] == 0x4E &&
-        bytes[3] == 0x47;
-    final path = 'users/$uid/profile.${isPng ? 'png' : 'jpg'}';
-
-    await Supabase.instance.client.storage
-        .from(bucket)
-        .uploadBinary(
-          path,
-          bytes,
-          fileOptions: FileOptions(
-            upsert: true,
-            contentType: isPng ? 'image/png' : 'image/jpeg',
-          ),
-        );
-
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'profilePhoto': FieldValue.delete(),
-      'profilePhotoPath': path,
-    }, SetOptions(merge: true));
-  }
-
-  Future<void> _deleteStoredProfilePhoto(String uid) async {
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'profilePhoto': FieldValue.delete(),
-      'profilePhotoPath': FieldValue.delete(),
-    }, SetOptions(merge: true));
-
-    try {
-      await Supabase.instance.client.storage.from('shipping-documents').remove([
-        'users/$uid/profile.jpg',
-        'users/$uid/profile.png',
-      ]);
-    } catch (_) {
-      // Ignore missing storage objects.
-    }
-  }
-
-  Future<Uint8List?> _downloadProfilePhoto(String? path) async {
-    if (path == null || path.isEmpty) return null;
-
-    try {
-      return await Supabase.instance.client.storage
-          .from('shipping-documents')
-          .download(path);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<void> _enablePushToken(String uid) async {
-    final token = await FirebaseMessaging.instance.getToken();
-    if (token == null || token.isEmpty) return;
-
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'fcmToken': token,
-      'fcmTokens': FieldValue.arrayUnion([token]),
-      'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
-  }
-
-  Future<void> _disablePushToken(String uid) async {
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
-    final storedToken = doc.data()?['fcmToken']?.toString();
-
-    try {
-      await FirebaseMessaging.instance.deleteToken();
-    } catch (_) {
-      // Continue clearing the stored token even if deleteToken fails.
-    }
-
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'fcmToken': FieldValue.delete(),
-      if (storedToken != null && storedToken.isNotEmpty)
-        'fcmTokens': FieldValue.arrayRemove([storedToken]),
-      'fcmTokenUpdatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
   }
 
   // ==========================================================
@@ -620,21 +490,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final name = _fullName.trim();
     if (name.isEmpty) return 'T';
     return name.substring(0, 1).toUpperCase();
-  }
-
-  // Read a stored profile photo from Firestore without assuming a type.
-  Uint8List? _bytesFromProfilePhoto(dynamic value) {
-    if (value is Blob) return value.bytes;
-    if (value is Uint8List) return value;
-    if (value is List<int>) return Uint8List.fromList(value);
-    if (value is String && value.isNotEmpty) {
-      try {
-        return Uint8List.fromList(base64Decode(value));
-      } catch (_) {
-        return null;
-      }
-    }
-    return null;
   }
 
   // ==========================================================
@@ -849,21 +704,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (result == null || !mounted) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
     if (user == null) return;
 
     try {
       final company = (result['company'] ?? '').trim();
       final address = (result['address'] ?? '').trim();
 
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      await _authController.mergeUserFields(user.uid, {
         'name': result['name'] ?? _fullName,
         'phone': result['phone'] ?? _phone,
         'company': company.isEmpty ? 'Not provided' : company,
         'address': address.isEmpty ? 'Not provided' : address,
-      }, SetOptions(merge: true));
+      });
 
-      await user.updateDisplayName(result['name'] ?? _fullName);
+      await _authController.updateDisplayName(result['name'] ?? _fullName);
 
       if (!mounted) return;
 
@@ -919,7 +774,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _changePassword() async {
     final l10n = AppLocalizations.of(context)!;
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
 
     if (user == null || user.email == null) {
       _showMessage(l10n.couldNotVerifyAccount);
@@ -1043,13 +898,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (result != true) return;
 
     try {
-      final credential = EmailAuthProvider.credential(
-        email: user.email!,
-        password: currentPassword,
+      await _authController.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
       );
-
-      await user.reauthenticateWithCredential(credential);
-      await user.updatePassword(newPassword);
 
       if (!mounted) return;
       _showMessage(l10n.passwordUpdated);
@@ -1241,7 +1093,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _requestAccountDeletion() async {
     final l10n = AppLocalizations.of(context)!;
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authController.currentUser;
 
     if (user == null || user.email == null) {
       _showMessage(l10n.couldNotVerifyAccount);
@@ -1328,39 +1180,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     try {
-      final credential = EmailAuthProvider.credential(
-        email: user.email!,
+      await _authController.requestAccountDeletion(
         password: passwordController.text.trim(),
       );
-
-      await user.reauthenticateWithCredential(credential);
-
-      final deletionRef = FirebaseFirestore.instance
-          .collection('account_deletion_requests')
-          .doc(user.uid);
-
-      final deletionDocument = await deletionRef.get();
-
-      if (!deletionDocument.exists) {
-        await deletionRef.set({
-          'userId': user.uid,
-          'email': user.email ?? '',
-          'status': 'pending',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-      }
-
-      await deletionRef.update({
-        'status': 'deleted',
-        'deletedAt': FieldValue.serverTimestamp(),
-      });
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .delete();
-
-      await user.delete();
 
       passwordController.dispose();
 
@@ -1447,7 +1269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (shouldLogout == true && mounted) {
-      await FirebaseAuth.instance.signOut();
+      await Get.find<AuthController>().signOut();
 
       if (!mounted) return;
 

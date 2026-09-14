@@ -64,7 +64,6 @@ class _SupportScreenState extends State<SupportScreen> {
   ];
 
   String _selectedCategory = 'Shipment Tracking';
-  bool _isSubmitting = false;
 
   String _categoryLabel(AppLocalizations l10n, String value) {
     return LocaleController.optionLabel(l10n, value);
@@ -172,6 +171,7 @@ class _SupportScreenState extends State<SupportScreen> {
   // ==========================================================
 
   Future<void> _submitSupportRequest() async {
+    if (_supportController.isSubmitting.value) return;
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
@@ -185,14 +185,10 @@ class _SupportScreenState extends State<SupportScreen> {
       return;
     }
 
-    setState(() {
-      _isSubmitting = true;
-    });
-
     try {
       // Keep the same Firestore field structure used by
       // the existing support system/admin panel.
-      await _supportController.createSupportRequest({
+      await _supportController.submitSupportRequest({
         'userId': user.uid,
         'category': _selectedCategory,
         'shipmentNumber': _shipmentController.text.trim().toUpperCase(),
@@ -214,12 +210,6 @@ class _SupportScreenState extends State<SupportScreen> {
       if (!mounted) return;
 
       _showMessage(AppLocalizations.of(context)!.couldNotSendSupport);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
     }
   }
 
@@ -1006,41 +996,44 @@ class _SupportScreenState extends State<SupportScreen> {
 
           const SizedBox(height: 15),
 
-          SizedBox(
-            width: double.infinity,
-            height: 53,
-            child: ElevatedButton.icon(
-              onPressed: _isSubmitting ? null : _submitSupportRequest,
-              icon: _isSubmitting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2.2,
-                      ),
-                    )
-                  : const Icon(Icons.send_rounded, size: 18),
-              label: Text(
-                _isSubmitting ? l10n.submitting : l10n.submitSupportRequest,
-                style: const TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: .45,
+          Obx(() {
+            final submitting = _supportController.isSubmitting.value;
+            return SizedBox(
+              width: double.infinity,
+              height: 53,
+              child: ElevatedButton.icon(
+                onPressed: submitting ? null : _submitSupportRequest,
+                icon: submitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.2,
+                        ),
+                      )
+                    : const Icon(Icons.send_rounded, size: 18),
+                label: Text(
+                  submitting ? l10n.submitting : l10n.submitSupportRequest,
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: .45,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: _primaryBlue,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: const Color(0xFF7DA7CF),
+                  disabledForegroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
               ),
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: _primaryBlue,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: const Color(0xFF7DA7CF),
-                disabledForegroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -80,6 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
       const Duration(seconds: 4),
       (_) => _nextBanner(),
     );
+
+    _notificationController.startListening();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -296,60 +297,47 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _notificationController.watchNotifications(
-                    _notificationController.currentUser?.uid ?? '__no_user__',
-                  ),
-                builder: (context, snapshot) {
-                  int unreadCount = 0;
+              child: Obx(() {
+                final unreadCount = _notificationController.unreadCount;
 
-                  if (snapshot.hasData) {
-                    unreadCount = snapshot.data!.docs.where((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    const Icon(
+                      Icons.notifications_none_rounded,
+                      color: deepBlue,
+                      size: 27,
+                    ),
 
-                      return data['isRead'] != true;
-                    }).length;
-                  }
-
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      const Icon(
-                        Icons.notifications_none_rounded,
-                        color: deepBlue,
-                        size: 27,
-                      ),
-
-                      if (unreadCount > 0)
-                        PositionedDirectional(
-                          top: -9,
-                          end: -10,
-                          child: Container(
-                            constraints: const BoxConstraints(
-                              minWidth: 19,
-                              minHeight: 19,
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFE53935),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Text(
-                              unreadCount > 99 ? '99+' : unreadCount.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w900,
-                              ),
+                    if (unreadCount > 0)
+                      PositionedDirectional(
+                        top: -9,
+                        end: -10,
+                        child: Container(
+                          constraints: const BoxConstraints(
+                            minWidth: 19,
+                            minHeight: 19,
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE53935),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            unreadCount > 99 ? '99+' : unreadCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
                         ),
-                    ],
-                  );
-                },
-              ),
+                      ),
+                  ],
+                );
+              }),
             ),
           ),
         ],
@@ -751,9 +739,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'title': l10n.customerReviews,
           'icon': _QuickActionIconType.reviews,
           'onTap': () {
-            _openExternalUrl(
-              'https://share.google/tEGndxjEovXjiF15o',
-            );
+            _openExternalUrl('https://share.google/tEGndxjEovXjiF15o');
           },
         },
         {
@@ -1952,13 +1938,7 @@ class _QuickActionIconPainter extends CustomPainter {
     canvas.drawCircle(const Offset(24, 24), 19, line);
     canvas.drawOval(const Rect.fromLTWH(15, 5, 18, 38), line);
     canvas.drawLine(const Offset(5, 24), const Offset(43, 24), line);
-    canvas.drawArc(
-      const Rect.fromLTWH(7, 13, 34, 22),
-      0,
-      3.14159,
-      false,
-      line,
-    );
+    canvas.drawArc(const Rect.fromLTWH(7, 13, 34, 22), 0, 3.14159, false, line);
     canvas.drawArc(
       const Rect.fromLTWH(7, 13, 34, 22),
       3.14159,

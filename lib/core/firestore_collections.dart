@@ -5,4 +5,6 @@ abstract final class FirestoreCollections {
   static const String shipments = 'shipments';
   static const String notifications = 'notifications';
   static const String supportRequests = 'support_requests';
+  static const String quotes = 'quotes';
+  static const String accountDeletionRequests = 'account_deletion_requests';
 }

@@ -30,8 +30,13 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
   static const Color textGrey = Color(0xFF7E8A9A);
   static const Color border = Color(0xFFE2E8F0);
 
-  String _filter = 'all';
   bool _openedInitialQuote = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _quoteController.startListening();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,60 +60,48 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
                         ),
                       ),
                     )
-                  : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: _quoteController.watchQuoteRequests(user.uid),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return _buildError();
-                        }
+                  : Obx(() {
+                      if (_quoteController.isLoading.value) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: primaryBlue),
+                        );
+                      }
 
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: primaryBlue,
-                            ),
-                          );
-                        }
+                      if (_quoteController.loadError.value != null) {
+                        return _buildError();
+                      }
 
-                        final docs = [...?snapshot.data?.docs];
+                      final docs = _quoteController.quoteDocs.toList();
+                      final initialQuoteId = widget.initialQuoteId?.trim();
 
-                        docs.sort((a, b) {
-                          final aDate = _date(a.data()['createdAt']);
-                          final bDate = _date(b.data()['createdAt']);
-                          return bDate.compareTo(aDate);
-                        });
-                        final initialQuoteId = widget.initialQuoteId?.trim();
+                      if (!_openedInitialQuote &&
+                          initialQuoteId != null &&
+                          initialQuoteId.isNotEmpty) {
+                        QueryDocumentSnapshot<Map<String, dynamic>>?
+                        matchingDoc;
 
-                        if (!_openedInitialQuote &&
-                            initialQuoteId != null &&
-                            initialQuoteId.isNotEmpty) {
-                          QueryDocumentSnapshot<Map<String, dynamic>>?
-                          matchingDoc;
-
-                          for (final doc in docs) {
-                            if (doc.id == initialQuoteId) {
-                              matchingDoc = doc;
-                              break;
-                            }
-                          }
-
-                          final quoteDoc = matchingDoc;
-
-                          if (quoteDoc != null) {
-                            _openedInitialQuote = true;
-
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              if (!mounted) return;
-
-                              _showQuoteDetails(quoteDoc);
-                            });
+                        for (final doc in docs) {
+                          if (doc.id == initialQuoteId) {
+                            matchingDoc = doc;
+                            break;
                           }
                         }
 
-                        return _buildContent(docs);
-                      },
-                    ),
+                        final quoteDoc = matchingDoc;
+
+                        if (quoteDoc != null) {
+                          _openedInitialQuote = true;
+
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!mounted) return;
+
+                            _showQuoteDetails(quoteDoc);
+                          });
+                        }
+                      }
+
+                      return _buildContent(docs);
+                    }),
             ),
           ],
         ),
@@ -149,7 +142,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
       final data = doc.data();
       final decision = _text(data['customerDecision']).toLowerCase();
 
-      switch (_filter) {
+      switch (_quoteController.selectedFilter.value) {
         case 'waiting':
           return !_hasPrice(data);
         case 'quoted':
@@ -353,12 +346,8 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
         ListFilterItem(value: 'accepted', label: l10n.accepted),
         ListFilterItem(value: 'declined', label: l10n.declined),
       ],
-      selectedValue: _filter,
-      onSelected: (value) {
-        setState(() {
-          _filter = value;
-        });
-      },
+      selectedValue: _quoteController.selectedFilter.value,
+      onSelected: _quoteController.setFilter,
       height: 39,
       useSeparatedList: true,
       animationDuration: const Duration(milliseconds: 180),
@@ -1110,9 +1099,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           behavior: SnackBarBehavior.floating,
           backgroundColor: deepBlue,
           content: Text(
-            accepted
-                ? l10n.quotationAccepted
-                : l10n.quotationDeclined,
+            accepted ? l10n.quotationAccepted : l10n.quotationDeclined,
           ),
         ),
       );
@@ -1123,9 +1110,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
         SnackBar(
           behavior: SnackBarBehavior.floating,
           backgroundColor: const Color(0xFF9D2732),
-          content: Text(
-            error.message ?? l10n.unableToUpdateQuoteDecision,
-          ),
+          content: Text(error.message ?? l10n.unableToUpdateQuoteDecision),
         ),
       );
     }
@@ -1151,9 +1136,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              accepted
-                  ? l10n.youAcceptedQuotation
-                  : l10n.youDeclinedQuotation,
+              accepted ? l10n.youAcceptedQuotation : l10n.youDeclinedQuotation,
               style: TextStyle(
                 color: accepted
                     ? const Color(0xFF135B47)
@@ -1196,7 +1179,7 @@ class _MyQuotesScreenState extends State<MyQuotesScreen> {
       body: l10n.pleaseCheckConnectionTryAgain,
       retryLabel: l10n.tryAgain,
       onRetry: () {
-        setState(() {});
+        _quoteController.startListening(force: true);
       },
       borderColor: border,
       titleColor: textDark,

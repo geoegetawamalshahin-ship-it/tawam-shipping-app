@@ -3,8 +3,10 @@ import '../app/utils/value_formatters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../app/widgets/shipping_form_widgets.dart';
+import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -35,6 +37,7 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   static const Color _success = Color(0xFF16765C);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final QuoteController _quoteController = Get.find<QuoteController>();
 
   // =========================================================
   // CONTROLLERS
@@ -125,7 +128,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // =========================================================
 
   bool _loadingProfile = true;
-  bool _submitting = false;
 
   String _customerName = '';
   String _customerEmail = '';
@@ -461,7 +463,11 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.public_rounded, color: _primaryBlue, size: 14),
+                  const Icon(
+                    Icons.public_rounded,
+                    color: _primaryBlue,
+                    size: 14,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     l10n.globalRelocation,
@@ -518,38 +524,38 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     return ShippingTrustBar(
       borderColor: _border,
       children: [
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.inventory_2_outlined,
-              title: l10n.badgePack,
-              subtitle: l10n.professionalPacking,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.inventory_2_outlined,
+            title: l10n.badgePack,
+            subtitle: l10n.professionalPacking,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.public_rounded,
-              title: l10n.badgeGlobal,
-              subtitle: l10n.serviceInternationalMoving,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.public_rounded,
+            title: l10n.badgeGlobal,
+            subtitle: l10n.serviceInternationalMoving,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.home_rounded,
-              title: 'D2D',
-              subtitle: l10n.doorToDoor,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.home_rounded,
+            title: 'D2D',
+            subtitle: l10n.doorToDoor,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
+        ),
       ],
     );
   }
@@ -584,7 +590,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -687,7 +692,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       textColor: _textDark,
       label: l10n.preferredPickupDate,
       isEmpty: _movingDate == null,
-      valueText: _movingDate == null ? l10n.selectADate : _formatDate(_movingDate!),
+      valueText: _movingDate == null
+          ? l10n.selectADate
+          : _formatDate(_movingDate!),
     );
   }
 
@@ -699,7 +706,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1004,7 +1010,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1108,7 +1113,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1180,7 +1184,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1292,7 +1295,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1328,7 +1330,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1580,17 +1581,19 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-    return ShippingSubmitButton(
-      submitting: _submitting,
-      onSubmit: _submitQuote,
-      primaryColor: _primaryBlue,
-      label: l10n.submitQuoteRequest,
-      icon: Icons.request_quote_outlined,
+    return Obx(
+      () => ShippingSubmitButton(
+        submitting: _quoteController.isSubmitting.value,
+        onSubmit: _submitQuote,
+        primaryColor: _primaryBlue,
+        label: l10n.submitQuoteRequest,
+        icon: Icons.request_quote_outlined,
+      ),
     );
   }
 
   Future<void> _submitQuote() async {
-    if (_submitting) return;
+    if (_quoteController.isSubmitting.value) return;
 
     FocusScope.of(context).unfocus();
 
@@ -1606,16 +1609,12 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       _showMessage(l10n.pleaseSignInBeforeQuote, error: true);
       return;
     }
-
-    setState(() {
-      _submitting = true;
-    });
 
     try {
       final now = DateTime.now();
@@ -1760,31 +1759,17 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      await FirebaseFirestore.instance
-          .collection('quote_requests')
-          .add(quoteData);
+      await _quoteController.submitQuoteRequest(quoteData);
 
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       await _showSuccessDialog(quoteNumber);
     } on FirebaseException catch (error) {
       if (!mounted) return;
 
-      setState(() {
-        _submitting = false;
-      });
-
       _showMessage(error.message ?? l10n.couldNotSubmitQuote, error: true);
     } catch (_) {
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       _showMessage(l10n.somethingWentWrong, error: true);
     }
@@ -1826,7 +1811,6 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
   // COMMON UI
   // =========================================================
 
-
   Widget _textField({
     required TextEditingController controller,
     required String label,
@@ -1842,7 +1826,12 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       validator: validator,
       onChanged: (_) => setState(() {}),
       textColor: _textDark,
-      decoration: _inputDecoration(label: label, hint: hint, icon: icon, suffix: suffix),
+      decoration: _inputDecoration(
+        label: label,
+        hint: hint,
+        icon: icon,
+        suffix: suffix,
+      ),
     );
   }
 
@@ -1981,7 +1970,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
       return l10n.standardRelocationCoordination;
     }
 
-    final labels = services.map((service) => _optionLabel(l10n, service)).toList();
+    final labels = services
+        .map((service) => _optionLabel(l10n, service))
+        .toList();
 
     if (labels.length <= 2) {
       return labels.join(' • ');
@@ -2031,12 +2022,9 @@ class _InternationalMovingScreenState extends State<InternationalMovingScreen> {
     return LocaleController.optionLabel(l10n, value);
   }
 
-
   String _formatNumber(double value) {
     return formatDisplayNumber(value);
   }
-
-
 
   void _showMessage(String message, {required bool error}) {
     showShippingMessage(

@@ -68,7 +68,6 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
 
   String _selectedService = 'Land Freight';
   DateTime? _pickupDate;
-  bool _submitting = false;
 
   @override
   void initState() {
@@ -738,52 +737,55 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: _submitting ? null : _submitQuote,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: deepBlue,
-          disabledBackgroundColor: deepBlue.withValues(alpha: .55),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+    return Obx(() {
+      final submitting = _quoteController.isSubmitting.value;
+      return SizedBox(
+        width: double.infinity,
+        height: 60,
+        child: ElevatedButton(
+          onPressed: submitting ? null : _submitQuote,
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: deepBlue,
+            disabledBackgroundColor: deepBlue.withValues(alpha: .55),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
           ),
-        ),
-        child: _submitting
-            ? const SizedBox(
-                width: 23,
-                height: 23,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.4,
-                  color: Colors.white,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.send_rounded, size: 20),
-                  const SizedBox(width: 10),
-                  Text(
-                    l10n.submitQuoteRequest,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: .4,
-                    ),
+          child: submitting
+              ? const SizedBox(
+                  width: 23,
+                  height: 23,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    color: Colors.white,
                   ),
-                  const SizedBox(width: 9),
-                  const Icon(Icons.arrow_forward_rounded, size: 20),
-                ],
-              ),
-      ),
-    );
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.send_rounded, size: 20),
+                    const SizedBox(width: 10),
+                    Text(
+                      l10n.submitQuoteRequest,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: .4,
+                      ),
+                    ),
+                    const SizedBox(width: 9),
+                    const Icon(Icons.arrow_forward_rounded, size: 20),
+                  ],
+                ),
+        ),
+      );
+    });
   }
 
   Future<void> _submitQuote() async {
-    if (_submitting) return;
+    if (_quoteController.isSubmitting.value) return;
 
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
@@ -799,10 +801,6 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
       _showMessage(l10n.pleaseSignInBeforeQuote, isError: true);
       return;
     }
-
-    setState(() {
-      _submitting = true;
-    });
 
     try {
       final userData = await _quoteController.loadUserProfile(user.uid);
@@ -869,13 +867,9 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
         'source': 'customer_app',
       };
 
-      final reference = await _quoteController.createQuoteRequest(quoteData);
+      final reference = await _quoteController.submitQuoteRequest(quoteData);
 
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       await _showSuccessDialog(
         quoteNumber: quoteNumber,
@@ -884,17 +878,9 @@ class _GetQuoteScreenState extends State<GetQuoteScreen> {
     } on FirebaseException catch (error) {
       if (!mounted) return;
 
-      setState(() {
-        _submitting = false;
-      });
-
       _showMessage(error.message ?? l10n.couldNotSubmitQuote, isError: true);
     } catch (_) {
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       _showMessage(l10n.somethingWentWrong, isError: true);
     }

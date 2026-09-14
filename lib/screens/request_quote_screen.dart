@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 import '../app/utils/value_formatters.dart';
 import '../app/widgets/action_success_dialog.dart';
+import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 
@@ -22,6 +23,7 @@ class RequestQuoteScreen extends StatefulWidget {
 }
 
 class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
+  final QuoteController _quoteController = Get.find<QuoteController>();
   final _formKey = GlobalKey<FormState>();
 
   final _pickupController = TextEditingController();
@@ -57,7 +59,6 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   String _selectedShippingMode = 'Road Freight';
 
   DateTime? _pickupDate;
-  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -135,28 +136,23 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
   }
 
   Future<void> _submitQuote() async {
+    if (_quoteController.isSubmitting.value) return;
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.pleaseSignInBeforeQuoteShort),
-        ),
+        SnackBar(content: Text(l10n.pleaseSignInBeforeQuoteShort)),
       );
       return;
     }
 
-    setState(() {
-      _isSubmitting = true;
-    });
-
     try {
-      await FirebaseFirestore.instance.collection('quotes').add({
+      await _quoteController.submitQuote({
         'userId': user.uid,
         'pickupLocation': _pickupController.text.trim(),
         'deliveryLocation': _deliveryController.text.trim(),
@@ -194,12 +190,6 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
           content: Text(AppLocalizations.of(context)!.couldNotSubmitQuoteRetry),
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
     }
   }
 
@@ -240,10 +230,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.local_shipping_outlined,
-                  color: _primaryBlue,
-                ),
+                const Icon(Icons.local_shipping_outlined, color: _primaryBlue),
                 const SizedBox(width: 11),
                 Expanded(
                   child: Text(
@@ -617,10 +604,7 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
                       keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
                       validator: (value) {
-                        return _requiredValidator(
-                          value,
-                          l10n.pleaseEnterPhone,
-                        );
+                        return _requiredValidator(value, l10n.pleaseEnterPhone);
                       },
                       decoration: _fieldDecoration(
                         hintText: l10n.phoneNumber,
@@ -697,45 +681,48 @@ class _RequestQuoteScreenState extends State<RequestQuoteScreen> {
 
               const SizedBox(height: 18),
 
-              SizedBox(
-                width: double.infinity,
-                height: 61,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitQuote,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryBlue,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: const Color(0xFF7DA9D0),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(19),
+              Obx(() {
+                final submitting = _quoteController.isSubmitting.value;
+                return SizedBox(
+                  width: double.infinity,
+                  height: 61,
+                  child: ElevatedButton(
+                    onPressed: submitting ? null : _submitQuote,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primaryBlue,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: const Color(0xFF7DA9D0),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(19),
+                      ),
                     ),
-                  ),
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              l10n.submitQuoteRequest,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                              ),
+                    child: submitting
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
                             ),
-                            const SizedBox(width: 11),
-                            const Icon(Icons.arrow_forward_rounded, size: 22),
-                          ],
-                        ),
-                ),
-              ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                l10n.submitQuoteRequest,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(width: 11),
+                              const Icon(Icons.arrow_forward_rounded, size: 22),
+                            ],
+                          ),
+                  ),
+                );
+              }),
             ],
           ),
         ),

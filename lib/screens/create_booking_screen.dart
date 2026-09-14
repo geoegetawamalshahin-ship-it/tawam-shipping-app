@@ -69,7 +69,6 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   String _customerName = 'TAWAM Customer';
   String _customerEmail = '';
   bool _loadingProfile = true;
-  bool _submitting = false;
 
   @override
   void initState() {
@@ -282,7 +281,11 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.shield_outlined, color: Colors.white, size: 20),
+                  const Icon(
+                    Icons.shield_outlined,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     l10n.globalBookingDesk,
@@ -591,11 +594,10 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                 ),
                 items: _preferredTimes
                     .map(
-                      (time) =>
-                          DropdownMenuItem(
-                            value: time,
-                            child: Text(_preferredTimeLabel(l10n, time)),
-                          ),
+                      (time) => DropdownMenuItem(
+                        value: time,
+                        child: Text(_preferredTimeLabel(l10n, time)),
+                      ),
                     )
                     .toList(),
                 onChanged: (value) {
@@ -666,7 +668,11 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
           const SizedBox(height: 17),
           Row(
             children: [
-              const Icon(Icons.straighten_rounded, color: primaryBlue, size: 18),
+              const Icon(
+                Icons.straighten_rounded,
+                color: primaryBlue,
+                size: 18,
+              ),
               const SizedBox(width: 7),
               Text(
                 l10n.dimensionsOptional,
@@ -830,8 +836,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           labelText: l10n.specialInstructions,
-          hintText:
-              l10n.pickupAccessHint,
+          hintText: l10n.pickupAccessHint,
           labelStyle: const TextStyle(
             color: textGrey,
             fontSize: 11,
@@ -901,60 +906,60 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      height: 62,
-      child: ElevatedButton(
-        onPressed: _submitting ? null : _submitBooking,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: deepBlue,
-          disabledBackgroundColor: deepBlue.withValues(alpha: .55),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+    return Obx(() {
+      final submitting = _bookingController.isSubmitting.value;
+      return SizedBox(
+        width: double.infinity,
+        height: 62,
+        child: ElevatedButton(
+          onPressed: submitting ? null : _submitBooking,
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: deepBlue,
+            disabledBackgroundColor: deepBlue.withValues(alpha: .55),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
           ),
-        ),
-        child: _submitting
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.4,
-                  color: Colors.white,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.calendar_month_rounded, size: 20),
-                  const SizedBox(width: 10),
-                  Text(
-                    l10n.confirmBooking,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: .5,
-                    ),
+          child: submitting
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    color: Colors.white,
                   ),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.arrow_forward_rounded, size: 20),
-                ],
-              ),
-      ),
-    );
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.calendar_month_rounded, size: 20),
+                    const SizedBox(width: 10),
+                    Text(
+                      l10n.confirmBooking,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: .5,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.arrow_forward_rounded, size: 20),
+                  ],
+                ),
+        ),
+      );
+    });
   }
 
   Future<void> _submitBooking() async {
-    if (_submitting) return;
+    if (_bookingController.isSubmitting.value) return;
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
-      _showMessage(
-        l10n.pleaseCompleteBooking,
-        isError: true,
-      );
+      _showMessage(l10n.pleaseCompleteBooking, isError: true);
       return;
     }
 
@@ -968,8 +973,6 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       _showMessage(l10n.pleaseSignInBeforeBooking, isError: true);
       return;
     }
-
-    setState(() => _submitting = true);
 
     try {
       final now = DateTime.now();
@@ -1011,21 +1014,15 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
         'source': 'customer_app',
       };
 
-      await _bookingController.createBookingRequest(bookingData);
+      await _bookingController.submitBookingRequest(bookingData);
 
       if (!mounted) return;
-      setState(() => _submitting = false);
       await _showSuccessDialog(bookingReference);
     } on FirebaseException catch (error) {
       if (!mounted) return;
-      setState(() => _submitting = false);
-      _showMessage(
-        error.message ?? l10n.unableToSubmitBooking,
-        isError: true,
-      );
+      _showMessage(error.message ?? l10n.unableToSubmitBooking, isError: true);
     } catch (_) {
       if (!mounted) return;
-      setState(() => _submitting = false);
       _showMessage(l10n.somethingWentWrong, isError: true);
     }
   }
@@ -1294,9 +1291,6 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
   String _formatDate(AppLocalizations l10n, DateTime date) {
     return formatLocalizedDate(l10n, date);
   }
-
-
-
 
   String _initials(String name) {
     final parts = name

@@ -5,8 +5,10 @@ import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../app/widgets/shipping_form_widgets.dart';
+import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -40,6 +42,7 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   static const double _volumetricDivisor = 5000;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final QuoteController _quoteController = Get.find<QuoteController>();
 
   // =========================================================
   // CONTROLLERS
@@ -109,7 +112,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // =========================================================
 
   bool _loadingProfile = true;
-  bool _submitting = false;
 
   String _customerName = '';
   String _customerEmail = '';
@@ -572,38 +574,38 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     return ShippingTrustBar(
       borderColor: _border,
       children: [
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.bolt_rounded,
-              title: l10n.badgeExpress,
-              subtitle: l10n.priority,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.bolt_rounded,
+            title: l10n.badgeExpress,
+            subtitle: l10n.priority,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.public_rounded,
-              title: l10n.badgeIntl,
-              subtitle: l10n.globalParcels,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.public_rounded,
+            title: l10n.badgeIntl,
+            subtitle: l10n.globalParcels,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.home_work_outlined,
-              title: 'D2D',
-              subtitle: l10n.doorToDoor,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.home_work_outlined,
+            title: 'D2D',
+            subtitle: l10n.doorToDoor,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
+        ),
       ],
     );
   }
@@ -638,7 +640,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -741,7 +742,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       textColor: _textDark,
       label: l10n.cargoReadyDate,
       isEmpty: _readyDate == null,
-      valueText: _readyDate == null ? l10n.selectReadyDate : _formatDate(_readyDate!),
+      valueText: _readyDate == null
+          ? l10n.selectReadyDate
+          : _formatDate(_readyDate!),
     );
   }
 
@@ -753,7 +756,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -890,7 +892,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1039,7 +1040,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1219,7 +1219,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
                 const SizedBox(height: 9),
 
                 Text(
-                  l10n.totalVolumeCarrierNote(_totalVolumeCbm.toStringAsFixed(3)),
+                  l10n.totalVolumeCarrierNote(
+                    _totalVolumeCbm.toStringAsFixed(3),
+                  ),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Color(0xFFBFD5E8),
@@ -1246,7 +1248,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1334,7 +1335,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1370,7 +1370,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1612,17 +1611,19 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-    return ShippingSubmitButton(
-      submitting: _submitting,
-      onSubmit: _submitQuote,
-      primaryColor: _primaryBlue,
-      label: l10n.submitQuoteRequest,
-      icon: Icons.request_quote_outlined,
+    return Obx(
+      () => ShippingSubmitButton(
+        submitting: _quoteController.isSubmitting.value,
+        onSubmit: _submitQuote,
+        primaryColor: _primaryBlue,
+        label: l10n.submitQuoteRequest,
+        icon: Icons.request_quote_outlined,
+      ),
     );
   }
 
   Future<void> _submitQuote() async {
-    if (_submitting) return;
+    if (_quoteController.isSubmitting.value) return;
 
     FocusScope.of(context).unfocus();
 
@@ -1646,17 +1647,12 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       _showMessage(l10n.pleaseSignInBeforeQuote, error: true);
-
       return;
     }
-
-    setState(() {
-      _submitting = true;
-    });
 
     try {
       final now = DateTime.now();
@@ -1788,31 +1784,17 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      await FirebaseFirestore.instance
-          .collection('quote_requests')
-          .add(quoteData);
+      await _quoteController.submitQuoteRequest(quoteData);
 
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       await _showSuccessDialog(quoteNumber);
     } on FirebaseException catch (error) {
       if (!mounted) return;
 
-      setState(() {
-        _submitting = false;
-      });
-
       _showMessage(error.message ?? l10n.couldNotSubmitQuote, error: true);
     } catch (_) {
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       _showMessage(l10n.somethingWentWrong, error: true);
     }
@@ -1854,7 +1836,6 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
   // COMMON UI
   // =========================================================
 
-
   Widget _textField({
     required TextEditingController controller,
     required String label,
@@ -1870,7 +1851,12 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
       validator: validator,
       onChanged: (_) => setState(() {}),
       textColor: _textDark,
-      decoration: _inputDecoration(label: label, hint: hint, icon: icon, suffix: suffix),
+      decoration: _inputDecoration(
+        label: label,
+        hint: hint,
+        icon: icon,
+        suffix: suffix,
+      ),
     );
   }
 
@@ -1986,12 +1972,9 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
     return LocaleController.optionLabel(l10n, value);
   }
 
-
   String _formatNumber(double value) {
     return formatDisplayNumber(value, nonPositiveAsZero: true);
   }
-
-
 
   void _showMessage(String message, {required bool error}) {
     showShippingMessage(

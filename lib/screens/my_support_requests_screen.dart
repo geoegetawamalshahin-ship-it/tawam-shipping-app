@@ -39,10 +39,15 @@ class MySupportRequestsScreen extends StatefulWidget {
 class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
   final SupportController _supportController = Get.find<SupportController>();
 
-  String _selectedFilter = 'all';
   bool _openedInitialRequest = false;
 
   final List<String> _filters = const ['all', 'new', 'in_progress', 'resolved'];
+
+  @override
+  void initState() {
+    super.initState();
+    _supportController.startListening();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,105 +62,71 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
             Expanded(
               child: user == null
                   ? _buildSignedOut()
-                  : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: _supportController.watchSupportRequests(user.uid),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: _primaryBlue,
-                            ),
-                          );
-                        }
+                  : Obx(() {
+                      if (_supportController.isLoading.value) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: _primaryBlue),
+                        );
+                      }
 
-                        if (snapshot.hasError) {
-                          return _buildError();
-                        }
+                      if (_supportController.loadError.value != null) {
+                        return _buildError();
+                      }
 
-                        final requests =
-                            snapshot.data?.docs.map((doc) {
-                              return <String, dynamic>{
-                                ...doc.data(),
-                                'id': doc.id,
-                              };
-                            }).toList() ??
-                            [];
+                      final requests = _supportController.requests.toList();
+                      final initialRequestId = widget.initialRequestId?.trim();
 
-                        requests.sort((a, b) {
-                          final aTime = a['createdAt'];
-                          final bTime = b['createdAt'];
-
-                          if (aTime is Timestamp && bTime is Timestamp) {
-                            return bTime.compareTo(aTime);
-                          }
-
-                          return 0;
-                        });
-                        final initialRequestId = widget.initialRequestId
-                            ?.trim();
-
-                        if (!_openedInitialRequest &&
-                            initialRequestId != null &&
-                            initialRequestId.isNotEmpty) {
-                          final matchingRequests = requests.where((request) {
-                            return (request['id'] ?? '').toString() ==
-                                initialRequestId;
-                          }).toList();
-
-                          if (matchingRequests.isNotEmpty) {
-                            _openedInitialRequest = true;
-
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              if (!mounted) return;
-
-                              _showRequestDetails(
-                                context,
-                                matchingRequests.first,
-                              );
-                            });
-                          }
-                        }
-                        final filtered = requests.where((request) {
-                          if (_selectedFilter == 'all') {
-                            return true;
-                          }
-
-                          return _normalizeSupportStatus(
-                                (request['status'] ?? 'new').toString(),
-                              ) ==
-                              _selectedFilter;
+                      if (!_openedInitialRequest &&
+                          initialRequestId != null &&
+                          initialRequestId.isNotEmpty) {
+                        final matchingRequests = requests.where((request) {
+                          return (request['id'] ?? '').toString() ==
+                              initialRequestId;
                         }).toList();
 
-                        return ListView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
-                          children: [
-                            _buildHero(requests),
+                        if (matchingRequests.isNotEmpty) {
+                          _openedInitialRequest = true;
 
-                            const SizedBox(height: 16),
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!mounted) return;
 
-                            _buildFilters(),
+                            _showRequestDetails(
+                              context,
+                              matchingRequests.first,
+                            );
+                          });
+                        }
+                      }
+                      final filtered = _supportController.filteredRequests;
 
-                            const SizedBox(height: 20),
+                      return ListView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                        children: [
+                          _buildHero(requests),
 
-                            _buildSectionHeader(filtered.length),
+                          const SizedBox(height: 16),
 
-                            const SizedBox(height: 12),
+                          _buildFilters(),
 
-                            if (filtered.isEmpty)
-                              _buildEmpty()
-                            else
-                              ...filtered.map(
-                                (request) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: _buildRequestCard(context, request),
-                                ),
+                          const SizedBox(height: 20),
+
+                          _buildSectionHeader(filtered.length),
+
+                          const SizedBox(height: 12),
+
+                          if (filtered.isEmpty)
+                            _buildEmpty()
+                          else
+                            ...filtered.map(
+                              (request) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _buildRequestCard(context, request),
                               ),
-                          ],
-                        );
-                      },
-                    ),
+                            ),
+                        ],
+                      );
+                    }),
             ),
           ],
         ),
@@ -336,12 +307,8 @@ class _MySupportRequestsScreenState extends State<MySupportRequestsScreen> {
             label: _supportFilterLabel(l10n, filter),
           ),
       ],
-      selectedValue: _selectedFilter,
-      onSelected: (value) {
-        setState(() {
-          _selectedFilter = value;
-        });
-      },
+      selectedValue: _supportController.selectedFilter.value,
+      onSelected: _supportController.setFilter,
       height: 40,
       useSeparatedList: true,
       animationDuration: const Duration(milliseconds: 180),

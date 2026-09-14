@@ -5,8 +5,10 @@ import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../app/widgets/shipping_form_widgets.dart';
+import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -40,6 +42,7 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   static const double _volumetricDivisor = 6000;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final QuoteController _quoteController = Get.find<QuoteController>();
 
   // =========================================================
   // CONTROLLERS
@@ -110,8 +113,6 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   // =========================================================
 
   bool _loadingProfile = true;
-
-  bool _submitting = false;
 
   String _customerName = '';
 
@@ -486,7 +487,11 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.public_rounded, color: _primaryBlue, size: 14),
+                  const Icon(
+                    Icons.public_rounded,
+                    color: _primaryBlue,
+                    size: 14,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     l10n.globalAirCargo,
@@ -545,38 +550,38 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     return ShippingTrustBar(
       borderColor: _border,
       children: [
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.bolt_rounded,
-              title: l10n.express.toUpperCase(),
-              subtitle: l10n.priorityCargo,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.bolt_rounded,
+            title: l10n.express.toUpperCase(),
+            subtitle: l10n.priorityCargo,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.flight_takeoff_rounded,
-              title: 'A2A',
-              subtitle: l10n.airportToAirport,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.flight_takeoff_rounded,
+            title: 'A2A',
+            subtitle: l10n.airportToAirport,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.home_work_outlined,
-              title: 'D2D',
-              subtitle: l10n.doorToDoor,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.home_work_outlined,
+            title: 'D2D',
+            subtitle: l10n.doorToDoor,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
           ),
+        ),
       ],
     );
   }
@@ -613,7 +618,6 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -716,7 +720,9 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
       textColor: _textDark,
       label: l10n.cargoReadyDate,
       isEmpty: _readyDate == null,
-      valueText: _readyDate == null ? l10n.selectReadyDate : _formatDate(_readyDate!),
+      valueText: _readyDate == null
+          ? l10n.selectReadyDate
+          : _formatDate(_readyDate!),
       labelWeight: null,
     );
   }
@@ -729,7 +735,6 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -866,7 +871,6 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -965,7 +969,6 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1287,7 +1290,11 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.fact_check_outlined, color: Colors.white, size: 19),
+              const Icon(
+                Icons.fact_check_outlined,
+                color: Colors.white,
+                size: 19,
+              ),
 
               const SizedBox(width: 8),
 
@@ -1370,7 +1377,10 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
                 Expanded(
                   child: Text(
                     l10n.chargeableWeight,
-                    style: const TextStyle(color: Color(0xFFD9E8F6), fontSize: 9.5),
+                    style: const TextStyle(
+                      color: Color(0xFFD9E8F6),
+                      fontSize: 9.5,
+                    ),
                   ),
                 ),
 
@@ -1400,27 +1410,26 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-    return ShippingSubmitButton(
-      submitting: _submitting,
-      onSubmit: _submitQuote,
-      primaryColor: _primaryBlue,
-      label: l10n.submitQuoteRequest,
-      icon: Icons.flight_takeoff_rounded,
+    return Obx(
+      () => ShippingSubmitButton(
+        submitting: _quoteController.isSubmitting.value,
+        onSubmit: _submitQuote,
+        primaryColor: _primaryBlue,
+        label: l10n.submitQuoteRequest,
+        icon: Icons.flight_takeoff_rounded,
+      ),
     );
   }
 
   Future<void> _submitQuote() async {
-    if (_submitting) return;
+    if (_quoteController.isSubmitting.value) return;
 
     final l10n = AppLocalizations.of(context)!;
 
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
-      _showMessage(
-        l10n.pleaseCompleteShipmentInfo,
-        error: true,
-      );
+      _showMessage(l10n.pleaseCompleteShipmentInfo, error: true);
 
       return;
     }
@@ -1437,17 +1446,13 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       _showMessage(l10n.pleaseSignInBeforeQuote, error: true);
 
       return;
     }
-
-    setState(() {
-      _submitting = true;
-    });
 
     try {
       final now = DateTime.now();
@@ -1533,34 +1538,17 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      await FirebaseFirestore.instance
-          .collection('quote_requests')
-          .add(quoteData);
+      await _quoteController.submitQuoteRequest(quoteData);
 
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       await _showSuccessDialog(quoteNumber);
     } on FirebaseException catch (error) {
       if (!mounted) return;
 
-      setState(() {
-        _submitting = false;
-      });
-
-      _showMessage(
-        error.message ?? l10n.couldNotSubmitQuote,
-        error: true,
-      );
+      _showMessage(error.message ?? l10n.couldNotSubmitQuote, error: true);
     } catch (_) {
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       _showMessage(l10n.somethingWentWrong, error: true);
     }
@@ -1603,7 +1591,6 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
   // COMMON WIDGETS
   // =========================================================
 
-
   Widget _textField({
     required TextEditingController controller,
     required String label,
@@ -1619,7 +1606,12 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
       validator: validator,
       onChanged: (_) => setState(() {}),
       textColor: _textDark,
-      decoration: _inputDecoration(label: label, hint: hint, icon: icon, suffix: suffix),
+      decoration: _inputDecoration(
+        label: label,
+        hint: hint,
+        icon: icon,
+        suffix: suffix,
+      ),
     );
   }
 
@@ -1730,12 +1722,9 @@ class _AirFreightScreenState extends State<AirFreightScreen> {
     return LocaleController.optionLabel(l10n, value);
   }
 
-
   String _formatNumber(double value) {
     return formatDisplayNumber(value, nonPositiveAsZero: true);
   }
-
-
 
   void _showMessage(String message, {required bool error}) {
     showShippingMessage(

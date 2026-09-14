@@ -12,7 +12,10 @@ class QuoteService {
   User? get currentUser => _firebaseAuth.currentUser;
 
   Future<Map<String, dynamic>> loadUserProfile(String userId) async {
-    final snapshot = await _firestore.collection(FirestoreCollections.users).doc(userId).get();
+    final snapshot = await _firestore
+        .collection(FirestoreCollections.users)
+        .doc(userId)
+        .get();
     return snapshot.data() ?? <String, dynamic>{};
   }
 
@@ -20,6 +23,12 @@ class QuoteService {
     Map<String, dynamic> data,
   ) {
     return _firestore.collection(FirestoreCollections.quoteRequests).add(data);
+  }
+
+  Future<DocumentReference<Map<String, dynamic>>> createQuote(
+    Map<String, dynamic> data,
+  ) {
+    return _firestore.collection(FirestoreCollections.quotes).add(data);
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> watchQuoteRequests(

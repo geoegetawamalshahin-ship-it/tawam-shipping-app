@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -56,11 +54,6 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   final ShipmentController _shipmentController = Get.find<ShipmentController>();
 
   final TextEditingController _searchController = TextEditingController();
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
-  String? _loadError;
-  bool _isLoading = true;
-  String _selectedFilter = 'all';
-  List<Map<String, dynamic>> _shipments = [];
 
   final List<String> _filters = const [
     'all',
@@ -77,112 +70,24 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   @override
   void initState() {
     super.initState();
-    _listenToShipments();
+    _searchController.text = _shipmentController.searchQuery.value;
+    _shipmentController.startListening();
   }
 
   @override
   void dispose() {
-    _subscription?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
-  void _listenToShipments() {
-    final user = _shipmentController.currentUser;
-
-    if (user == null) {
-      setState(() {
-        _shipments = [];
-        _isLoading = false;
-      });
-      return;
-    }
-    if (mounted) {
-      setState(() {
-        _isLoading = true;
-        _loadError = null;
-      });
-    }
-    _subscription?.cancel();
-
-    _subscription = _shipmentController.watchUserShipments(user.uid).listen(
-          (snapshot) {
-            final items = snapshot.docs.map((doc) {
-              final data = doc.data();
-              final rawStatus = LocaleController.normalizeStatus(
-                (data['status'] ?? 'pending').toString(),
-              );
-              final cargo = (data['cargo'] ?? data['cargoType'] ?? '')
-                  .toString()
-                  .trim();
-
-              return <String, dynamic>{
-                ...data,
-                'id': doc.id,
-                'number': (data['trackingNumber'] ?? '').toString(),
-                'origin': (data['pickupLocation'] ?? '').toString(),
-                'destination': (data['deliveryLocation'] ?? '').toString(),
-                'rawStatus': rawStatus,
-                'progress': _statusProgress(rawStatus),
-                'type': cargo,
-                'currentLocation': _currentLocation(data, rawStatus),
-              };
-            }).toList();
-
-            items.sort((a, b) {
-              final aCreated = a['createdAt'];
-              final bCreated = b['createdAt'];
-              if (aCreated is Timestamp && bCreated is Timestamp) {
-                return bCreated.compareTo(aCreated);
-              }
-              return 0;
-            });
-
-            if (!mounted) return;
-            setState(() {
-              _shipments = items;
-              _isLoading = false;
-            });
-          },
-          onError: (error) {
-            if (!mounted) return;
-
-            setState(() {
-              _isLoading = false;
-              _loadError = 'error';
-            });
-          },
-        );
-  }
-
-  List<Map<String, dynamic>> get _visibleShipments {
-    final query = _searchController.text.trim().toLowerCase();
-    final l10n = AppLocalizations.of(context)!;
-
-    return _shipments.where((shipment) {
-      final rawStatus = (shipment['rawStatus'] ?? '').toString();
-      final searchable = [
-        shipment['number'],
-        shipment['origin'],
-        shipment['destination'],
-        shipment['type'],
-        shipment['currentLocation'],
-        rawStatus,
-        LocaleController.statusLabel(l10n, rawStatus),
-      ].join(' ').toLowerCase();
-
-      final matchesFilter =
-          _selectedFilter == 'all' || rawStatus == _selectedFilter;
-      final matchesSearch = query.isEmpty || searchable.contains(query);
-
-      return matchesFilter && matchesSearch;
-    }).toList();
+  List<Map<String, dynamic>> _visibleShipments(AppLocalizations l10n) {
+    return _shipmentController.visibleShipments(
+      (status) => LocaleController.statusLabel(l10n, status),
+    );
   }
 
   int _countStatus(String status) {
-    return _shipments
-        .where((shipment) => shipment['rawStatus'] == status)
-        .length;
+    return _shipmentController.countStatus(status);
   }
 
   void _openShipmentDetails(Map<String, dynamic> shipment) {
@@ -196,7 +101,6 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final visible = _visibleShipments;
 
     return Scaffold(
       backgroundColor: _pageBg,
@@ -205,108 +109,115 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           children: [
             _buildTopHeader(),
             Expanded(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
-                children: [
-                  _buildHero(),
-                  const SizedBox(height: 16),
-                  _buildSearchField(),
-                  const SizedBox(height: 14),
-                  _buildFilters(),
-                  const SizedBox(height: 20),
-                  _buildListHeader(visible.length),
-                  const SizedBox(height: 12),
-                  if (_isLoading)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 60),
-                      child: Center(
-                        child: CircularProgressIndicator(color: _primaryBlue),
-                      ),
-                    )
-                  else if (_loadError != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 45),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEAF3FF),
-                                borderRadius: BorderRadius.circular(20),
+              child: Obx(() {
+                final visible = _visibleShipments(l10n);
+                final isLoading = _shipmentController.isLoading.value;
+                final loadError = _shipmentController.loadError.value;
+
+                return ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                  children: [
+                    _buildHero(),
+                    const SizedBox(height: 16),
+                    _buildSearchField(),
+                    const SizedBox(height: 14),
+                    _buildFilters(),
+                    const SizedBox(height: 20),
+                    _buildListHeader(visible.length),
+                    const SizedBox(height: 12),
+                    if (isLoading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 60),
+                        child: Center(
+                          child: CircularProgressIndicator(color: _primaryBlue),
+                        ),
+                      )
+                    else if (loadError != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 45),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEAF3FF),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(
+                                  Icons.cloud_off_rounded,
+                                  color: _primaryBlue,
+                                  size: 30,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.cloud_off_rounded,
-                                color: _primaryBlue,
-                                size: 30,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              l10n.unableToLoadShipments,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: _deepBlue,
-                              ),
-                            ),
-                            const SizedBox(height: 7),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                              ),
-                              child: Text(
-                                l10n.couldNotLoadShipments,
-                                textAlign: TextAlign.center,
+                              const SizedBox(height: 16),
+                              Text(
+                                l10n.unableToLoadShipments,
                                 style: const TextStyle(
-                                  fontSize: 13,
-                                  height: 1.5,
-                                  color: _textGrey,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: _deepBlue,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 18),
-                            ElevatedButton.icon(
-                              onPressed: _listenToShipments,
-                              icon: const Icon(Icons.refresh_rounded),
-                              label: Text(l10n.tryAgain),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _primaryBlue,
-                                foregroundColor: Colors.white,
+                              const SizedBox(height: 7),
+                              Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 22,
-                                  vertical: 14,
+                                  horizontal: 24,
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                                child: Text(
+                                  l10n.couldNotLoadShipments,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    height: 1.5,
+                                    color: _textGrey,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  else if (visible.isEmpty)
-                    _buildEmptyState()
-                  else
-                    ...visible.map(
-                      (shipment) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _ShipmentCard(
-                          shipment: shipment,
-                          statusInfo: _statusInfo(
-                            l10n,
-                            shipment['rawStatus'] as String,
+                              const SizedBox(height: 18),
+                              ElevatedButton.icon(
+                                onPressed: () => _shipmentController
+                                    .startListening(force: true),
+                                icon: const Icon(Icons.refresh_rounded),
+                                label: Text(l10n.tryAgain),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _primaryBlue,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 22,
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          onTap: () => _openShipmentDetails(shipment),
+                        ),
+                      )
+                    else if (visible.isEmpty)
+                      _buildEmptyState()
+                    else
+                      ...visible.map(
+                        (shipment) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _ShipmentCard(
+                            shipment: shipment,
+                            statusInfo: _statusInfo(
+                              l10n,
+                              shipment['rawStatus'] as String,
+                            ),
+                            onTap: () => _openShipmentDetails(shipment),
+                          ),
                         ),
                       ),
-                    ),
-                ],
-              ),
+                  ],
+                );
+              }),
             ),
           ],
         ),
@@ -399,7 +310,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
                 children: [
                   Expanded(
                     child: _HeroStat(
-                      value: '${_shipments.length}',
+                      value: '${_shipmentController.shipments.length}',
                       label: l10n.total,
                       icon: Icons.inventory_2_outlined,
                     ),
@@ -433,7 +344,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     final l10n = AppLocalizations.of(context)!;
     return TextField(
       controller: _searchController,
-      onChanged: (_) => setState(() {}),
+      onChanged: _shipmentController.setSearchQuery,
       style: const TextStyle(
         color: _textDark,
         fontSize: 12.5,
@@ -443,12 +354,12 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
         hintText: l10n.searchTrackingRouteCargo,
         hintStyle: const TextStyle(color: Color(0xFFA0A8B4), fontSize: 11.5),
         prefixIcon: const Icon(Icons.search_rounded, color: _primaryBlue),
-        suffixIcon: _searchController.text.isEmpty
+        suffixIcon: _shipmentController.searchQuery.value.isEmpty
             ? const Icon(Icons.manage_search_rounded, color: Color(0xFF7F8997))
             : IconButton(
                 onPressed: () {
                   _searchController.clear();
-                  setState(() {});
+                  _shipmentController.setSearchQuery('');
                 },
                 icon: const Icon(Icons.close_rounded, color: Color(0xFF7F8997)),
               ),
@@ -481,8 +392,8 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
         for (final filter in _filters)
           ListFilterItem(value: filter, label: _filterLabel(l10n, filter)),
       ],
-      selectedValue: _selectedFilter,
-      onSelected: (value) => setState(() => _selectedFilter = value),
+      selectedValue: _shipmentController.selectedFilter.value,
+      onSelected: _shipmentController.setFilter,
       height: 40,
       useSeparatedList: true,
       animationDuration: const Duration(milliseconds: 200),
@@ -513,8 +424,8 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
 
   Widget _buildEmptyState() {
     final l10n = AppLocalizations.of(context)!;
-    final hasSearch = _searchController.text.trim().isNotEmpty;
-    final hasFilter = _selectedFilter != 'all';
+    final hasSearch = _shipmentController.searchQuery.value.trim().isNotEmpty;
+    final hasFilter = _shipmentController.selectedFilter.value != 'all';
     final isFiltered = hasSearch || hasFilter;
 
     return Container(
@@ -567,9 +478,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
           const SizedBox(height: 8),
 
           Text(
-            isFiltered
-                ? l10n.noMatchingShipmentsBody
-                : l10n.noShipmentsYetBody,
+            isFiltered ? l10n.noMatchingShipmentsBody : l10n.noShipmentsYetBody,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: _textGrey,
@@ -584,10 +493,7 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
             OutlinedButton.icon(
               onPressed: () {
                 _searchController.clear();
-
-                setState(() {
-                  _selectedFilter = 'all';
-                });
+                _shipmentController.clearSearchAndFilters();
               },
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text(l10n.clearSearchFilters),
@@ -614,28 +520,6 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
     return LocaleController.statusLabel(l10n, filter);
   }
 
-  double _statusProgress(String status) {
-    switch (status) {
-      case 'confirmed':
-        return .25;
-      case 'prepared':
-        return .36;
-      case 'in_transit':
-        return .58;
-      case 'customs':
-      case 'customs_clearance':
-        return .72;
-      case 'out_for_delivery':
-        return .88;
-      case 'delivered':
-        return 1;
-      case 'cancelled':
-        return 0;
-      default:
-        return .10;
-    }
-  }
-
   String _statusUpperLabel(AppLocalizations l10n, String status) {
     switch (LocaleController.normalizeStatus(status)) {
       case 'confirmed':
@@ -655,33 +539,6 @@ class _ShipmentsScreenState extends State<ShipmentsScreen> {
       default:
         return l10n.pendingUpper;
     }
-  }
-
-  String _currentLocation(Map<String, dynamic> data, String status) {
-    for (final key in [
-      'currentLocation',
-      'currentArea',
-      'lastLocation',
-      'location',
-    ]) {
-      final value = data[key];
-      if (value != null && value.toString().trim().isNotEmpty) {
-        return value.toString().trim();
-      }
-    }
-
-    final pickup = (data['pickupLocation'] ?? '').toString().trim();
-    final delivery = (data['deliveryLocation'] ?? '').toString().trim();
-
-    if (status == 'delivered' || status == 'out_for_delivery') {
-      return delivery;
-    }
-
-    if (status == 'pending' || status == 'confirmed' || status == 'prepared') {
-      return pickup;
-    }
-
-    return '';
   }
 
   _StatusInfo _statusInfo(AppLocalizations l10n, String status) {
@@ -864,8 +721,9 @@ class _ShipmentCard extends StatelessWidget {
     final originRaw = (shipment['origin'] ?? '').toString().trim();
     final destinationRaw = (shipment['destination'] ?? '').toString().trim();
     final origin = originRaw.isEmpty ? l10n.notSpecified : originRaw;
-    final destination =
-        destinationRaw.isEmpty ? l10n.notSpecified : destinationRaw;
+    final destination = destinationRaw.isEmpty
+        ? l10n.notSpecified
+        : destinationRaw;
     final date = _formatDate(
       shipment['expectedDelivery'] ?? shipment['estimatedDelivery'],
       l10n,

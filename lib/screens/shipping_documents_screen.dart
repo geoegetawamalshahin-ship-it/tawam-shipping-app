@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 
 import '../app/utils/shipment_documents.dart';
 import '../app/widgets/shipping_document_viewer.dart';
+import '../controllers/shipment_controller.dart';
 import '../l10n/app_localizations.dart';
 
 class ShippingDocumentsScreen extends StatefulWidget {
@@ -20,6 +20,7 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
   static const Color _pageBackground = Color(0xFFF4F7FB);
   static const Color _mutedText = Color(0xFF8B95A3);
 
+  final ShipmentController _shipmentController = Get.find<ShipmentController>();
   late Future<List<Map<String, dynamic>>> _documentsFuture;
 
   @override
@@ -28,48 +29,8 @@ class _ShippingDocumentsScreenState extends State<ShippingDocumentsScreen> {
     _documentsFuture = _loadDocuments();
   }
 
-  Future<List<Map<String, dynamic>>> _loadDocuments() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      return [];
-    }
-
-    final shipments = await FirebaseFirestore.instance
-        .collection('shipments')
-        .where('userId', isEqualTo: user.uid)
-        .get();
-
-    final documents = <Map<String, dynamic>>[];
-
-    for (final shipmentDoc in shipments.docs) {
-      final shipment = shipmentDoc.data();
-
-      for (final document in shipmentDocumentsOf(shipment)) {
-        documents.add({
-          'item': document,
-          'name': document.name,
-          'path': document.path,
-          'contentType': document.contentType,
-          'size': document.size ?? 0,
-          'uploadedAt': document.uploadedAt,
-          'trackingNumber': (shipment['trackingNumber'] ?? '').toString(),
-        });
-      }
-    }
-
-    documents.sort((a, b) {
-      final aDate = a['uploadedAt'];
-      final bDate = b['uploadedAt'];
-
-      if (aDate is Timestamp && bDate is Timestamp) {
-        return bDate.compareTo(aDate);
-      }
-
-      return 0;
-    });
-
-    return documents;
+  Future<List<Map<String, dynamic>>> _loadDocuments() {
+    return _shipmentController.loadShippingDocuments();
   }
 
   Future<void> _openDocument(Map<String, dynamic> document) async {

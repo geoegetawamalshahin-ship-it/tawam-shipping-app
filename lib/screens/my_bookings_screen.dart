@@ -28,7 +28,11 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   static const Color borderColor = Color(0xFFE3EAF2);
   static const Color softBlue = Color(0xFFEAF3FF);
 
-  String _selectedFilter = 'all';
+  @override
+  void initState() {
+    super.initState();
+    _bookingController.startListening();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,138 +61,108 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               )
             else
               Expanded(
-                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: _bookingController.watchBookingRequests(user.uid),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return _buildError(snapshot.error.toString());
-                    }
+                child: Obx(() {
+                  if (_bookingController.loadError.value != null) {
+                    return _buildError(_bookingController.loadError.value!);
+                  }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: primaryBlue),
-                      );
-                    }
-
-                    final docs = snapshot.data?.docs.toList() ?? [];
-
-                    // أحدث طلب أولاً بدون الحاجة إلى Firestore Index.
-                    docs.sort((a, b) {
-                      final aDate = a.data()['createdAt'];
-                      final bDate = b.data()['createdAt'];
-
-                      final aMilliseconds = aDate is Timestamp
-                          ? aDate.millisecondsSinceEpoch
-                          : 0;
-
-                      final bMilliseconds = bDate is Timestamp
-                          ? bDate.millisecondsSinceEpoch
-                          : 0;
-
-                      return bMilliseconds.compareTo(aMilliseconds);
-                    });
-
-                    final bookingDocs = docs.where((doc) {
-                      final data = doc.data();
-
-                      final requestType = (data['requestType'] ?? '')
-                          .toString()
-                          .toLowerCase();
-
-                      // الحجوزات الجديدة عندنا booking.
-                      // ونسمح للطلبات القديمة أيضاً إذا ما كان الحقل موجود.
-                      return requestType.isEmpty || requestType == 'booking';
-                    }).toList();
-
-                    final filtered = bookingDocs.where((doc) {
-                      final status = _normalizedStatus(doc.data()['status']);
-
-                      if (_selectedFilter == 'all') {
-                        return true;
-                      }
-
-                      if (_selectedFilter == 'pending') {
-                        return status == 'pending' ||
-                            status == 'pending_review';
-                      }
-
-                      if (_selectedFilter == 'approved') {
-                        return status == 'approved' || status == 'confirmed';
-                      }
-
-                      if (_selectedFilter == 'rejected') {
-                        return status == 'rejected';
-                      }
-
-                      return true;
-                    }).toList();
-
-                    final pendingCount = bookingDocs.where((doc) {
-                      final status = _normalizedStatus(doc.data()['status']);
-
-                      return status == 'pending' || status == 'pending_review';
-                    }).length;
-
-                    final approvedCount = bookingDocs.where((doc) {
-                      final status = _normalizedStatus(doc.data()['status']);
-
-                      return status == 'approved' || status == 'confirmed';
-                    }).length;
-
-                    return SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHero(),
-
-                          const SizedBox(height: 18),
-
-                          _buildStats(
-                            total: bookingDocs.length,
-                            pending: pendingCount,
-                            approved: approvedCount,
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          Text(
-                            l10n.yourBookings,
-                            style: const TextStyle(
-                              color: textDark,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -.4,
-                            ),
-                          ),
-
-                          const SizedBox(height: 5),
-
-                          Text(
-                            l10n.trackEveryBooking,
-                            style: const TextStyle(
-                              color: textGrey,
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          const SizedBox(height: 15),
-
-                          _buildFilters(),
-
-                          const SizedBox(height: 17),
-
-                          if (filtered.isEmpty)
-                            _buildEmptyState()
-                          else
-                            ...filtered.map((doc) => _buildBookingCard(doc)),
-                        ],
-                      ),
+                  if (_bookingController.isLoading.value) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: primaryBlue),
                     );
-                  },
-                ),
+                  }
+
+                  final bookingDocs = _bookingController.bookingDocs.toList();
+                  final selectedFilter =
+                      _bookingController.selectedFilter.value;
+
+                  final filtered = bookingDocs.where((doc) {
+                    final status = _normalizedStatus(doc.data()['status']);
+
+                    if (selectedFilter == 'all') {
+                      return true;
+                    }
+
+                    if (selectedFilter == 'pending') {
+                      return status == 'pending' || status == 'pending_review';
+                    }
+
+                    if (selectedFilter == 'approved') {
+                      return status == 'approved' || status == 'confirmed';
+                    }
+
+                    if (selectedFilter == 'rejected') {
+                      return status == 'rejected';
+                    }
+
+                    return true;
+                  }).toList();
+
+                  final pendingCount = bookingDocs.where((doc) {
+                    final status = _normalizedStatus(doc.data()['status']);
+
+                    return status == 'pending' || status == 'pending_review';
+                  }).length;
+
+                  final approvedCount = bookingDocs.where((doc) {
+                    final status = _normalizedStatus(doc.data()['status']);
+
+                    return status == 'approved' || status == 'confirmed';
+                  }).length;
+
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 34),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHero(),
+
+                        const SizedBox(height: 18),
+
+                        _buildStats(
+                          total: bookingDocs.length,
+                          pending: pendingCount,
+                          approved: approvedCount,
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        Text(
+                          l10n.yourBookings,
+                          style: const TextStyle(
+                            color: textDark,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -.4,
+                          ),
+                        ),
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          l10n.trackEveryBooking,
+                          style: const TextStyle(
+                            color: textGrey,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        _buildFilters(),
+
+                        const SizedBox(height: 17),
+
+                        if (filtered.isEmpty)
+                          _buildEmptyState()
+                        else
+                          ...filtered.map((doc) => _buildBookingCard(doc)),
+                      ],
+                    ),
+                  );
+                }),
               ),
           ],
         ),
@@ -403,12 +377,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         ListFilterItem(value: 'approved', label: l10n.statusConfirmed),
         ListFilterItem(value: 'rejected', label: l10n.rejected),
       ],
-      selectedValue: _selectedFilter,
-      onSelected: (value) {
-        setState(() {
-          _selectedFilter = value;
-        });
-      },
+      selectedValue: _bookingController.selectedFilter.value,
+      onSelected: _bookingController.setFilter,
       animationDuration: const Duration(milliseconds: 160),
       chipPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 10),
       selectedColor: primaryBlue,
@@ -1024,7 +994,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       body: l10n.pleaseCheckConnectionTryAgain,
       retryLabel: l10n.tryAgain,
       onRetry: () {
-        setState(() {});
+        _bookingController.startListening(force: true);
       },
       borderColor: borderColor,
       titleColor: textDark,

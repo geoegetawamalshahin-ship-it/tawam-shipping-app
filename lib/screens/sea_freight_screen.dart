@@ -3,8 +3,10 @@ import '../app/utils/value_formatters.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../app/widgets/shipping_form_widgets.dart';
+import '../controllers/quote_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../locale_controller.dart';
 import 'my_quotes_screen.dart';
@@ -38,6 +40,7 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   // =========================================================
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final QuoteController _quoteController = Get.find<QuoteController>();
 
   final TextEditingController _originController = TextEditingController();
 
@@ -107,7 +110,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   // =========================================================
 
   bool _loadingProfile = true;
-  bool _submitting = false;
 
   String _customerName = '';
   String _customerEmail = '';
@@ -360,7 +362,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     );
   }
 
-
   // =========================================================
   // HERO
   // =========================================================
@@ -412,7 +413,11 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.public_rounded, color: _primaryBlue, size: 14),
+                  const Icon(
+                    Icons.public_rounded,
+                    color: _primaryBlue,
+                    size: 14,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     l10n.oceanFreight,
@@ -473,44 +478,44 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     return ShippingTrustBar(
       borderColor: _border,
       children: [
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.inventory_2_outlined,
-              title: 'FCL',
-              subtitle: _optionLabel(l10n, 'Full Container'),
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-              titleFontSize: 11,
-              subtitleFontWeight: FontWeight.w500,
-            ),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.inventory_2_outlined,
+            title: 'FCL',
+            subtitle: _optionLabel(l10n, 'Full Container'),
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
+            titleFontSize: 11,
+            subtitleFontWeight: FontWeight.w500,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.widgets_outlined,
-              title: 'LCL',
-              subtitle: _optionLabel(l10n, 'Shared Cargo'),
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-              titleFontSize: 11,
-              subtitleFontWeight: FontWeight.w500,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.widgets_outlined,
+            title: 'LCL',
+            subtitle: _optionLabel(l10n, 'Shared Cargo'),
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
+            titleFontSize: 11,
+            subtitleFontWeight: FontWeight.w500,
           ),
-          const ShippingTrustDivider(color: _border),
-          Expanded(
-            child: ShippingTrustItem(
-              icon: Icons.home_work_outlined,
-              title: 'D2D',
-              subtitle: l10n.doorToDoor,
-              primaryColor: _primaryBlue,
-              titleColor: _textDark,
-              subtitleColor: _textGrey,
-              titleFontSize: 11,
-              subtitleFontWeight: FontWeight.w500,
-            ),
+        ),
+        const ShippingTrustDivider(color: _border),
+        Expanded(
+          child: ShippingTrustItem(
+            icon: Icons.home_work_outlined,
+            title: 'D2D',
+            subtitle: l10n.doorToDoor,
+            primaryColor: _primaryBlue,
+            titleColor: _textDark,
+            subtitleColor: _textGrey,
+            titleFontSize: 11,
+            subtitleFontWeight: FontWeight.w500,
           ),
+        ),
       ],
     );
   }
@@ -545,7 +550,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -644,7 +648,9 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       textColor: _textDark,
       label: l10n.cargoReadyDate,
       isEmpty: _readyDate == null,
-      valueText: _readyDate == null ? l10n.selectReadyDate : _formatDate(_readyDate!),
+      valueText: _readyDate == null
+          ? l10n.selectReadyDate
+          : _formatDate(_readyDate!),
     );
   }
 
@@ -656,7 +662,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -906,7 +911,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1077,7 +1081,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1113,7 +1116,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return ShippingPremiumCard(
-
       borderColor: _border,
 
       shadowColor: _deepBlue,
@@ -1319,27 +1321,26 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
 
   Widget _buildSubmitButton() {
     final l10n = AppLocalizations.of(context)!;
-    return ShippingSubmitButton(
-      submitting: _submitting,
-      onSubmit: _submitQuote,
-      primaryColor: _primaryBlue,
-      label: l10n.submitQuoteRequest,
-      icon: Icons.request_quote_outlined,
+    return Obx(
+      () => ShippingSubmitButton(
+        submitting: _quoteController.isSubmitting.value,
+        onSubmit: _submitQuote,
+        primaryColor: _primaryBlue,
+        label: l10n.submitQuoteRequest,
+        icon: Icons.request_quote_outlined,
+      ),
     );
   }
 
   Future<void> _submitQuote() async {
-    if (_submitting) return;
+    if (_quoteController.isSubmitting.value) return;
 
     final l10n = AppLocalizations.of(context)!;
 
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
-      _showMessage(
-        l10n.pleaseCompleteShipmentInfo,
-        error: true,
-      );
+      _showMessage(l10n.pleaseCompleteShipmentInfo, error: true);
       return;
     }
 
@@ -1348,16 +1349,12 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _quoteController.currentUser;
 
     if (user == null) {
       _showMessage(l10n.pleaseSignInBeforeQuote, error: true);
       return;
     }
-
-    setState(() {
-      _submitting = true;
-    });
 
     try {
       final now = DateTime.now();
@@ -1467,15 +1464,9 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      final reference = await FirebaseFirestore.instance
-          .collection('quote_requests')
-          .add(quoteData);
+      final reference = await _quoteController.submitQuoteRequest(quoteData);
 
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       await _showSuccessDialog(
         quoteNumber: quoteNumber,
@@ -1484,20 +1475,9 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
     } on FirebaseException catch (error) {
       if (!mounted) return;
 
-      setState(() {
-        _submitting = false;
-      });
-
-      _showMessage(
-        error.message ?? l10n.couldNotSubmitQuote,
-        error: true,
-      );
+      _showMessage(error.message ?? l10n.couldNotSubmitQuote, error: true);
     } catch (_) {
       if (!mounted) return;
-
-      setState(() {
-        _submitting = false;
-      });
 
       _showMessage(l10n.somethingWentWrong, error: true);
     }
@@ -1543,7 +1523,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   // COMMON UI
   // =========================================================
 
-
   Widget _textField({
     required TextEditingController controller,
     required String label,
@@ -1559,7 +1538,12 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
       validator: validator,
       onChanged: (_) => setState(() {}),
       textColor: _textDark,
-      decoration: _inputDecoration(label: label, hint: hint, icon: icon, suffix: suffix),
+      decoration: _inputDecoration(
+        label: label,
+        hint: hint,
+        icon: icon,
+        suffix: suffix,
+      ),
     );
   }
 
@@ -1727,10 +1711,6 @@ class _SeaFreightScreenState extends State<SeaFreightScreen> {
   String _optionLabel(AppLocalizations l10n, String value) {
     return LocaleController.optionLabel(l10n, value);
   }
-
-
-
-
 
   void _showMessage(String message, {required bool error}) {
     showShippingMessage(

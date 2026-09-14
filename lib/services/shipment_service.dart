@@ -40,4 +40,11 @@ class ShipmentService {
         .doc(documentId)
         .snapshots();
   }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getUserShipments(String userId) {
+    return _firestore
+        .collection(FirestoreCollections.shipments)
+        .where('userId', isEqualTo: userId)
+        .get();
+  }
 }
