@@ -822,38 +822,47 @@ class _CarShippingScreenState extends State<CarShippingScreen> {
             ],
           ),
 
-          if (_vehicleCount > 1) ...[
-            const SizedBox(height: 10),
-
-            Container(
-              padding: const EdgeInsets.all(11),
-              decoration: BoxDecoration(
-                color: _softBlue,
-                borderRadius: BorderRadius.circular(13),
-              ),
-              child: Row(
+          FormSummaryListener(
+            listenables: [_vehicleCountController],
+            builder: (context) {
+              if (_vehicleCount <= 1) {
+                return const SizedBox.shrink();
+              }
+              return Column(
                 children: [
-                  const Icon(
-                    Icons.info_outline_rounded,
-                    color: _primaryBlue,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n.differentVehiclesHint,
-                      style: const TextStyle(
-                        color: _primaryBlue,
-                        fontSize: 9,
-                        height: 1.35,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(11),
+                    decoration: BoxDecoration(
+                      color: _softBlue,
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline_rounded,
+                          color: _primaryBlue,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.differentVehiclesHint,
+                            style: const TextStyle(
+                              color: _primaryBlue,
+                              fontSize: 9,
+                              height: 1.35,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         ],
       ),
     );

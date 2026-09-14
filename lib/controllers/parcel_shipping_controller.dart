@@ -69,6 +69,14 @@ class ParcelShippingController extends GetxController
     heightController,
   ];
 
+  List<Listenable> get calculationListenables => [
+    parcelCountController,
+    weightController,
+    lengthController,
+    widthController,
+    heightController,
+  ];
+
   int get parcelCount {
     final value = int.tryParse(parcelCountController.text.trim());
     if (value == null || value <= 0) return 1;
@@ -131,6 +139,7 @@ class ParcelShippingController extends GetxController
     return loadCustomerProfile(
       readUserDocument: (uid) => _quoteService.loadUserProfile(uid),
       emptyNameFallback: emptyNameFallback,
+      currentUser: _quoteService.currentUser,
     );
   }
 

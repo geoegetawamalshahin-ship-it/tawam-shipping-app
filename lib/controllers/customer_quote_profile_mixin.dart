@@ -45,12 +45,13 @@ mixin CustomerQuoteProfileMixin on GetxController {
     required Future<Map<String, dynamic>?> Function(String uid)
     readUserDocument,
     required String emptyNameFallback,
+    User? currentUser,
     bool force = false,
   }) async {
     if (!force && _profileLoadStarted) return;
     _profileLoadStarted = true;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = currentUser;
     if (user == null) {
       _profileLoadStarted = false;
       loadingProfile.value = false;

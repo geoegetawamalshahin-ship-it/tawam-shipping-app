@@ -963,121 +963,128 @@ class _ParcelShippingScreenState extends State<ParcelShippingScreen> {
 
           const SizedBox(height: 18),
 
-          Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: _deepBlue,
-              borderRadius: BorderRadius.circular(17),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.auto_awesome_rounded,
-                      color: Color(0xFF7FC2FF),
-                      size: 18,
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    Text(
-                      l10n.automaticParcelCalculation,
-                      style: const TextStyle(
-                        color: Color(0xFFD6E8F8),
-                        fontSize: 7.8,
-                        letterSpacing: .7,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
+          FormSummaryListener(
+            listenables: _c.calculationListenables,
+            builder: (context) {
+              return Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: _deepBlue,
+                  borderRadius: BorderRadius.circular(17),
                 ),
-
-                const SizedBox(height: 15),
-
-                Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: _calculationItem(
-                        l10n.actual,
-                        '${_formatNumber(_totalActualWeight)} KG',
-                      ),
-                    ),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.auto_awesome_rounded,
+                          color: Color(0xFF7FC2FF),
+                          size: 18,
+                        ),
 
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.white.withValues(alpha: .14),
-                    ),
+                        const SizedBox(width: 8),
 
-                    Expanded(
-                      child: _calculationItem(
-                        l10n.volumetric,
-                        '${_formatNumber(_totalVolumetricWeight)} KG',
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 13),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 13,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .10),
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.scale_outlined,
-                        color: Color(0xFF87C8FF),
-                        size: 19,
-                      ),
-
-                      const SizedBox(width: 9),
-
-                      Expanded(
-                        child: Text(
-                          l10n.chargeableWeight,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: Text(
+                            l10n.automaticParcelCalculation,
+                            style: const TextStyle(
+                              color: Color(0xFFD6E8F8),
+                              fontSize: 7.8,
+                              letterSpacing: .7,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
+                    ),
 
-                      Text(
-                        '${_formatNumber(_chargeableWeight)} KG',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
+                    const SizedBox(height: 15),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _calculationItem(
+                            l10n.actual,
+                            '${_formatNumber(_totalActualWeight)} KG',
+                          ),
                         ),
+
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.white.withValues(alpha: .14),
+                        ),
+
+                        Expanded(
+                          child: _calculationItem(
+                            l10n.volumetric,
+                            '${_formatNumber(_totalVolumetricWeight)} KG',
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 13),
+
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 13,
+                        vertical: 12,
                       ),
-                    ],
-                  ),
-                ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: .10),
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.scale_outlined,
+                            color: Color(0xFF87C8FF),
+                            size: 19,
+                          ),
 
-                const SizedBox(height: 9),
+                          const SizedBox(width: 9),
 
-                Text(
-                  l10n.totalVolumeCarrierNote(
-                    _totalVolumeCbm.toStringAsFixed(3),
-                  ),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFFBFD5E8),
-                    fontSize: 8.2,
-                  ),
+                          Expanded(
+                            child: Text(
+                              l10n.chargeableWeight,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+
+                          Text(
+                            '${_formatNumber(_chargeableWeight)} KG',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 9),
+
+                    Text(
+                      l10n.totalVolumeCarrierNote(
+                        _totalVolumeCbm.toStringAsFixed(3),
+                      ),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFFBFD5E8),
+                        fontSize: 8.2,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ],
       ),

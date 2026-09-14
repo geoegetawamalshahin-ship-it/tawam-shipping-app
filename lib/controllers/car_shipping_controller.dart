@@ -106,6 +106,7 @@ class CarShippingController extends GetxController
     return loadCustomerProfile(
       readUserDocument: (uid) => _quoteService.loadUserProfile(uid),
       emptyNameFallback: emptyNameFallback,
+      currentUser: _quoteService.currentUser,
     );
   }
 

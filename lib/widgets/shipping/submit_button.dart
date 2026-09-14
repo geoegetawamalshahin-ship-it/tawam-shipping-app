@@ -48,12 +48,16 @@ class ShippingSubmitButton extends StatelessWidget {
 
                   const SizedBox(width: 10),
 
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: .35,
+                  Flexible(
+                    child: Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: .35,
+                      ),
                     ),
                   ),
 

@@ -67,6 +67,14 @@ class AirFreightController extends GetxController
     heightController,
   ];
 
+  List<Listenable> get calculationListenables => [
+    weightController,
+    piecesController,
+    lengthController,
+    widthController,
+    heightController,
+  ];
+
   double get grossWeight => double.tryParse(weightController.text.trim()) ?? 0;
 
   int get pieces => int.tryParse(piecesController.text.trim()) ?? 0;
@@ -111,6 +119,7 @@ class AirFreightController extends GetxController
     return loadCustomerProfile(
       readUserDocument: (uid) => _quoteService.loadUserProfile(uid),
       emptyNameFallback: emptyNameFallback,
+      currentUser: _quoteService.currentUser,
     );
   }
 
